@@ -1,6 +1,6 @@
 # Soft actor critic
 
-## Reproduce OpenAI SpinningUp results
+## 🚀 Reproduce OpenAI SpinningUp results
 
 ### How to run?
 
@@ -48,7 +48,7 @@ Training logs are located in `spinningup/data/sac`. Each seed is saved as a sepa
 
 Use `clean-rl/sac/plotting_for_spinnup.ipynb`.
 
-## Reproduce my implementation
+## 🚀 Reproduce my implementation
 
 ### How to run?
 
