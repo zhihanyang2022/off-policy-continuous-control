@@ -42,6 +42,8 @@ TODO
 
 Training logs are located in `spinningup/data/sac`. Each seed is saved as a separate folder in this directory. For example, `spinningup/data/sac/sac_s0` represents the training logs for SAC with seed 0.
 
+**You should know this.** If you give two runs the same experiment name, then they will share the same logging directory, even if one uses the PyTorch version and the other uses the TensorFlow version of the algorithm.
+
 ### How to parse training logs
 
 Use `clean-rl/sac/exp_name`
