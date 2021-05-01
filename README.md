@@ -21,3 +21,5 @@ With these advantages, I hope that testing out new research ideas would be a bre
 ## What are implemented inside this repo?
 
 TODO
+
+## Quick intro to Mujoco envs
