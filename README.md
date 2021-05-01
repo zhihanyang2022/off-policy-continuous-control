@@ -22,4 +22,6 @@ With these advantages, I hope that testing out new research ideas would be a bre
 
 TODO
 
+## Installation guide for Mujoco
+
 ## Quick intro to Mujoco envs
