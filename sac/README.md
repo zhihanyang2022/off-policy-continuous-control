@@ -7,9 +7,12 @@
 PyTorch version:
 
 ```bash
-python -m spinup.run sac --exp_name sac-pytorch --env [ENV] --seed [SEED] 
+python -m spinup.run sac 
+    --exp_name sac-pytorch 
+    --env [ENV] 
     --steps_per_epoch 10000
     --epochs 300
+    --seed [SEED]
 ```
 
 TensorFlow version:
