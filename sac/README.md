@@ -61,7 +61,7 @@ Training logs are located in `spinningup/data/sac`. Each seed is saved as a sepa
 
 Use `clean-rl/sac/plotting_for_spinnup.ipynb`.
 
-## 🚀 Reproduce my implementation
+## 🚀 Reproduce CleanRL results
 
 ### How to run?
 
