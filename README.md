@@ -14,6 +14,8 @@
 |    Does not compare against authoritative repos    |       Compares with OpenAI Spinning Up       |
 |         Does not test on many environments         |   Tests on many tasks including Mujoco ones  |
 
+With these advantages, we hope that testing out new research ideas would be a breeze.
+
 ## What are implemented inside this repo?
 
 TODO
