@@ -10,6 +10,7 @@
 |:--------------------------------------------------:|:--------------------------------------------:|
 | Uses sophisticated abstraction without explanation | Uses graphical explanation of design choices |
 |                  Uses one library                  |       Uses both PyTorch and TensorFlow       |
+| Does not have a good requirements file             | Has a requirements file tested across multiple machines |
 |    Does not compare against authoritative repos    |       Compares with OpenAI Spinning Up       |
 |         Does not test on many environments         |   Tests on many tasks including Mujoco ones  |
 
