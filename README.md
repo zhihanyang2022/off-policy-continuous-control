@@ -1,5 +1,7 @@
 # CleanRL
 
+TODO: artwork by Yifei Zhu
+
 *Battle-tested implementation of important Deep RL algorithms using both PyTorch and TensorFlow, with a strong focus on understandable code.*
 
 *Special thanks to the Joshia for creating the OpenAI Spinning Up repo, without which this project would have been impossible.*
