@@ -4,6 +4,8 @@
 
 *Special thanks to the Joshia for creating the OpenAI Spinning Up repo, without which this project would have been impossible.*
 
+## Getting your first run in 5 minutes
+
 ## Why this repo?
 
 |              Problems with some repos              |                 Our solutions                |
