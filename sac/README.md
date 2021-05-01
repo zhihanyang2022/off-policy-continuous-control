@@ -1,6 +1,6 @@
 # Soft actor critic
 
-## Results
+## 🚀 Results
 
 ## 🚀 Reproduce OpenAI SpinningUp results
 
