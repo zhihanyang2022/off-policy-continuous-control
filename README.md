@@ -2,7 +2,8 @@
 Implementation of important Deep RL algorithms using both PyTorch and TF, with a strong focus on understandable code.
 
 - Model-free
-  - Policy optimization (only); see directory `mf-po`
-  - Q-learning and policy optimization; see directory `mf-ql-po`
-  - Q-learning (only); see directory `mf-ql`
+  - Policy optimization (only)
+  - Q-learning and policy optimization
+    - Soft actor critic
+  - Q-learning (only)
 - Model-based (TODO)
