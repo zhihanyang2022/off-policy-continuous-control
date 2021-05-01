@@ -44,6 +44,17 @@ Training logs are located in `spinningup/data/sac`. Each seed is saved as a sepa
 
 **You should know this.** If you give two runs the same experiment name, then they will share the same logging directory, even if one uses the PyTorch version and the other uses the TensorFlow version of the algorithm.
 
-### How to parse training logs
+### How to parse and plot training logs?
 
-Use `clean-rl/sac/exp_name`
+Use `clean-rl/sac/plotting_for_spinnup.ipynb`.
+
+## Reproduce my implementation
+
+### How to run?
+
+### Where are the training logs located?
+
+### How to parse and plot training logs?
+
+Use `clean-rl/sac/plotting_for_cleanrl.ipynb`.
+
