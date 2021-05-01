@@ -4,7 +4,17 @@
 
 ### How to run?
 
-TODO: run multiple seeds at once, or one at a time
+PyTorch version:
+
+```bash
+python -m spinup.run sac --exp_name sac-pytorch --env [ENV] --seed [SEED] 
+    --steps_per_epoch 10000
+    --epochs 300
+```
+
+TensorFlow version:
+
+TODO
 
 Below are the default parameters (before we overwrite them using the command above)
 
