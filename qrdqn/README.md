@@ -26,7 +26,7 @@ In the C51 paper:
 
 In the QR-DQN paper:
 
-- The projection of A distribution is another distribution (fixed probability mass, variable position) that's closest to it in W-1 distance. 
+- The projection of a distribution is another distribution (fixed probability mass, variable position) that's closest to it in W-1 distance. 
 - The paper showed that the projected DBO converges. 
 - The paper did not show that the projected DBO2 also converges.
 
