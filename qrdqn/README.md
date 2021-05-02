@@ -30,6 +30,8 @@ In the QR-DQN paper:
 - The paper showed that the projected DBO converges. 
 - The paper did not show that the projected DBO2 also converges.
 
+Proving the convergence of projected DBO2 is important but the success of C51 and QR-DQN might imply it.
+
 **Loss function and gradient.** 
 
 In *A Distributional Perspective on Reinforcement Learning*, the authors minimizes the KL (instead of Wasserstein; but KL enables sample udpates) between the predicted and target value distributions (without proving that the projected distributional Bellman optimality operator also converges). The stuff in brackets highlight what should be but are not shown in the paper. Nevertheless, the resulting algorithm C51 performed well empirically.
