@@ -18,13 +18,13 @@ Parametrizing (i.e., approximation or projection) the value distribution appropr
 
 In the C51 paper:
 
-- The projection of a distribution is another distribution (constraints: variable probability mass, fixed position) that's closest to it in KL.
+- The projection of a distribution is another distribution (variable probability mass, fixed position) that's closest to it in KL.
 - The paper showed that the DBO and DBO2 both converge.
 - The paper did not show that the projected DBO2 also converges. 
 
 In the QR-DQN paper:
 
-- The projection of A distribution is another distribution (constraints: fixed probability mass, variable position) that's closest to it in W-1 distance. 
+- The projection of A distribution is another distribution (fixed probability mass, variable position) that's closest to it in W-1 distance. 
 - The paper showed that the projected DBO converges. 
 - The paper did not show that the projected DBO2 also converges.
 
