@@ -14,9 +14,13 @@ I'm not good enough in math to understand what the authors meant by "in a weak s
 
 Parametrizing (i.e., approximation or projection) the value distribution appropriately is what enables distributional updates in practice. 
 
-In C51,  
+In C51, 
 
-In the QR-DQN paper, the projection of some arbitrary distribution is to find an allowed distribution that's closest to it in Wasserstein-1 distance. The paper showed that the projected distributional operator converges. However, the paper did not show that the projected distributional *optimality* operator also converges - although QR-DQN's success might imply this to some extend.
+In the QR-DQN paper:
+
+- The projection of some arbitrary distribution is to find an allowed distribution that's closest to it in Wasserstein-1 distance. 
+- The paper showed that the projected distributional operator converges. 
+- However, the paper did not show that the projected distributional *optimality* operator also converges, although QR-DQN's success might imply this to some extend.
 
 **Loss function.** 
 
