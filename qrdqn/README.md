@@ -1,6 +1,6 @@
 # Quantile Regression DQN
 
-## 5-minute theory
+## Theory
 
 **Distributional Bellman optimality operator** 
 
@@ -12,19 +12,21 @@ I'm not good enough in math to understand what the authors meant by "in a weak s
 
 **Parametrization of value distribution & its effect on operators** 
 
+Abbreviations
+
 Parametrizing (i.e., approximation or projection) the value distribution appropriately is what enables distributional updates in practice. 
 
 In the C51 paper:
 
-- The projection of some arbitrary distribution is an allowed distribution (variable probability mass, fixed position) that's closest to it in KL.
-- The paper showed that the distribution Bellman operator and optimality operator both converge.
-- The paper did not show that the projected distributional Bellman *optimality* operator also converges. Although it showed that the *un-projected* distributional Bellman optimality operator converges, projection might mess things up. The convergence of this operator is crucial for optimal control from scratch. C51's success might imply this to some extend.
+- The projection of a distribution is another distribution (constraints: variable probability mass, fixed position) that's closest to it in KL.
+- The paper showed that the DBO and DBO2 both converge.
+- The paper did not show that the projected DBO2 also converges. Although it showed that DBO2 converges, projection might mess things up. The convergence of this operator is crucial for optimal control from scratch. C51's success might imply this to some extend.
 
 In the QR-DQN paper:
 
-- The projection of some arbitrary distribution is an allowed distribution (fixed probability mass, variable position) that's closest to it in Wasserstein-1 distance. 
-- The paper showed that the projected distributional Bellman operator converges. 
-- But the paper did not show that the projected distributional Bellman *optimality* operator also converges. Although the C51 paper showed that the *un-projected* distributional Bellman optimality operator converges, projection might mess things up. The convergence of this operator is crucial for optimal control from scratch. QR-DQN's success might imply this to some extend.
+- The projection of A distribution is another distribution (constraints: fixed probability mass, variable position) that's closest to it in W-1 distance. 
+- The paper showed that the projected DBO converges. 
+- The paper did not show that the projected DBO2 also converges. Although the C51 paper showed that DB02 converges, projection might mess things up. The convergence of this operator is crucial for optimal control from scratch. QR-DQN's success might imply this to some extend.
 
 **Loss function and gradient.** 
 
