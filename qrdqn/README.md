@@ -30,7 +30,9 @@ In the QR-DQN paper:
 - The paper showed that the projected DBO converges. 
 - The paper did not show that the projected DBO2 also converges.
 
-Proving the convergence of projected DBO2 is important but the success of C51 and QR-DQN might imply it.
+Proving the convergence of projected DBO2 is important but the success of C51 and QR-DQN might imply it. 
+
+From now on, I will assume that projected DBO2 converges with a projection in W-1 distance. 🤔
 
 **Loss function and gradient.** 
 
