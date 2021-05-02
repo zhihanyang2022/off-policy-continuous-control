@@ -15,8 +15,8 @@ I'm not good enough in math to understand what the authors meant by "in a weak s
 Parametrizing (i.e., approximation or projection) the value distribution appropriately is what enables distributional updates in practice. 
 
 Abbreviations:
-- DBO: distributional Bellman operator
-- DB02: distribution Bellman optimality operator
+- DBO: distributional Bellman operator (for policy evaluation)
+- DBO2: distribution Bellman optimality operator (for control)
 
 In the C51 paper:
 
