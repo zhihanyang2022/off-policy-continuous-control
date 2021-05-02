@@ -4,7 +4,7 @@
 
 **Distributional Bellman optimality operator** 
 
-The core concept behind QR-DQN is the distributional Bellman optimality operator. The "optimality" nature of this operator is what enables the algorithm to do control; otherwise it would be just evaluating the value distribution of the current policy. This operator was analyzed *A Distributional Perspective on Reinforcement Learning*, where it was proven that 
+The core concept behind QR-DQN is the distributional Bellman optimality operator. The "optimality" nature of this operator is what enables the algorithm to do control; otherwise it would be just evaluating the value distribution of the current policy. This operator was analyzed *A Distributional Perspective on Reinforcement Learning* (abbreviated as DPRL), where it was proven that 
 
 > [The] Bellman optimality operator converges, in a weak sense, to the set of optimal value distributions. However, this operator is not a contraction in any metric between distributions, and is in general much more temperamental than the policy evaluation operators. (Page 4, right column, top)
 
@@ -13,6 +13,10 @@ I'm not good enough in math to understand what the authors meant by "in a weak s
 **Parametrization of value distribution** 
 
 Parametrizing (i.e., approximation or projection) the value distribution appropriately is what enables distributional updates in practice. 
+
+In C51,  
+
+In QR-DQN, the projection of some arbitrary distribution is to find an allowed distribution that's closest to it in Wasserstein-1 distance. The QR-DQN paper showed that the projected distributional operator converges. However, the paper did not show that the projected distributional *optimality* operator also converges.
 
 **Loss function.** 
 
