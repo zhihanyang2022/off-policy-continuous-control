@@ -16,7 +16,7 @@ Parametrizing (i.e., approximation or projection) the value distribution appropr
 
 In C51,  
 
-In the QR-DQN paper, the projection of some arbitrary distribution is to find an allowed distribution that's closest to it in Wasserstein-1 distance. The paper showed that the projected distributional operator converges. However, the paper did not show that the projected distributional *optimality* operator also converges. Although QR-DQN's success might imply this to some extend, I'm not sure about it.
+In the QR-DQN paper, the projection of some arbitrary distribution is to find an allowed distribution that's closest to it in Wasserstein-1 distance. The paper showed that the projected distributional operator converges. However, the paper did not show that the projected distributional *optimality* operator also converges - although QR-DQN's success might imply this to some extend.
 
 **Loss function.** 
 
