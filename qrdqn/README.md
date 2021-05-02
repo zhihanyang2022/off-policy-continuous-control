@@ -18,7 +18,7 @@ In C51,
 
 In the QR-DQN paper:
 
-- The projection of some arbitrary distribution is to find an allowed distribution (fixed probability mass, variable position) that's closest to it in Wasserstein-1 distance. 
+- The projection of some arbitrary distribution is an allowed distribution (fixed probability mass, variable position) that's closest to it in Wasserstein-1 distance. 
 - The paper showed that the projected distributional operator converges. 
 - However, the paper did not show that the projected distributional *optimality* operator also converges. The convergence of this operator is crucial for optimal control from scratch. QR-DQN's success might imply this to some extend.
 
