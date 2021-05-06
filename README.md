@@ -3,6 +3,8 @@ CITE image
 
 PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.
 
+Table of content
+
 # CleanRL 🧚‍♂️ 
 
 *Clean implementation of **model-free** deep RL algorithms using both **PyTorch** and **TensorFlow**.*
@@ -34,3 +36,5 @@ PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.
 
 Q-learning algorithms:
 - <a target="_blank" href="https://nbviewer.jupyter.org/github/zhihanyang2022/CleanRL/blob/main/notes/qrdqn.pdf" type="application/pdf">Quantile-Regression DQN</a>
+
+## Gallery of GIFs
