@@ -1,4 +1,4 @@
-# CleanRL 🧚‍♂️ 强化学习修炼手册
+# CleanRL 🧚‍♂️ 干净理论强化学习
 
 *Clean implementation of important Deep RL algorithms using both PyTorch and TensorFlow.*
 
