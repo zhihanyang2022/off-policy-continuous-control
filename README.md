@@ -35,6 +35,8 @@ Table of content
 ## Implemented algorithms and notes
 
 Q-learning algorithms:
+- Deep Q-learing
+- Categorical 51
 - <a target="_blank" href="https://nbviewer.jupyter.org/github/zhihanyang2022/CleanRL/blob/main/notes/qrdqn.pdf" type="application/pdf">Quantile-Regression DQN</a>
 
 ## Gallery of GIFs of learned policies
