@@ -10,7 +10,7 @@
   <img src="https://spinningup.openai.com/en/latest/_images/rl_algorithms_9_15.svg" width=600>
 </p>
 
-[CITE image]
+CITE image
 
 PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.
 
