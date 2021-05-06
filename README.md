@@ -7,7 +7,7 @@ Table of content
 
 # CleanRL 🧚‍♂️ 
 
-*Clean implementation of **model-free** deep RL algorithms using **PyTorch**.
+*Clean implementation of **model-free** deep RL algorithms using **PyTorch**.*
 
 *As a side project of mine, this repo has a strong focus on helping learners like me.*
 
