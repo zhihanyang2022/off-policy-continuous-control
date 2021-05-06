@@ -8,7 +8,7 @@
 
 PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.
 
-## You might ask: "Why this repo?"
+## Manifesto
 
 |              Problems with some repos              |                 Solutions                |
 |:--------------------------------------------------:|:--------------------------------------------:|
