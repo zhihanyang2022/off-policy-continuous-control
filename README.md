@@ -9,7 +9,7 @@ Table of content
 
 *Clean implementation of **model-free** deep RL algorithms using both **PyTorch** and **TensorFlow**.*
 
-*As a part-time project of mine, this repo has a strong focus on helping learners like me.*
+*As a side project of mine, this repo has a strong focus on helping learners like me.*
 
 *Inpsired by OpenAI Spinning Up, which helped me tremendously along the way.*
 
