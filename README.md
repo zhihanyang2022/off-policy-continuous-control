@@ -1,7 +1,10 @@
 # CleanRL
 
-*Clean implementation of important Deep RL algorithms using both PyTorch and TensorFlow, with a strong focus on helping learners.*
+*Clean implementation of important Deep RL algorithms using both PyTorch and TensorFlow*
 
+*It has a strong focus on helping learners.*
+
+PLEASE NOTE THAT THIS REPO IS UNDER CONSTRUCTION.
 
 ## Why this repo?
 
