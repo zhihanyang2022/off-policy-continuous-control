@@ -2,6 +2,8 @@
 
 *Clean implementation of model-free deep RL algorithms using both PyTorch and TensorFlow.*
 
+<img src="https://spinningup.openai.com/en/latest/_images/rl_algorithms_9_15.svg" width=600>
+
 *This repo has a strong focus on helping learners.*
 
 *Inpsired by OpenAI Spinning Up, which helped me tremendously along the way.*
