@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:x="http://www.texmacs.org/2002/extensions" xmlns:m="http://www.w3.org/1998/Math/MathML">
+  <head>
+    <title>QR-DQN</title>
+    <meta content="TeXmacs 1.99.13" name="generator"></meta>
+    <style type="text/css">
+      body { text-align: justify } h5 { display: inline; padding-right: 1em }
+      h6 { display: inline; padding-right: 1em } table { border-collapse:
+      collapse } td { padding: 0.2em; vertical-align: baseline } dt { float:
+      left; min-width: 1.75em; text-align: right; padding-right: 0.75em;
+      font-weight: bold; } dd { margin-left: 2.5em; } .subsup { display:
+      inline; vertical-align: -0.2em } .subsup td { padding: 0px; text-align:
+      left} .fraction { display: inline; vertical-align: -0.8em } .fraction td
+      { padding: 0px; text-align: center } .wide { position: relative;
+      margin-left: -0.4em } .accent { position: relative; margin-left: -0.4em;
+      top: -0.1em } .title-block { width: 100%; text-align: center }
+      .title-block p { margin: 0px } .compact-block p { margin-top: 0px;
+      margin-bottom: 0px } .left-tab { text-align: left } .center-tab {
+      text-align: center } .balloon-anchor { border-bottom: 1px dotted
+      #000000; outline: none; cursor: help; position: relative; }
+      .balloon-anchor [hidden] { margin-left: -999em; position: absolute;
+      display: none; } .balloon-anchor: hover [hidden] { position: absolute;
+      left: 1em; top: 2em; z-index: 99; margin-left: 0; width: 500px; display:
+      inline-block; } .balloon-body { } .ornament { border-width: 1px;
+      border-style: solid; border-color: black; display: inline-block;
+      padding: 0.2em; } .right-tab { float: right; position: relative; top:
+      -1em } 
+    </style>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" language="javascript"></script>
+  </head>
+  <body>
+    <table class="title-block">
+      <tr>
+        <td><table class="title-block">
+          <tr>
+            <td><font style="font-size: 168.2%"><b>QR-DQN</b></font></td>
+          </tr>
+        </table><table class="title-block">
+          <tr>
+            <td><font style="font-size: 129.7%"><b>Implementation notes</b></font></td>
+          </tr>
+        </table></td>
+      </tr>
+    </table>
+    <p>
+      <i>As always, please read the code first. Comments in the code should
+      tell you when you might want to refer to implementation notes. For this
+      reason, implementation notes are not comprehensive; instead, they focus
+      on convoluted details. Anyway, cheers and happy reinforcement
+      learning!</i>
+    </p>
+    <p>
+      In this document, I focus on implementing the last <b>output</b> step of
+      the QR-DQN algorithm using broadcasting. It is difficult to implement
+      because the algorithm uses a single transition at each time-step, yet in
+      practice we need to deal with transitions in batches. 
+    </p>
+    <p>
+      Everything here is motivated by this <a href="https://github.com/Kchu/DeepRL_PyTorch/blob/master/Distributional_RL/2_QR_DQN.py">script</a> but strives for
+      more clarity in notation.
+    </p>
+    <table style="width: 100%">
+      <tbody><tr>
+        <td style="text-align: center"><img src="qrdqn-1.png" width="75%"></img></td>
+      </tr></tbody>
+    </table>
+    <p>
+      In practice, \(T \theta_j\)'s will be put together into a tensor of
+      shape <tt class="verbatim">(batch_size, num_quants)</tt>, and \(\theta_i (x,
+      a)\)'s will also have the same size. 
+    </p>
+    <p>
+      To compute the <b>output</b>, we need to realize that
+    </p>
+    <center>
+      \(\displaystyle \sum_{i = 1}^N \mathbb{E}_j
+      [\rho_{\hat{\tau}_i}^{\kappa} (T \theta_j -
+\theta_i (x, a))] =
+      \frac{1}{N} \sum_{i = 1}^N \sum_{i = 1}^N
+[\rho_{\hat{\tau}_i}^{\kappa}
+      (T \theta_j - \theta_i (x, a))]
+\overset{\ast}{=} \frac{1}{N^2} \sum_{i
+      = 1}^N \sum_{i = 1}^N
+[\rho_{\hat{\tau}_i}^{\kappa} (T \theta_j -
+      \theta_i (x, a))]\)
+    </center>
+    <p>
+      which simply means that we need calculate the subtraction between all
+      \((T \theta_j, \theta_i (x, a))\) pairs. 
+    </p>
+    <p>
+      Note that \(\ast\) means &ldquo;in practice&rdquo;. Since we don't want
+      the loss to grow linearly just because we have more quantiles, we
+      multiply the loss by \(\frac{1}{N}\); otherwise we need to use different
+      learning rates for different number of quantiles, which is clearly
+      undesirable.
+    </p>
+    <p>
+      To do this subtraction, we first need to change the shape of the
+      tensors:
+    </p>
+    <ul>
+      <li>
+        <p>
+          \(T \theta_j\)'s: <tt class="verbatim">(batch_size, num_quants)</tt> to <tt
+          class="verbatim">(batch_size, 1, num_quants)</tt>
+        </p>
+      </li>
+      <li>
+        <p>
+          \(\theta_i (x, a)\)'s: <tt class="verbatim">(batch_size, num_quants)</tt> to
+          <tt class="verbatim">(batch_size, num_quants, 1)</tt>
+        </p>
+      </li>
+    </ul>
+    <p>
+      Through broadcasting, the resulting tensor has shape <tt class="verbatim">(batch_size,
+      num_quants, num_quants)</tt>.
+    </p>
+    <p>
+      To understand what happened during broadcasting, we can focus on some
+      slice of \(T \theta_j\)'s with shape <tt class="verbatim">(1, num_quants)</tt> and
+      the corresponding slice of \(\theta_i (x, a)\)'s with shape <tt class="verbatim">(num_quants,
+      1)</tt>, and understand the shape <tt class="verbatim">(num_quants,
+      num_quants)</tt> and interpretation of their subtraction.
+    </p>
+    <p>
+      Within this slice, the element-wise subtraction of 
+    </p>
+    <center>
+      \(\displaystyle \left( \begin{array}{ccc}
+  T \theta_1 & \ldots . & T
+      \theta_N
+\end{array} \right)\)
+    </center>
+    <p>
+      and
+    </p>
+    <center>
+      \(\displaystyle \left( \begin{array}{c}
+  \theta_1\\
+  \vdots\\
+ 
+      \theta_N
+\end{array} \right)\)
+    </center>
+    <p>
+      gets converted in this by broadcasting:
+    </p>
+    <center>
+      \(\displaystyle \left( \begin{array}{ccc}
+  T \theta_1 & \cdots & T
+      \theta_N\\
+  & \vdots & \\
+  T \theta_1 & \cdots & T
+      \theta_N
+\end{array} \right) - \left( \begin{array}{ccc}
+  \theta_1 &  &
+      \theta_1\\
+  \vdots & \cdots & \vdots\\
+  \theta_N &  &
+      \theta_N
+\end{array} \right) = \left( \begin{array}{ccc}
+  T \theta_1 -
+      \theta_1 &  & T \theta_N - \theta_1\\
+  \vdots & \cdots & \vdots\\
+  T
+      \theta_1 - \theta_N &  & T \theta_N - \theta_N
+\end{array} \right) .\)
+    </center>
+    <p>
+      Now, notice that the \(i\)-th row corresponds to the \(i\)-th quantile,
+      and we need to apply \(\rho_{\hat{\tau}_i}\) to this row. Since
+      \(\rho_{\hat{\tau}_i} = | \hat{\tau}_i - \delta_{\{u < 0\}} | L (u)\),
+      we can compute it in three steps for all quantiles.
+    </p>
+    <p>
+      First, \(\delta_{\{u < 0\}}\) can be computed trivially.
+    </p>
+    <p>
+      Second, \(| \hat{\tau}_i - \delta_{\{u < 0\}} |\) can be computed via
+      broadcasting.
+    </p>
+    <p>
+      Third, \(L (u)\) can be computed trivially.
+    </p>
+    <p>
+      In the end, we have
+    </p>
+    <center>
+      \(\displaystyle \left( \begin{array}{ccc}
+  \rho_{\hat{\tau}_1} (T
+      \theta_1 - \theta_1) &  & \rho_{\hat{\tau}_1} (T
+  \theta_N -
+      \theta_1)\\
+  \vdots & \cdots & \vdots\\
+  \rho_{\hat{\tau}_N} (T
+      \theta_1 - \theta_N) &  & \rho_{\hat{\tau}_N} (T
+  \theta_N -
+      \theta_N)
+\end{array} \right)\)
+    </center>
+    <p>
+      We can take expectation across row and sum across the resulting vector
+      to get the loss. But we choose to take mean across the resulting vector
+      because otherwise learinng rate need to be tuned for different number of
+      quantiles \(N\), which we don't want.
+    </p>
+    <p>
+      
+    </p>
+    <p>
+      
+    </p>
+    <p>
+      
+    </p>
+  </body>
+</html>

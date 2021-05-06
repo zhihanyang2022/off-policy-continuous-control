@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:x="http://www.texmacs.org/2002/extensions" xmlns:m="http://www.w3.org/1998/Math/MathML">
+  <head>
+    <title>Hierarchical Actor-Critic</title>
+    <meta content="TeXmacs 1.99.13" name="generator"></meta>
+    <style type="text/css">
+      body { text-align: justify } h5 { display: inline; padding-right: 1em }
+      h6 { display: inline; padding-right: 1em } table { border-collapse:
+      collapse } td { padding: 0.2em; vertical-align: baseline } dt { float:
+      left; min-width: 1.75em; text-align: right; padding-right: 0.75em;
+      font-weight: bold; } dd { margin-left: 2.5em; } .subsup { display:
+      inline; vertical-align: -0.2em } .subsup td { padding: 0px; text-align:
+      left} .fraction { display: inline; vertical-align: -0.8em } .fraction td
+      { padding: 0px; text-align: center } .wide { position: relative;
+      margin-left: -0.4em } .accent { position: relative; margin-left: -0.4em;
+      top: -0.1em } .title-block { width: 100%; text-align: center }
+      .title-block p { margin: 0px } .compact-block p { margin-top: 0px;
+      margin-bottom: 0px } .left-tab { text-align: left } .center-tab {
+      text-align: center } .balloon-anchor { border-bottom: 1px dotted
+      #000000; outline: none; cursor: help; position: relative; }
+      .balloon-anchor [hidden] { margin-left: -999em; position: absolute;
+      display: none; } .balloon-anchor: hover [hidden] { position: absolute;
+      left: 1em; top: 2em; z-index: 99; margin-left: 0; width: 500px; display:
+      inline-block; } .balloon-body { } .ornament { border-width: 1px;
+      border-style: solid; border-color: black; display: inline-block;
+      padding: 0.2em; } .right-tab { float: right; position: relative; top:
+      -1em } 
+    </style>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" language="javascript"></script>
+  </head>
+  <body>
+    <table class="title-block">
+      <tr>
+        <td><table class="title-block">
+          <tr>
+            <td><font style="font-size: 168.2%"><b>Hierarchical Actor-Critic</b></font></td>
+          </tr>
+        </table></td>
+      </tr>
+    </table>
+    <p>
+      Causes of non-stationary transition functions
+    </p>
+    <ul>
+      <li>
+        <p>
+          Updates to lower-level policies
+        </p>
+      </li>
+      <li>
+        <p>
+          Exploring lower-level policies
+        </p>
+      </li>
+    </ul>
+    <p>
+      Hindsight action transition (simulate a transition function that uses
+      the optimal lower level policy hierarchy)
+    </p>
+    <ul>
+      <li>
+        <p>
+          Subgoal state achieved in hindsight is used as the <i>action</i>
+          component in the transition, not the originally proposed subgoal
+          state
+        </p>
+      </li>
+      <li>
+        <p>
+          Reward function
+        </p>
+        <ul>
+          <li>
+            <p>
+              Requirements:
+            </p>
+            <ul>
+              <li>
+                <p>
+                  Incentivize short paths to the goal because shorter paths
+                  can be learned more quickly
+                </p>
+              </li>
+              <li>
+                <p>
+                  Independent of the path taken at lower levels
+                </p>
+              </li>
+              <li>
+                <p>
+                  Only be a function of state reached in hindsight and the
+                  goal state
+                </p>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <p>
+              Reward is -1 if the goal has not been achieved and a reward of 0
+              otherwise
+            </p>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p>
+          Although none of the hindsight actions produced in the episode
+          contained the sparse reward of 0, they are helpful for the high
+          level of the agent. Through these transitions, the high level
+          discovers on its own possible subgoals that fit the time scale of
+          \(H\) primitive actions per high level action. Also, robust to
+          changing and exploring lower level policies.
+        </p>
+      </li>
+    </ul>
+    <p>
+      Hindsight goal transitions
+    </p>
+    <ul>
+      <li>
+        <p>
+          Bottom level
+        </p>
+        <ul>
+          <li>
+            <p>
+              Two transitions
+            </p>
+            <ul>
+              <li>
+                <p>
+                  Typical transition
+                </p>
+              </li>
+              <li>
+                <p>
+                  Copy of the first transiton but goal state and reward
+                  components are temporarily erased (filled with hindsight
+                  goal and corresponding reward)
+                </p>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p>
+          Higher level
+        </p>
+        <ul>
+          <li>
+            <p>
+              Two transitions
+            </p>
+            <ul>
+              <li>
+                <p>
+                  Hindsight action transition
+                </p>
+              </li>
+              <li>
+                <p>
+                  Copy of the first transiton but goal state and reward
+                  components are temporarily erased (filled with hindsight
+                  goal and corresponding reward)
+                </p>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <p>
+      Subgoal testing transitions
+    </p>
+    <ul>
+      <li>
+        <p>
+          After level \(i\) proposes a subgoal \(a_i\), a certain fraction of
+          the time \(\lambda\), the lower level behavior policy hierarchy,
+          \(\Pi_{i - 1_{_b}}\), used to achieve subgoal \(a_i\) must be the
+          current lower policy 
+        </p>
+      </li>
+      <li>
+        <p>
+          If subgoal \(a_i\) is not achieved in at most \(H\) actions by level
+          \(i - 1\), level \(i\) will be penalized with a low reward, penalty.
+          In our experiments, we set penalty=-H, or the negative of the
+          maximum horizon of a subgoal. In addition, we use a discount rate of
+          0 in these transitions to avoid non-stationary transition function
+          issues.
+        </p>
+      </li>
+    </ul>
+  </body>
+</html>
