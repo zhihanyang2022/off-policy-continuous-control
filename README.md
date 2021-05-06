@@ -37,4 +37,4 @@ Table of content
 Q-learning algorithms:
 - <a target="_blank" href="https://nbviewer.jupyter.org/github/zhihanyang2022/CleanRL/blob/main/notes/qrdqn.pdf" type="application/pdf">Quantile-Regression DQN</a>
 
-## Gallery of GIFs
+## Gallery of GIFs of learned policies
