@@ -1,7 +1,5 @@
 # CleanRL 🧚‍♂️ 
 
-*“我想写一个能帮助他人简单快乐地学习强化学习的资源。”*
-
 *Clean implementation of important Deep RL algorithms using both PyTorch and TensorFlow.*
 
 *With a strong focus on helping learners.*
