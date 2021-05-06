@@ -10,7 +10,7 @@ PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.
 
 |              Problems with some repos              |                 Our solutions                |
 |:--------------------------------------------------:|:--------------------------------------------:|
-| "Code works but I don't understand the math"       | Offers implementation notes                  | 
+| "Code works but I don't understand the how"       | Offers implementation notes                  | 
 | Uses sophisticated abstraction                     | Offers graphical explanation of design choices |
 |                  Uses one library                  |       Uses both PyTorch and TensorFlow       |
 | Does not have a good requirements file             | Has a requirements file tested across multiple machines |
