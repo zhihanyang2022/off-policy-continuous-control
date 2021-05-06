@@ -13,7 +13,7 @@ Q-learning algorithms:
 
 |              Problems with some repos              |                 Our solutions                |
 |:--------------------------------------------------:|:--------------------------------------------:|
-| "Code works but I don't understand the math (aka why)"| Offers implementation notes               | 
+| "Code works but I don't understand the math"       | Offers implementation notes                  | 
 | Uses sophisticated abstraction without explanation | Uses graphical explanation of design choices |
 |                  Uses one library                  |       Uses both PyTorch and TensorFlow       |
 | Does not have a good requirements file             | Has a requirements file tested across multiple machines |
