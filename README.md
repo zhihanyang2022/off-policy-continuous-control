@@ -2,6 +2,10 @@
 
 *Battle-tested implementation of important Deep RL algorithms using both PyTorch and TensorFlow, with a strong focus on explaining the math behind the algorithms and writing understandable code.*
 
+## Implementation notes
+
+- [Quantile-Regression DQN](http://htmlpreview.github.io/?https://github.com/zhihanyang2022/CleanRL/blob/main/notes/qrdqn.html)
+
 ## Getting your first run in 5 minutes
 
 ## Why this repo?
