@@ -2,7 +2,9 @@
 
 *Clean implementation of **model-free** deep RL algorithms using both **PyTorch** and **TensorFlow**.*
 
-<img align="center" src="https://spinningup.openai.com/en/latest/_images/rl_algorithms_9_15.svg" width=600>
+<p align="center">
+  <img src="https://spinningup.openai.com/en/latest/_images/rl_algorithms_9_15.svg" width=600>
+</p>
 
 [CITE image]
 
