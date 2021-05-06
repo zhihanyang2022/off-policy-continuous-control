@@ -4,7 +4,7 @@
 
 ## Implementation notes
 
-- [Quantile-Regression DQN](http://htmlpreview.github.io/?https://github.com/zhihanyang2022/CleanRL/blob/main/notes/qrdqn.html)
+- <a href="https://github.com/zhihanyang2022/CleanRL/blob/main/notes/qrdqn.pdf" target="_blank">Quantile-Regression DQN</a>
 
 ## Getting your first run in 5 minutes
 
