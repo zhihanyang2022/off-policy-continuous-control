@@ -8,7 +8,7 @@ PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.
 
 ## You might ask: "Why this repo?"
 
-|              Problems with some repos              |                 Our solutions                |
+|              Problems with some repos              |                 Solutions                |
 |:--------------------------------------------------:|:--------------------------------------------:|
 | "Code works but I don't understand the how"       | Offers implementation notes                  | 
 | Uses sophisticated abstraction                     | Offers graphical explanation of design choices |
