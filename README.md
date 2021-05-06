@@ -4,6 +4,7 @@
 
 ## Implementation notes
 
+Q-learning algorithms:
 - <a target="_blank" href="https://nbviewer.jupyter.org/github/zhihanyang2022/CleanRL/blob/main/notes/qrdqn.pdf" type="application/pdf">Quantile-Regression DQN</a>
 
 ## Getting your first run in 5 minutes
