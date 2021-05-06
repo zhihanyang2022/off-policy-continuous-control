@@ -1,6 +1,6 @@
 # CleanRL
 
-*Battle-tested implementation of important Deep RL algorithms using both PyTorch and TensorFlow, with a strong focus on explaining the math behind the algorithms and writing understandable code.*
+*Clean implementation of important Deep RL algorithms using both PyTorch and TensorFlow, with a strong focus on helping learners.*
 
 ## Implementation notes
 
