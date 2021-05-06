@@ -38,4 +38,10 @@ Q-learning algorithms:
 - Categorical 51
 - <a target="_blank" href="https://nbviewer.jupyter.org/github/zhihanyang2022/CleanRL/blob/main/notes/qrdqn.pdf" type="application/pdf">Quantile-Regression DQN</a>
 
+Policy optimization algorithms:
+- TODO
+
+Both:
+- TODO
+
 ## Gallery of GIFs of learned policies
