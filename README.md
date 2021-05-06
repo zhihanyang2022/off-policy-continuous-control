@@ -1,3 +1,8 @@
+
+CITE image
+
+PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.
+
 # CleanRL 🧚‍♂️ 
 
 *Clean implementation of **model-free** deep RL algorithms using both **PyTorch** and **TensorFlow**.*
@@ -9,10 +14,6 @@
 <p align="center">
   <img src="https://spinningup.openai.com/en/latest/_images/rl_algorithms_9_15.svg" width=600>
 </p>
-
-CITE image
-
-PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.
 
 ## Manifesto
 
