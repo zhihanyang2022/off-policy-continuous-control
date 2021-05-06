@@ -2,12 +2,6 @@
 
 *Clean implementation of important Deep RL algorithms using both PyTorch and TensorFlow, with a strong focus on helping learners.*
 
-## Implementation notes
-
-Q-learning algorithms:
-- <a target="_blank" href="https://nbviewer.jupyter.org/github/zhihanyang2022/CleanRL/blob/main/notes/qrdqn.pdf" type="application/pdf">Quantile-Regression DQN</a>
-
-## Getting your first run in 5 minutes
 
 ## Why this repo?
 
@@ -22,6 +16,7 @@ Q-learning algorithms:
 
 \* However, not all algorithms here are implemented in OpenAI Spinning Up.
 
-## What are implemented inside this repo?
+## Implemented algorithms and notes
 
-TODO
+Q-learning algorithms:
+- <a target="_blank" href="https://nbviewer.jupyter.org/github/zhihanyang2022/CleanRL/blob/main/notes/qrdqn.pdf" type="application/pdf">Quantile-Regression DQN</a>
