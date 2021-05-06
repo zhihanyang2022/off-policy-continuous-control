@@ -7,7 +7,7 @@ Table of content
 
 # CleanRL 🧚‍♂️ 
 
-*Clean implementation of **model-free** deep RL algorithms using both **PyTorch** and **TensorFlow**.*
+*Clean implementation of **model-free** deep RL algorithms using **PyTorch**.
 
 *As a side project of mine, this repo has a strong focus on helping learners like me.*
 
@@ -23,7 +23,6 @@ Table of content
 |:--------------------------------------------------:|:--------------------------------------------:|
 | "Code works but I don't understand the how"       | Offers docs and implementation notes                 | 
 | Uses sophisticated abstraction                     | Offers graphical explanation of design choices |
-|                  Uses one library                  |       Uses both PyTorch and TensorFlow       |
 | Does not have a good requirements file             | Has a requirements file tested across multiple machines |
 |    Does not compare against authoritative repos    |       Compares against OpenAI Spinning Up*       |
 |         Does not test on many environments         |   Tests on many tasks including Mujoco ones  |
