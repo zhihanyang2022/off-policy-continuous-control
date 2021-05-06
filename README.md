@@ -4,6 +4,8 @@
 
 *With a strong focus on helping learners.*
 
+*Inpsired by OpenAI Spinning Up, which helped me tremendously along the way.*
+
 PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.
 
 ## You might ask: "Why this repo?"
