@@ -21,6 +21,8 @@ PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.
 
 \* However, not all algorithms here are implemented in OpenAI Spinning Up.
 
+## Design choices
+
 ## Implemented algorithms and notes
 
 Q-learning algorithms:
