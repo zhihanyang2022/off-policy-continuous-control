@@ -11,7 +11,7 @@ Table of content
 
 *As a side project of mine, this repo has a strong focus on helping learners like me.*
 
-*Inpsired by OpenAI Spinning Up, which helped me tremendously along the way.*
+*This project was inpsired by OpenAI Spinning Up, which helped me tremendously along the way.*
 
 <p align="center">
   <img src="https://spinningup.openai.com/en/latest/_images/rl_algorithms_9_15.svg" width=600>
