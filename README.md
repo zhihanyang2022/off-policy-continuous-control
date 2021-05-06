@@ -4,7 +4,7 @@
 
 *It has a strong focus on helping learners.*
 
-PLEASE NOTE THAT THIS REPO IS UNDER CONSTRUCTION.
+PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.
 
 ## Why this repo?
 
