@@ -1,6 +1,6 @@
 # CleanRL 🧚‍♂️ 
 
-*Clean implementation of important Deep RL algorithms using both PyTorch and TensorFlow.*
+*Clean implementation of model-free deep RL algorithms using both PyTorch and TensorFlow.*
 
 *With a strong focus on helping learners.*
 
