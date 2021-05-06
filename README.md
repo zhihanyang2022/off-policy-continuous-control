@@ -1,4 +1,4 @@
-# CleanRL
+# CleanRL 🧚‍♂️
 
 *Clean implementation of important Deep RL algorithms using both PyTorch and TensorFlow.*
 
