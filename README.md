@@ -17,7 +17,7 @@ Table of content
   <img src="https://spinningup.openai.com/en/latest/_images/rl_algorithms_9_15.svg" width=600>
 </p>
 
-## Manifesto
+## Features
 
 |              Problems with some repos              |                 Solutions                |
 |:--------------------------------------------------:|:--------------------------------------------:|
