@@ -7,7 +7,7 @@ Table of content
 
 Ablations
 
-# OffPolicyRL 🧚‍♂️ 
+# CleanRL 🧚‍♂️ off-policy repo
 
 *Minimalistic implementation of model-free off-policy deep RL algorithms using PyTorch.*
 
