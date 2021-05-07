@@ -19,7 +19,6 @@ Table of content
 
 ## Features
 
-<p align="center">
 |              Problems with some repos              |                 Solutions                |
 |:--------------------------------------------------:|:--------------------------------------------:|
 | "Code works but I don't understand the how"       | Offers docs and implementation notes                 | 
@@ -27,7 +26,6 @@ Table of content
 | Does not have a good requirements file             | Has a requirements file tested across multiple machines |
 |    Does not compare against authoritative repos    |       Compares against OpenAI Spinning Up*       |
 |         Does not test on many environments         |   Tests on many tasks including Atari & Mujoco |
-</p>
 
 \* However, not all algorithms here are implemented in OpenAI Spinning Up.
 
