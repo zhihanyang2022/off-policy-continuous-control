@@ -21,34 +21,33 @@ Table of content
 <table>
 <thead>
 <tr>
-<th style="text-align:center">Problems with some repos</th>
-<th style="text-align:center">Solutions</th>
+<th align="center">Problems with some repos</th>
+<th align="center">Solutions</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">&quot;Code works but I don&#39;t understand the how&quot;</td>
-<td style="text-align:center">Offers docs and implementation notes</td>
+<td align="center">"Code works but I don't understand the how"</td>
+<td align="center">Offers docs and implementation notes</td>
 </tr>
 <tr>
-<td style="text-align:center">Uses sophisticated abstraction</td>
-<td style="text-align:center">Offers graphical explanation of design choices</td>
+<td align="center">Uses sophisticated abstraction</td>
+<td align="center">Offers graphical explanation of design choices</td>
 </tr>
 <tr>
-<td style="text-align:center">Does not have a good requirements file</td>
-<td style="text-align:center">Has a requirements file tested across multiple machines</td>
+<td align="center">Does not have a good requirements file</td>
+<td align="center">Has a requirements file tested across multiple machines</td>
 </tr>
 <tr>
-<td style="text-align:center">Does not compare against authoritative repos</td>
-<td style="text-align:center">Compares against OpenAI Spinning Up*</td>
+<td align="center">Does not compare against authoritative repos</td>
+<td align="center">Compares against OpenAI Spinning Up*</td>
 </tr>
 <tr>
-<td style="text-align:center">Does not test on many environments</td>
-<td style="text-align:center">Tests on many tasks including Atari &amp; Mujoco</td>
+<td align="center">Does not test on many environments</td>
+<td align="center">Tests on many tasks including Atari &amp; Mujoco</td>
 </tr>
 </tbody>
 </table>
-
 
 \* However, not all algorithms here are implemented in OpenAI Spinning Up.
 
