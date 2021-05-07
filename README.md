@@ -33,9 +33,13 @@ Table of content
 
 The diagrams below are created using Lucidchart.
 
+### Overview
+
 <p align="center">
   <img src="design.svg" width=600>
 </p>
+
+### Abstract classes
 
 ## Implemented algorithms and notes
 
