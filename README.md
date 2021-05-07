@@ -17,8 +17,8 @@ Table of content
 </p>
 
 ## Features
-
-<table width="100%" style="margin: 0px;">
+<center>
+<table>
 <thead>
 <tr>
 <th align="center">Problems with some repos</th>
@@ -48,6 +48,7 @@ Table of content
 </tr>
 </tbody>
 </table>
+</center>
 
 \* However, not all algorithms here are implemented in OpenAI Spinning Up.
 
