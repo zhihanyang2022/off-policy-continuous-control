@@ -29,7 +29,7 @@ Table of content
 
 \* However, not all algorithms here are implemented in OpenAI Spinning Up.
 
-## Design choices
+## Codebase design
 
 ## Implemented algorithms and notes
 
