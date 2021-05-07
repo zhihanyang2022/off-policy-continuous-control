@@ -9,7 +9,7 @@ Ablations
 
 # OffPolicyRL 🧚‍♂️ 
 
-*Clean implementation of model-free off-policy deep RL algorithms using PyTorch.*
+*Minimalistic implementation of model-free off-policy deep RL algorithms using PyTorch.*
 
 *This repo implements all algorithms attached to the "Q-learning" node in the diagram below.*
 
