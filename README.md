@@ -18,9 +18,9 @@ Table of content
 
 ## Features
 
-|              Problems with some repos \n\n              |                 Solutions                |
+|              Problems with some repos              |                 Solutions                |
 |:--------------------------------------------------:|:--------------------------------------------:|
-| "Code works but I don't understand the how"       | Offers docs and implementation notes                 | 
+| "Code works but I don't understand the how"        | Offers docs and implementation notes                 | 
 | Uses sophisticated abstraction                     | Offers graphical explanation of design choices |
 | Does not have a good requirements file             | Has a requirements file tested across multiple machines |
 |    Does not compare against authoritative repos    |       Compares against OpenAI Spinning Up*       |
