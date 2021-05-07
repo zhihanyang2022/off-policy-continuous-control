@@ -1,7 +1,3 @@
-table {
-    width:100%;
-}
-
 CITE image
 
 PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.
@@ -22,7 +18,7 @@ Table of content
 
 ## Features
 
-<table width=100%>
+<table style="width:100%">
 <thead>
 <tr>
 <th align="center">Problems with some repos</th>
