@@ -9,7 +9,7 @@ Ablations
 
 # CleanRL 🧚‍♂️ 
 
-*Clean implementation of **model-free/Q-learning-related** deep RL algorithms using **PyTorch**.*
+*Clean implementation of **Q-learning** deep RL algorithms using **PyTorch**.*
 
 *As a side project of mine, this repo has a strong focus on helping learners like me.*
 
