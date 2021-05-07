@@ -18,7 +18,7 @@ Table of content
 
 ## Features
 
-<table style="width:100%">
+<table border="1" width="100%" ID="Table2" style="margin: 0px;">
 <thead>
 <tr>
 <th align="center">Problems with some repos</th>
