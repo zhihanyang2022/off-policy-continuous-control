@@ -31,7 +31,7 @@ Table of content
 
 ## Codebase design
 
-Created using Lucidchart.
+The diagrams below are created using Lucidchart.
 
 <p align="center">
   <img src="design.svg" width=600>
