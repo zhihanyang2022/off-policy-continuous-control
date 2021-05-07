@@ -17,37 +17,15 @@ Table of content
 </p>
 
 ## Features
+
 <center>
-<table>
-<thead>
-<tr>
-<th align="center">Problems with some repos</th>
-<th align="center">Solutions</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center">"Code works but I don't understand the how"</td>
-<td align="center">Offers docs and implementation notes</td>
-</tr>
-<tr>
-<td align="center">Uses sophisticated abstraction</td>
-<td align="center">Offers graphical explanation of design choices</td>
-</tr>
-<tr>
-<td align="center">Does not have a good requirements file</td>
-<td align="center">Has a requirements file tested across multiple machines</td>
-</tr>
-<tr>
-<td align="center">Does not compare against authoritative repos</td>
-<td align="center">Compares against OpenAI Spinning Up*</td>
-</tr>
-<tr>
-<td align="center">Does not test on many environments</td>
-<td align="center">Tests on many tasks including Atari &amp; Mujoco</td>
-</tr>
-</tbody>
-</table>
+|              Problems with some repos              |                 Solutions                |
+|:--------------------------------------------------:|:--------------------------------------------:|
+| "Code works but I don't understand the how"       | Offers docs and implementation notes                 | 
+| Uses sophisticated abstraction                     | Offers graphical explanation of design choices |
+| Does not have a good requirements file             | Has a requirements file tested across multiple machines |
+|    Does not compare against authoritative repos    |       Compares against OpenAI Spinning Up*       |
+|         Does not test on many environments         |   Tests on many tasks including Atari & Mujoco |
 </center>
 
 \* However, not all algorithms here are implemented in OpenAI Spinning Up.
