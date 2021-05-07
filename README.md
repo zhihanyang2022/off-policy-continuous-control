@@ -24,7 +24,7 @@ Table of content
 
 ## Features
 
-<table>
+<table width=100%>
 <thead>
 <tr>
 <th align="center">Problems with some repos</th>
