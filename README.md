@@ -18,7 +18,7 @@ Table of content
 
 ## Features
 
-|              Problems with some repos              |                 Solutions                |
+|              Problems with some repos \n\n              |                 Solutions                |
 |:--------------------------------------------------:|:--------------------------------------------:|
 | "Code works but I don't understand the how"       | Offers docs and implementation notes                 | 
 | Uses sophisticated abstraction                     | Offers graphical explanation of design choices |
