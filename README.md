@@ -25,7 +25,7 @@ Table of content
 | Uses sophisticated abstraction                     | Offers graphical explanation of design choices |
 | Does not have a good requirements file             | Has a requirements file tested across multiple machines |
 |    Does not compare against authoritative repos    |       Compares against OpenAI Spinning Up*       |
-|         Does not test on many environments         |   Tests on many tasks including Mujoco ones  |
+|         Does not test on many environments         |   Tests on many tasks including Atari & Mujoco |
 
 \* However, not all algorithms here are implemented in OpenAI Spinning Up.
 
