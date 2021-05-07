@@ -11,7 +11,7 @@ Ablations
 
 *Clean implementation of model-free off-policy deep RL algorithms using PyTorch.*
 
-*As a side project of mine, this repo has a strong focus on helping learners like me.*
+*This repo implements all algorithms attached to the "Q-learning" node in the diagram below.*
 
 *This project was inpsired by OpenAI Spinning Up, which helped me tremendously along the way.*
 
