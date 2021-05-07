@@ -18,17 +18,37 @@ Table of content
 
 ## Features
 
-<center>
-  
-|              Problems with some repos              |                 Solutions                |
-|:--------------------------------------------------:|:--------------------------------------------:|
-| "Code works but I don't understand the how"       | Offers docs and implementation notes                 | 
-| Uses sophisticated abstraction                     | Offers graphical explanation of design choices |
-| Does not have a good requirements file             | Has a requirements file tested across multiple machines |
-|    Does not compare against authoritative repos    |       Compares against OpenAI Spinning Up*       |
-|         Does not test on many environments         |   Tests on many tasks including Atari & Mujoco |
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Problems with some repos</th>
+<th style="text-align:center">Solutions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">&quot;Code works but I don&#39;t understand the how&quot;</td>
+<td style="text-align:center">Offers docs and implementation notes</td>
+</tr>
+<tr>
+<td style="text-align:center">Uses sophisticated abstraction</td>
+<td style="text-align:center">Offers graphical explanation of design choices</td>
+</tr>
+<tr>
+<td style="text-align:center">Does not have a good requirements file</td>
+<td style="text-align:center">Has a requirements file tested across multiple machines</td>
+</tr>
+<tr>
+<td style="text-align:center">Does not compare against authoritative repos</td>
+<td style="text-align:center">Compares against OpenAI Spinning Up*</td>
+</tr>
+<tr>
+<td style="text-align:center">Does not test on many environments</td>
+<td style="text-align:center">Tests on many tasks including Atari &amp; Mujoco</td>
+</tr>
+</tbody>
+</table>
 
-</center>
 
 \* However, not all algorithms here are implemented in OpenAI Spinning Up.
 
