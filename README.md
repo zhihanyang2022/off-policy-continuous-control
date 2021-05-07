@@ -31,6 +31,10 @@ Table of content
 
 ## Codebase design
 
+<p align="center">
+  <img src="design.svg" width=600>
+</p>
+
 ## Implemented algorithms and notes
 
 Q-learning algorithms:
