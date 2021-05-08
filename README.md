@@ -35,7 +35,7 @@ The diagrams below are created using Lucidchart.
 ### Overview
 
 <p align="center">
-  <img src="design.svg" width=600>
+  <img src="diagrams/design.svg" width=600>
 </p>
 
 ### Abstract classes
