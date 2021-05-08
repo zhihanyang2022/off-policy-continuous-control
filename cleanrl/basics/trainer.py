@@ -1,8 +1,8 @@
 from typing import Union
 import gin
 
-from CleanRL.basics.buffer import Buffer
-from CleanRL.basics.abstract_algorithms import OffPolicyRLAlgorithmDiscreteAction, OffPolicyRLAlgorithmContinuousAction
+from cleanrl.basics.buffer import Buffer
+from cleanrl.basics.abstract_algorithms import OffPolicyRLAlgorithmDiscreteAction, OffPolicyRLAlgorithmContinuousAction
 
 class Trainer:
 
