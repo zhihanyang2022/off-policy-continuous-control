@@ -1,7 +1,6 @@
 import gin
 import torch
 import torch.nn as nn
-from torch.distributions import Normal, Independent
 
 @gin.configurable
 def get_net(
@@ -47,7 +46,7 @@ class MLPGaussianActor(nn.Module):
         self.means_net = get_net(num_in=input_dim, num_out=action_dim, final_activation=None)
         self.log_stds_net = get_net(num_in=input_dim, num_out=action_dim, final_activation=None)
 
-    def forward(self, states: torch.tensor):
+    def forward(self, states: torch.tensor) -> tuple:
 
         means, log_stds = self.means_net(states), self.log_stds_net(states)
 
@@ -56,7 +55,7 @@ class MLPGaussianActor(nn.Module):
 
         stds = torch.exp(torch.clamp(log_stds, LOG_STD_MIN, LOG_STD_MAX))
 
-        return Independent(Normal(loc=means, scale=stds), reinterpreted_batch_ndims=1)
+        return means, stds
 
 class MLPCritic(nn.Module):
 

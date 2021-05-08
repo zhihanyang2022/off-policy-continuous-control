@@ -1,15 +1,15 @@
 import os
-import gin
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
+
+from torch.distributions import Normal, Independent
 from basics.abstract_algorithms import OffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPGaussianActor, MLPCritic
 from basics.buffer import Batch
-from basics.utils import clip_gradient
 
-@gin.configurable(module=__name__)
 class SAC(OffPolicyRLAlgorithm):
 
     def __init__(
@@ -22,8 +22,8 @@ class SAC(OffPolicyRLAlgorithm):
         polyak
     ):
 
-        self.Normal = MLPGaussianActor(input_dim=input_dim, action_dim=action_dim)
-        self.Normal_optimizer = optim.Adam(self.Normal.parameters(), lr=lr)
+        self.actor = MLPGaussianActor(input_dim=input_dim, action_dim=action_dim)
+        self.actor_optimizer = optim.Adam(self.actor_optimizer.parameters(), lr=lr)
 
         self.Q1 = MLPCritic(input_dim=input_dim, action_dim=action_dim)
         self.Q1_targ = MLPCritic(input_dim=input_dim, action_dim=action_dim)
@@ -39,30 +39,46 @@ class SAC(OffPolicyRLAlgorithm):
         self.alpha = alpha
         self.polyak = polyak
 
-    def sample_action_and_compute_log_pi(self, state: torch.tensor, use_reparametrization_trick: bool) -> tuple:
-        mu_given_s = self.Normal(state)  # in paper, mu represents the normal distribution
-        # in paper, u represents the un-squashed action; nu stands for next u's
-        # actually, we can just use reparametrization trick in both Step 12 and 14, but it might be good to separate
-        # the two cases for pedagogical purposes, i.e., using reparametrization trick is a must in Step 14
-        u = mu_given_s.rsample() if use_reparametrization_trick else mu_given_s.sample()
+    def sample_action_from_distribution(
+        self,
+        state: torch.tensor,
+        use_noise: bool,
+        return_log_prob: bool
+    ) -> tuple:
+
+        means, stds = self.actor(state)
+
+        if use_noise:
+            # in paper, mu represents the normal distribution
+            mu_given_s = Independent(Normal(loc=means, scale=stds), reinterpreted_batch_ndims=1)
+            # in paper, u represents the un-squashed action; nu stands for next u's
+            # using reparametrization trick is not a must in both Step 12 and 14; it is a must in Step 14
+            u = mu_given_s.rsample()
+        else:
+            u = means
+
         a = torch.tanh(u)
-        # the following line of code is not numerically stable:
-        # log_pi_a_given_s = mu_given_s.log_prob(u) - torch.sum(torch.log(1 - torch.tanh(u) ** 2), dim=1)
-        # ref: https://github.com/vitchyr/rlkit/blob/0073d73235d7b4265cd9abe1683b30786d863ffe/rlkit/torch/distributions.py#L358
-        # ref: https://github.com/tensorflow/probability/blob/master/tensorflow_probability/python/bijectors/tanh.py#L73
-        log_pi_a_given_s = mu_given_s.log_prob(u) - (2 * (np.log(2) - u - F.softplus(-2 * u))).sum(dim=1)
-        return a, log_pi_a_given_s
+
+        if return_log_prob:
+            # the following line of code is not numerically stable:
+            # log_pi_a_given_s = mu_given_s.log_prob(u) - torch.sum(torch.log(1 - torch.tanh(u) ** 2), dim=1)
+            # ref: https://github.com/vitchyr/rlkit/blob/0073d73235d7b4265cd9abe1683b30786d863ffe/rlkit/torch/distributions.py#L358
+            # ref: https://github.com/tensorflow/probability/blob/master/tensorflow_probability/python/bijectors/tanh.py#L73
+            log_pi_a_given_s = mu_given_s.log_prob(u) - (2 * (np.log(2) - u - F.softplus(-2 * u))).sum(dim=1)
+            return a, log_pi_a_given_s
+        else:
+            return a
 
     def polyak_update(self, old_net: nn.Module, new_net: nn.Module) -> None:
-        with torch.no_grad():
+        with torch.no_grad():  # no grad is probably not needed
             for old_param, new_param in zip(old_net.parameters(), new_net.parameters()):
                 old_param.data.copy_(old_param.data * self.polyak + new_param.data * (1 - self.polyak))
 
-    def act(self, state: np.array) -> np.array:
-        # TODO: add eval mode without noise
-        state = torch.tensor(state).unsqueeze(0).float()
-        action, _ = self.sample_action_and_compute_log_pi(state, use_reparametrization_trick=False)
-        return action.numpy()[0]  # no need to detach first because we are not using the reparametrization trick
+    def act(self, state: np.array, use_noise: bool) -> np.array:
+        with torch.no_grad():
+            state = torch.tensor(state).unsqueeze(0).float()
+            action, _ = self.sample_action_from_distribution(state, use_noise=use_noise, return_log_prob=False)
+            return action.numpy()[0]  # no need to detach first because we are not using the reparametrization trick
 
     def update_networks(self, b: Batch) -> None:
         # ========================================
@@ -71,8 +87,9 @@ class SAC(OffPolicyRLAlgorithm):
 
         with torch.no_grad():
 
-            na, log_pi_na_given_ns = self.sample_action_and_compute_log_pi(b.ns, use_reparametrization_trick=False)
-            targets = b.r + self.gamma * (1 - b.d) * \
+            na, log_pi_na_given_ns = self.sample_action_from_distribution(b.ns, use_noise=True, return_log_prob=True)
+            targets = b.r + \
+                      self.gamma * (1 - b.d) * \
                       (torch.min(self.Q1_targ(b.ns, na), self.Q2_targ(b.ns, na)) - self.alpha * log_pi_na_given_ns)
 
         # ========================================
@@ -84,7 +101,6 @@ class SAC(OffPolicyRLAlgorithm):
 
         self.Q1_optimizer.zero_grad()
         Q1_loss.backward()
-        clip_gradient(net=self.Q1)
         self.Q1_optimizer.step()
 
         Q2_predictions = self.Q2(b.s, b.a)
@@ -92,7 +108,6 @@ class SAC(OffPolicyRLAlgorithm):
 
         self.Q2_optimizer.zero_grad()
         Q2_loss.backward()
-        clip_gradient(net=self.Q2)
         self.Q2_optimizer.step()
 
         # ========================================
@@ -104,13 +119,12 @@ class SAC(OffPolicyRLAlgorithm):
         for param in self.Q2.parameters():
             param.requires_grad = False
 
-        a, log_pi_a_given_s = self.sample_action_and_compute_log_pi(b.s, use_reparametrization_trick=True)
+        a, log_pi_a_given_s = self.sample_action_from_distribution(b.s, use_noise=True, return_log_prob=True)
         policy_loss = - torch.mean(torch.min(self.Q1(b.s, a), self.Q2(b.s, a)) - self.alpha * log_pi_a_given_s)
 
-        self.Normal_optimizer.zero_grad()
+        self.actor_optimizer.zero_grad()
         policy_loss.backward()
-        clip_gradient(net=self.Normal)
-        self.Normal_optimizer.step()
+        self.actor_optimizer.step()
 
         for param in self.Q1.parameters():
             param.requires_grad = True
@@ -126,7 +140,7 @@ class SAC(OffPolicyRLAlgorithm):
 
     def save_actor(self, save_dir: str, save_filename: str) -> None:
         os.makedirs(save_dir, exist_ok=True)
-        torch.save(self.Normal.state_dict(), os.path.join(save_dir, save_filename))
+        torch.save(self.actor.state_dict(), os.path.join(save_dir, save_filename))
 
     def load_actor(self, save_dir: str, save_filename: str) -> None:
-        self.Normal.load_state_dict(torch.load(os.path.join(save_dir, save_filename)))
+        self.actor.load_state_dict(torch.load(os.path.join(save_dir, save_filename)))

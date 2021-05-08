@@ -20,9 +20,9 @@ class Trainer:
         self,
         num_epochs: int,
         num_exploration_steps: int,
-        num_env_steps_per_epoch: int,
-        num_grad_steps_per_epoch: int,
-        num_eval_episodes_per_epoch: int
+        num_steps_per_epoch: int,
+        num_updates_per_epoch: int,
+        num_test_episodes_per_epoch: int
     ):
         pass
 
