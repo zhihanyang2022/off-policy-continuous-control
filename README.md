@@ -32,6 +32,11 @@ Table of content
 
 The diagrams below are created using Lucidchart.
 
+TODO:
+- The design of the actor and critic class
+  - not meant to be used directly, instantiated within the algorithm
+  - Randomness should be handled within algorithm, not actor; even for SAC, the mean and std of Gaussian are outputed by actor, then processed in algorithm
+
 ### Overview
 
 <p align="center">
