@@ -3,10 +3,11 @@ from abc import ABC, abstractmethod
 import numpy as np
 from basics.buffer import Batch
 
+
 class OffPolicyRLAlgorithm(ABC):
 
     @abstractmethod
-    def act(self, state: np.array) -> Union[int, np.array]:
+    def act(self, state: np.array, deterministic: bool) -> Union[int, np.array]:
         pass
 
     @abstractmethod

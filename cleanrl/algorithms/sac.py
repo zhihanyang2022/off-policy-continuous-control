@@ -1,4 +1,5 @@
 import os
+from typing import Union
 import numpy as np
 import torch
 import torch.nn as nn
@@ -10,20 +11,21 @@ from basics.abstract_algorithms import OffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPGaussianActor, MLPCritic
 from basics.buffer import Batch
 
+
 class SAC(OffPolicyRLAlgorithm):
 
     def __init__(
-        self,
-        input_dim,
-        action_dim,
-        gamma,
-        alpha,
-        lr,
-        polyak
+            self,
+            input_dim,
+            action_dim,
+            gamma,
+            alpha,
+            lr,
+            polyak
     ):
 
         self.actor = MLPGaussianActor(input_dim=input_dim, action_dim=action_dim)
-        self.actor_optimizer = optim.Adam(self.actor_optimizer.parameters(), lr=lr)
+        self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
 
         self.Q1 = MLPCritic(input_dim=input_dim, action_dim=action_dim)
         self.Q1_targ = MLPCritic(input_dim=input_dim, action_dim=action_dim)
@@ -40,15 +42,15 @@ class SAC(OffPolicyRLAlgorithm):
         self.polyak = polyak
 
     def sample_action_from_distribution(
-        self,
-        state: torch.tensor,
-        use_noise: bool,
-        return_log_prob: bool
-    ) -> tuple:
+            self,
+            state: torch.tensor,
+            deterministic: bool,
+            return_log_prob: bool
+    ) -> Union[torch.tensor, tuple]:
 
         means, stds = self.actor(state)
 
-        if use_noise:
+        if not deterministic:
             # in paper, mu represents the normal distribution
             mu_given_s = Independent(Normal(loc=means, scale=stds), reinterpreted_batch_ndims=1)
             # in paper, u represents the un-squashed action; nu stands for next u's
@@ -74,10 +76,10 @@ class SAC(OffPolicyRLAlgorithm):
             for old_param, new_param in zip(old_net.parameters(), new_net.parameters()):
                 old_param.data.copy_(old_param.data * self.polyak + new_param.data * (1 - self.polyak))
 
-    def act(self, state: np.array, use_noise: bool) -> np.array:
+    def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
             state = torch.tensor(state).unsqueeze(0).float()
-            action, _ = self.sample_action_from_distribution(state, use_noise=use_noise, return_log_prob=False)
+            action, _ = self.sample_action_from_distribution(state, deterministic=deterministic, return_log_prob=False)
             return action.numpy()[0]  # no need to detach first because we are not using the reparametrization trick
 
     def update_networks(self, b: Batch) -> None:
@@ -87,7 +89,7 @@ class SAC(OffPolicyRLAlgorithm):
 
         with torch.no_grad():
 
-            na, log_pi_na_given_ns = self.sample_action_from_distribution(b.ns, use_noise=True, return_log_prob=True)
+            na, log_pi_na_given_ns = self.sample_action_from_distribution(b.ns, deterministic=False, return_log_prob=True)
             targets = b.r + \
                       self.gamma * (1 - b.d) * \
                       (torch.min(self.Q1_targ(b.ns, na), self.Q2_targ(b.ns, na)) - self.alpha * log_pi_na_given_ns)
@@ -119,7 +121,7 @@ class SAC(OffPolicyRLAlgorithm):
         for param in self.Q2.parameters():
             param.requires_grad = False
 
-        a, log_pi_a_given_s = self.sample_action_from_distribution(b.s, use_noise=True, return_log_prob=True)
+        a, log_pi_a_given_s = self.sample_action_from_distribution(b.s, deterministic=False, return_log_prob=True)
         policy_loss = - torch.mean(torch.min(self.Q1(b.s, a), self.Q2(b.s, a)) - self.alpha * log_pi_a_given_s)
 
         self.actor_optimizer.zero_grad()

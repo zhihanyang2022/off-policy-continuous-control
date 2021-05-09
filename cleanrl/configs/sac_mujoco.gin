@@ -1,7 +1,6 @@
 import basics.actors_and_critics
 
-basics.actors_and_critics.num_hidden_layers = 2
-basics.actors_and_critics.num_neurons_per_hidden_layer = 256
+basics.actors_and_critics.MLP.hidden_dimensions = (256, 256)
 
 import algorithms.sac
 
