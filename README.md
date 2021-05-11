@@ -4,7 +4,7 @@ PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.
 
 Table of content
 
-# Off-policy Continuous Control 🧚‍♂️ 
+# Off-policy methods for continuous control 🧚‍♂️ 
 
 *Minimalistic, well-documented implementation of model-free off-policy deep RL algorithms using PyTorch.*
 
