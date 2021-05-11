@@ -4,7 +4,12 @@ Run command (working directory library):
 
 ```bash
 cd off-policy-continuous-control/library
-python run.py --env=Pendulum-v0 --algo=sac --config=configs/pendulum.gin --run_id=1
+python run.py --env=Pendulum-v0 --algo=sac --config=configs/pendulum_sac.gin --run_id=1
+```
+
+```bash
+cd off-policy-continuous-control/library
+python run.py --env=Pendulum-v0 --algo=ddpg --config=configs/pendulum_ddpg.gin --run_id=1
 ```
 
 I/ use conda, create the env first using conda and then install requirements.txt using pip.
