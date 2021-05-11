@@ -31,7 +31,12 @@ def make_MLP(num_in, num_out, final_activation, hidden_dimensions=gin.REQUIRED):
 
 class MLPTanhActor(nn.Module):
     """Output actions from [-1, 1]."""
-    pass
+    def __init__(self, input_dim, action_dim):
+        super().__init__()
+        self.net = make_MLP(num_in=input_dim, num_out=action_dim, final_activation=nn.Tanh())
+
+    def forward(self, states: torch.tensor):
+        return self.net(states)
 
 
 class MLPGaussianActor(nn.Module):

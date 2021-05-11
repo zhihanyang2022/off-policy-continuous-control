@@ -33,11 +33,15 @@ class SAC(OffPolicyRLAlgorithm):
 
         self.Q1 = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
         self.Q1_targ = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
+
+        self.Q1_targ.eval()
         self.Q1_targ.load_state_dict(self.Q1.state_dict())
         self.Q1_optimizer = optim.Adam(self.Q1.parameters(), lr=lr)
 
         self.Q2 = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
         self.Q2_targ = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
+
+        self.Q2_targ.eval()
         self.Q2_targ.load_state_dict(self.Q2.state_dict())
         self.Q2_optimizer = optim.Adam(self.Q2.parameters(), lr=lr)
 
@@ -75,7 +79,8 @@ class SAC(OffPolicyRLAlgorithm):
         else:
             return a
 
-    def clip_gradient(self, net: nn.Module) -> None:
+    @staticmethod
+    def clip_gradient(net) -> None:
         for param in net.parameters():
             param.grad.data.clamp_(-1, 1)
 
