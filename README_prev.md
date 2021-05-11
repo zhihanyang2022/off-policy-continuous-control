@@ -19,7 +19,8 @@ python -m spinup.run sac \
 --steps_per_epoch 1000 \
 --epochs 100 \
 --start_steps 0 \
---update_after 200 \
+--update_after 950 \
+--update_every 50 \
 --max_ep_len 200 \
 --seed 0
 ```

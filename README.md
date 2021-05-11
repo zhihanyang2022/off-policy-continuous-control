@@ -1,3 +1,5 @@
+Utilize gradient clipping, which might improve stability (but I haven't investigated this)
+
 Run command (working directory library):
 
 ```bash
