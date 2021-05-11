@@ -6,9 +6,9 @@ from collections import namedtuple, deque
 Transition = namedtuple('Transition', 's a r ns d')
 Batch = namedtuple('Batch', 's a r ns d')
 
+
 @gin.configurable(module=__name__)
 class ReplayBuffer:
-
     """Just a standard FIFO replay buffer."""
 
     def __init__(self, capacity=gin.REQUIRED, batch_size=gin.REQUIRED):

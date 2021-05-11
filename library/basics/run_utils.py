@@ -4,7 +4,7 @@ import wandb
 import numpy as np
 from gym.wrappers import Monitor
 
-from basics.replay_buffer import ReplayBuffer
+from basics.replay_buffer import ReplayBuffer, Transition
 
 BASE_LOG_DIR = 'results'
 
@@ -20,7 +20,7 @@ def test_for_one_episode(env, algorithm) -> tuple:
         state, reward, done, _ = env.step(action)
         episode_return += reward
         episode_len += 1
-    return episode_return, episode_len
+    return episode_len, episode_return
 
 
 def visualize_trained_policy(
@@ -29,7 +29,7 @@ def visualize_trained_policy(
         log_dir,
         num_videos
 ) -> None:
-    algorithm.load_actor(save_dir=log_dir)
+    algorithm.load_actor(log_dir)
 
     for i in range(num_videos):
         env = Monitor(
@@ -45,12 +45,13 @@ def train(
         algorithm,
         buffer: ReplayBuffer,
         log_dir,
-        num_epochs,  # TODO: all configurable arugments are default to None
-        num_steps_per_epoch,
-        update_every,
-        # number of environment interactions between gradient updates; however, the ratio of the two is locked to 1-to-1.
-        num_test_episodes_per_epoch,
-        update_after,  # for exploration
+        max_steps_per_episode=gin.REQUIRED,
+        num_epochs=gin.REQUIRED,  # TODO: all configurable arugments are default to None
+        num_steps_per_epoch=gin.REQUIRED,
+        update_every=gin.REQUIRED,
+        # number of environment interactions between gradient updates; the ratio of the two is locked to 1-to-1.
+        num_test_episodes_per_epoch=gin.REQUIRED,
+        update_after=gin.REQUIRED,  # for exploration
 ) -> None:
     env = env_fn()
     test_env = env_fn()
@@ -76,12 +77,14 @@ def train(
         # however, the little catch is that the environment might actually be done
         # due to termination rather than timeout, but this is much less likely
         # so we just do it this way for convenience
-        done = False if episode_len == env._max_episode_steps else True
+        done = False if episode_len == max_steps_per_episode else True
+
+        buffer.push(Transition(state, action, reward, next_state, done))
 
         state = next_state
 
         # end of trajectory handling
-        if done or (episode_len == env._max_episode_steps):
+        if done or (episode_len == max_steps_per_episode):
             # TODO: talk about termination handling
             state, episode_return, episode_len = env.reset(), 0, 0
 
@@ -107,5 +110,7 @@ def train(
                 'test_mean_ep_len': np.mean(episode_lens),
                 'test_mean_ep_ret': np.mean(episode_returns)
             })
+
+            print(epoch, np.mean(episode_returns))
 
     algorithm.save_actor(log_dir)

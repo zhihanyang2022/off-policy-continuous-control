@@ -130,4 +130,4 @@ dmypy.json
 
 # Custom
 .idea/
-.wandb/
+library/.wandb/

@@ -81,7 +81,7 @@ class SAC(OffPolicyRLAlgorithm):
     def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
             state = torch.tensor(state).unsqueeze(0).float()
-            action, _ = self.sample_action_from_distribution(state, deterministic=deterministic, return_log_prob=False)
+            action = self.sample_action_from_distribution(state, deterministic=deterministic, return_log_prob=False)
             return action.numpy()[0]  # no need to detach first because we are not using the reparametrization trick
 
     def update_networks(self, b: Batch) -> None:

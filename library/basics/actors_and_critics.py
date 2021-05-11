@@ -5,7 +5,6 @@ import torch.nn as nn
 
 @gin.configurable(module=__name__)
 class MLP(nn.Module):
-
     """
     A easy-to-use class for creating MLPs.
 
@@ -19,7 +18,7 @@ class MLP(nn.Module):
         num_in=10, hidden_dimension=(256, 256), num_out=None.
     """
 
-    def __init__(self, num_in, num_out, final_activation, hidden_dimensions=(256, 256)):
+    def __init__(self, num_in, num_out, final_activation, hidden_dimensions=gin.REQUIRED):
         super().__init__()
 
         tensor_dimensions = [num_in]
@@ -30,7 +29,7 @@ class MLP(nn.Module):
 
         num_layers = len(tensor_dimensions) - 1
         layers = []
-        input_dimensions, output_dimensions = tensor_dimensions[-1:], tensor_dimensions[1:]
+        input_dimensions, output_dimensions = tensor_dimensions[:-1], tensor_dimensions[1:]
         for i, (input_dimension, output_dimension) in enumerate(zip(input_dimensions, output_dimensions)):
             layers.extend([
                 nn.Linear(input_dimension, output_dimension),
@@ -73,7 +72,7 @@ class MLPCritic(nn.Module):
 
     def __init__(self, input_dim, action_dim):
         super().__init__()
-        self.net = MLP(num_in=input_dim + action_dim, num_out=1, final_activation=None)
+        self.net = MLP(num_in=input_dim + action_dim, num_out=1, final_activation=nn.Identity())
 
     def forward(self, states: torch.tensor, actions: torch.tensor):
         return self.net(torch.cat([states, actions], dim=1))

@@ -8,8 +8,7 @@ from gym.wrappers import RescaleAction
 from basics.replay_buffer import ReplayBuffer
 from algorithms import *
 
-from basics.run_utils import train, visualize_trained_policy
-from basics.run_utils import generate_log_dir
+from basics.run_utils import generate_log_dir, train, visualize_trained_policy
 
 algo_name2class = {
     'ddpg': DDPG,

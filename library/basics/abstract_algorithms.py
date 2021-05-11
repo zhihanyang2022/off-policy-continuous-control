@@ -5,7 +5,6 @@ from basics.replay_buffer import Batch
 
 
 class OffPolicyRLAlgorithm(ABC):
-
     """
     Only these methods should be called in basics.trainer.Trainer.
     Also, they have to be called with the correct signature as described below.
@@ -21,9 +20,9 @@ class OffPolicyRLAlgorithm(ABC):
         pass
 
     @abstractmethod
-    def save_actor(self, save_dir: str, save_filename: str) -> None:
+    def save_actor(self, save_dir: str) -> None:
         pass
 
     @abstractmethod
-    def load_actor(self, save_dir: str, save_filename: str) -> None:
+    def load_actor(self, save_dir: str) -> None:
         pass
