@@ -1,4 +1,11 @@
-If use conda, create the env first using conda and then install requirements.txt using pip.
+Run command (working directory library):
+
+```bash
+cd off-policy-continuous-control/library
+python run.py --env=Pendulum-v0 --algo=sac --config=configs/pendulum.gin --run_id=1
+```
+
+I/ use conda, create the env first using conda and then install requirements.txt using pip.
 
 Comment on where working directly should be
 
