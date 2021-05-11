@@ -6,7 +6,7 @@ Table of content
 
 # Off-policy methods for continuous control 🧚‍♂️ 
 
-*Minimalistic implementation of model-free off-policy methods for continuous control in PyTorch.*
+*Clean, modular implementation of model-free off-policy methods for continuous control in PyTorch.*
 
 *This repo implements DDPG, TD3 and SAC and tests them against OpenAI Spinning Up's baselines.*
 
