@@ -1,3 +1,5 @@
+If use conda, create the env first using conda and then install requirements.txt using pip.
+
 Comment on where working directly should be
 
 CITE image
