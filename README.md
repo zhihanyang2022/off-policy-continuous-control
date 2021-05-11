@@ -4,7 +4,7 @@ PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.
 
 Table of content
 
-# CleanRL 🧚‍♂️ 
+# Off-policy Continuous Control 🧚‍♂️ 
 
 *Minimalistic, well-documented implementation of model-free off-policy deep RL algorithms using PyTorch.*
 
