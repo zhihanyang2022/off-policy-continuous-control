@@ -12,6 +12,7 @@ from torch.distributions import Normal, Independent
 from basics.abstract_algorithm import OffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPGaussianActor, MLPCritic
 from basics.replay_buffer import Batch
+from basics.run_utils import get_device
 
 
 @gin.configurable(module=__name__)
@@ -27,16 +28,16 @@ class SAC(OffPolicyRLAlgorithm):
             polyak
     ):
 
-        self.actor = MLPGaussianActor(input_dim=input_dim, action_dim=action_dim)
+        self.actor = MLPGaussianActor(input_dim=input_dim, action_dim=action_dim).to(get_device())
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
 
-        self.Q1 = MLPCritic(input_dim=input_dim, action_dim=action_dim)
-        self.Q1_targ = MLPCritic(input_dim=input_dim, action_dim=action_dim)
+        self.Q1 = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
+        self.Q1_targ = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
         self.Q1_targ.load_state_dict(self.Q1.state_dict())
         self.Q1_optimizer = optim.Adam(self.Q1.parameters(), lr=lr)
 
-        self.Q2 = MLPCritic(input_dim=input_dim, action_dim=action_dim)
-        self.Q2_targ = MLPCritic(input_dim=input_dim, action_dim=action_dim)
+        self.Q2 = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
+        self.Q2_targ = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
         self.Q2_targ.load_state_dict(self.Q2.state_dict())
         self.Q2_optimizer = optim.Adam(self.Q2.parameters(), lr=lr)
 
@@ -84,9 +85,9 @@ class SAC(OffPolicyRLAlgorithm):
 
     def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
-            state = torch.tensor(state).unsqueeze(0).float()
+            state = torch.tensor(state).unsqueeze(0).float().to(get_device())
             action = self.sample_action_from_distribution(state, deterministic=deterministic, return_log_prob=False)
-            return action.numpy()[0]  # no need to detach first because we are not using the reparametrization trick
+            return action.cpu().numpy()[0]  # no need to detach first because we are not using the reparametrization trick
 
     def update_networks(self, b: Batch) -> None:
         # ========================================
