@@ -8,9 +8,9 @@ Table of content
 
 *Minimalistic implementation of model-free off-policy methods for continuous control in PyTorch.*
 
-*This repo implements DDPG, TD3 and SAC.*
+*This repo implements DDPG, TD3 and SAC and tests them against OpenAI Spinning Up's baselines.*
 
-*This project was inpsired by OpenAI Spinning Up, which helped me tremendously along the way.*
+*OpenAI Spinning Up helped me tremendously along the way.*
 
 <p align="center">
   <img src="https://spinningup.openai.com/en/latest/_images/rl_algorithms_9_15.svg" width=600>
