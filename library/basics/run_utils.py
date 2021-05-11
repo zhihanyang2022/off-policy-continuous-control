@@ -1,12 +1,13 @@
+import os
 import gin
-import wandb
+import csv
 
 import numpy as np
 from gym.wrappers import Monitor
 
 from basics.replay_buffer import ReplayBuffer, Transition
 
-BASE_LOG_DIR = 'results'
+BASE_LOG_DIR = '../results'
 
 
 def generate_log_dir(env_name, algo_name, run_id) -> str:
@@ -53,6 +54,17 @@ def train(
         num_test_episodes_per_epoch=gin.REQUIRED,
         update_after=gin.REQUIRED,  # for exploration
 ) -> None:
+
+    # ===== logging =====
+
+    os.makedirs(log_dir, exist_ok=True)
+
+    csv_file = open(f'{log_dir}/progress.csv', 'w+')
+    csv_writer = csv.writer(csv_file)
+    csv_writer.writerow(['epoch', 'test_mean_ep_len', 'test_mean_ep_ret'])
+
+    # ===================
+
     env = env_fn()
     test_env = env_fn()
 
@@ -77,7 +89,8 @@ def train(
         # however, the little catch is that the environment might actually be done
         # due to termination rather than timeout, but this is much less likely
         # so we just do it this way for convenience
-        done = False if episode_len == max_steps_per_episode else True
+
+        done = False if episode_len == max_steps_per_episode else done
 
         buffer.push(Transition(state, action, reward, next_state, done))
 
@@ -105,12 +118,13 @@ def train(
                 episode_lens.append(episode_len)
                 episode_returns.append(episode_return)
 
-            wandb.log({
-                'epoch': epoch,
-                'test_mean_ep_len': np.mean(episode_lens),
-                'test_mean_ep_ret': np.mean(episode_returns)
-            })
+            mean_episode_len = np.mean(episode_lens)
+            mean_episode_return = np.mean(episode_returns)
 
-            print(epoch, np.mean(episode_returns))
+            csv_writer.writerow([epoch, mean_episode_len, mean_episode_return])
 
+            # 9 = 1 for sign + 5 for int + 1 for decimal point + 2 for decimal places
+            print(f'Epoch {epoch:4.0f} | Ep len {mean_episode_len:5.0f} | Ep ret {mean_episode_return:9.2f}')
+
+    csv_file.close()
     algorithm.save_actor(log_dir)

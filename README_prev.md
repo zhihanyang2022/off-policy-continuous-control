@@ -12,6 +12,20 @@ PyTorch version:
 python -m spinup.run sac --exp_name sac-pytorch --env [ENV] --steps_per_epoch 10000 --epochs 300 --seed [SEED]
 ```
 
+```bash
+python -m spinup.run sac \
+--exp_name pendulum-sac-pytorch \
+--env Pendulum-v0 \
+--steps_per_epoch 1000 \
+--epochs 100 \
+--start_steps 0 \
+--update_after 200 \
+--max_ep_len 200 \
+--seed 0
+```
+
+# TODO: mention my and spinup's use of start steps and update after
+
 TensorFlow version:
 
 TODO

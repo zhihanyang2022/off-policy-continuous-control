@@ -9,9 +9,10 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.distributions import Normal, Independent
 
-from basics.abstract_algorithms import OffPolicyRLAlgorithm
+from basics.abstract_algorithm import OffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPGaussianActor, MLPCritic
 from basics.replay_buffer import Batch
+
 
 @gin.configurable(module=__name__)
 class SAC(OffPolicyRLAlgorithm):
@@ -32,12 +33,12 @@ class SAC(OffPolicyRLAlgorithm):
         self.Q1 = MLPCritic(input_dim=input_dim, action_dim=action_dim)
         self.Q1_targ = MLPCritic(input_dim=input_dim, action_dim=action_dim)
         self.Q1_targ.load_state_dict(self.Q1.state_dict())
-        self.Q1_optimizer = optim.Adam(self.Q1.parameters(), lr=1e-3)
+        self.Q1_optimizer = optim.Adam(self.Q1.parameters(), lr=lr)
 
         self.Q2 = MLPCritic(input_dim=input_dim, action_dim=action_dim)
         self.Q2_targ = MLPCritic(input_dim=input_dim, action_dim=action_dim)
         self.Q2_targ.load_state_dict(self.Q2.state_dict())
-        self.Q2_optimizer = optim.Adam(self.Q2.parameters(), lr=1e-3)
+        self.Q2_optimizer = optim.Adam(self.Q2.parameters(), lr=lr)
 
         self.gamma = gamma
         self.alpha = alpha
@@ -73,10 +74,13 @@ class SAC(OffPolicyRLAlgorithm):
         else:
             return a
 
+    def clip_gradient(self, net: nn.Module) -> None:
+        for param in net.parameters():
+            param.grad.data.clamp_(-1, 1)
+
     def polyak_update(self, old_net: nn.Module, new_net: nn.Module) -> None:
-        with torch.no_grad():  # no grad is probably not needed
-            for old_param, new_param in zip(old_net.parameters(), new_net.parameters()):
-                old_param.data.copy_(old_param.data * self.polyak + new_param.data * (1 - self.polyak))
+        for old_param, new_param in zip(old_net.parameters(), new_net.parameters()):
+            old_param.data.copy_(old_param.data * self.polyak + new_param.data * (1 - self.polyak))
 
     def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
@@ -105,6 +109,7 @@ class SAC(OffPolicyRLAlgorithm):
 
         self.Q1_optimizer.zero_grad()
         Q1_loss.backward()
+        self.clip_gradient(self.Q1)
         self.Q1_optimizer.step()
 
         Q2_predictions = self.Q2(b.s, b.a)
@@ -112,6 +117,7 @@ class SAC(OffPolicyRLAlgorithm):
 
         self.Q2_optimizer.zero_grad()
         Q2_loss.backward()
+        self.clip_gradient(self.Q2)
         self.Q2_optimizer.step()
 
         # ========================================
@@ -128,6 +134,7 @@ class SAC(OffPolicyRLAlgorithm):
 
         self.actor_optimizer.zero_grad()
         policy_loss.backward()
+        self.clip_gradient(self.actor)
         self.actor_optimizer.step()
 
         for param in self.Q1.parameters():
@@ -143,7 +150,6 @@ class SAC(OffPolicyRLAlgorithm):
         self.polyak_update(old_net=self.Q2_targ, new_net=self.Q2)
 
     def save_actor(self, save_dir: str) -> None:
-        os.makedirs(save_dir, exist_ok=True)
         torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))
 
     def load_actor(self, save_dir: str) -> None:

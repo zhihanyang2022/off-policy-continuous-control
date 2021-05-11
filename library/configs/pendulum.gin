@@ -1,6 +1,6 @@
 import basics.actors_and_critics
 
-basics.actors_and_critics.MLP.hidden_dimensions = (256, 256)
+basics.actors_and_critics.make_MLP.hidden_dimensions = (256, 256)
 
 import algorithms.sac
 
@@ -17,6 +17,7 @@ basics.replay_buffer.ReplayBuffer.batch_size = 100
 import basics.run_utils
 
 basics.run_utils.train.max_steps_per_episode = 200  # should match with gym timeout
+
 basics.run_utils.train.num_epochs = 100
 basics.run_utils.train.num_steps_per_epoch = 1000
 basics.run_utils.train.update_every = 50

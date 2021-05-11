@@ -1,3 +1,5 @@
+Comment on where working directly should be
+
 CITE image
 
 PLEASE NOTE THAT THIS REPO IS UNDER ACTIVE CONSTRUCTION.

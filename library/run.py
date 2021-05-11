@@ -1,5 +1,4 @@
 import gin
-import wandb
 import argparse
 
 import gym
@@ -29,13 +28,12 @@ gin.parse_config_file(args.config)
 
 log_dir = generate_log_dir(args.env, args.algo, args.run_id)
 
-wandb.init(
-    project='off-policy-continuous-control',
-    entity='yangz2',
-    group=f'{args.env}-{args.algo}',
-    settings=wandb.Settings(_disable_stats=True),
-    name=f'run_id={args.run_id}'
-)
+print('============================================================')
+print('env:', args.env)
+print('algo:', args.algo)
+print('config:', args.config)
+print('logdir:', log_dir)
+print('============================================================')
 
 # ==================================================
 
