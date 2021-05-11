@@ -2,7 +2,7 @@ import gin
 import random
 import torch
 from collections import namedtuple, deque
-from basics.run_utils import get_device
+from basics.cuda_utils import get_device
 
 Transition = namedtuple('Transition', 's a r ns d')
 Batch = namedtuple('Batch', 's a r ns d')

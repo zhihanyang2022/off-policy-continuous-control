@@ -11,10 +11,6 @@ from basics.replay_buffer import ReplayBuffer, Transition
 BASE_LOG_DIR = '../results'
 
 
-def get_device():
-    return 'cuda' if torch.cuda.is_available() else 'cpu'
-
-
 def generate_log_dir(env_name, algo_name, run_id) -> str:
     return f'{BASE_LOG_DIR}/{env_name}/{algo_name}/{run_id}'
 
