@@ -6,6 +6,8 @@ import torch.nn as nn
 import torch.optim as optim
 from basics.abstract_algorithms import OffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPGaussianActor, MLPCritic
-from basics.buffer import Batch
+from basics.replay_buffer import Batch
 from basics.utils import clip_gradient
 
+class DDPG:
+    pass

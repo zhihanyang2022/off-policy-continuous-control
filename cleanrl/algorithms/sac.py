@@ -9,7 +9,7 @@ import torch.optim as optim
 from torch.distributions import Normal, Independent
 from basics.abstract_algorithms import OffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPGaussianActor, MLPCritic
-from basics.buffer import Batch
+from basics.replay_buffer import Batch
 
 
 class SAC(OffPolicyRLAlgorithm):
