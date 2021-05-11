@@ -1,6 +1,6 @@
 torch==1.8.0
 numpy==1.19.5
-gin-config==0.14.0
 gym==0.15.7
 mujoco-py==2.0.2.13
 matplotlib
+gin-config
