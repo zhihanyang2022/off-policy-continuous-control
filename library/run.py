@@ -51,7 +51,7 @@ if args.visualize:
         env_fn=env_fn,
         algorithm=algorithm,
         log_dir=log_dir,  # trained model will be loaded from here
-        num_videos=10  # number of episodes to record
+        num_videos=3  # number of episodes to record
     )
 
 else:

@@ -12,11 +12,13 @@ env_dir = args.env
 
 for algo_folder in os.listdir(env_dir):
 
+    run_folders = os.listdir(os.path.join(env_dir, algo_folder))
+
     ep_rets_s = []
 
-    for seed_folder in os.listdir(os.path.join(env_dir, algo_folder)):
+    for run_folder in run_folders:
 
-        csv_path = os.path.join(env_dir, algo_folder, seed_folder, 'progress.csv')
+        csv_path = os.path.join(env_dir, algo_folder, run_folder, 'progress.csv')
 
         df = pd.read_csv(csv_path)
 
@@ -27,7 +29,7 @@ for algo_folder in os.listdir(env_dir):
     ep_rets_s = np.array(ep_rets_s)
     mean_ep_ret = ep_rets_s.mean(axis=0)  # average across all seeds
 
-    plt.plot(np.arange(1, len(mean_ep_ret)+1), mean_ep_ret, label=algo_folder)
+    plt.plot(np.arange(1, len(mean_ep_ret)+1), mean_ep_ret, label=f'{algo_folder} ({len(run_folders)} runs)')
 
 plt.title(args.env)
 plt.xlabel('Epoch')
