@@ -6,12 +6,12 @@ from collections import namedtuple, deque
 Transition = namedtuple('Transition', 's a r ns d')
 Batch = namedtuple('Batch', 's a r ns d')
 
-gin.configurable(module=__name__)
+@gin.configurable(module=__name__)
 class ReplayBuffer:
 
     """Just a standard FIFO replay buffer."""
 
-    def __init__(self, capacity=None, batch_size=None):
+    def __init__(self, capacity=gin.REQUIRED, batch_size=gin.REQUIRED):
         self.capacity = capacity
         self.memory = deque(maxlen=capacity)
         self.batch_size = batch_size

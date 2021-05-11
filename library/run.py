@@ -2,161 +2,68 @@ import gin
 import wandb
 import argparse
 
-import numpy as np
 import gym
-from gym.wrappers import Monitor, RescaleAction
+from gym.wrappers import RescaleAction
 
-from cleanrl.basics.replay_buffer import ReplayBuffer
-from cleanrl.basics.abstract_algorithms import OffPolicyRLAlgorithm
+from basics.replay_buffer import ReplayBuffer
 from algorithms import *
 
-LOG_DIR = 'results'
+from basics.run_utils import train, visualize_trained_policy
+from basics.run_utils import generate_log_dir
 
-def generate_log_dir(exp_name, run_id) -> str:
-    return f'{LOG_DIR}/{exp_name}/{run_id}'
+algo_name2class = {
+    'ddpg': DDPG,
+    'td3': TD3,
+    'sac': SAC
+}
 
-def test_for_one_episode(env, algorithm) -> tuple:
-    state, done, episode_return, episode_len = env.reset(), False, 0, 0
-    while not done:
-        action = algorithm.act(state, deterministic=True)
-        state, reward, done, _ = env.step(action)
-        episode_return += reward
-        episode_len += 1
-    return episode_return, episode_len
+parser = argparse.ArgumentParser()
+parser.add_argument('--env', type=str, required=True)
+parser.add_argument('--algo', type=str, required=True, help='Choose among "ddpg", "td3" and "sac"')
+parser.add_argument('--run_id', type=int, required=True)
+parser.add_argument('--config', type=str, required=True, help='Task-specific hyperparameters')
+parser.add_argument('--visualize', action='store_true', help='Visualize a trained policy (no training happens)')  # default is false
 
-def visualize_trained_policy(
-    env_fn,
-    algorithm: OffPolicyRLAlgorithm,
-    exp_name,
-    run_id,
-    num_episodes
-) -> None:
+args = parser.parse_args()
 
-    log_dir = generate_log_dir(exp_name, run_id)
-    algorithm.load_actor(save_dir=log_dir, save_filename='actor.pth')
+gin.parse_config_file(args.config)
 
-    for i in range(num_episodes):
-        env = Monitor(
-            env_fn(),
-            directory=f'{log_dir}/videos/{i}'
-        )
-        test_for_one_episode(env, algorithm)
+log_dir = generate_log_dir(args.env, args.algo, args.run_id)
 
-@gin.configurable(module=__name__)
-def train(
-    env_fn,
-    algorithm: OffPolicyRLAlgorithm,
-    buffer: ReplayBuffer,
-    exp_name,  # TODO: explain that this can be different from env
-    run_id,  # TODO: explain this
-    num_epochs=None,  # TODO: all configurable arugments are default to None
-    num_steps_per_epoch=None,
-    update_every=None,  # number of environment interactions between gradient updates; however, the ratio of the two is locked to 1-to-1.
-    num_test_episodes_per_epoch=None,
-    update_after=None,  # for exploration
-) -> None:
+wandb.init(
+    project='off-policy-continuous-control',
+    entity='yangz2',
+    group=f'{args.env}-{args.algo}',
+    settings=wandb.Settings(_disable_stats=True),
+    name=f'run_id={args.run_id}'
+)
 
-    env = env_fn()
-    test_env = env_fn()
+# ==================================================
 
-    state = env.reset()
-    episode_len = 0
+def env_fn():
+    return RescaleAction(gym.make(args.env), -1, 1)
 
-    """Follow from OpenAI Spinup's training loop style"""
-    total_steps = num_steps_per_epoch * num_epochs
+algorithm = algo_name2class[args.algo](
+    input_dim=env_fn().observation_space.shape[0],
+    action_dim=env_fn().action_space.shape[0],
+)
 
-    for t in range(total_steps):
+if args.visualize:
 
-        if t >= update_after:   # num_exploration_steps have passed
-            action = algorithm.act(state, deterministic=False)
-        else:
-            action = env.action_space.sample()
+    visualize_trained_policy(
+        env_fn=env_fn,
+        algorithm=algorithm,
+        log_dir=log_dir,  # trained model will be loaded from here
+        num_videos=10  # number of episodes to record
+    )
 
-        next_state, reward, done, _ = env.step(action)
-        episode_len += 1
+else:
 
-        # ignore the done flag if done is caused by hitting the maximum episode steps
-        # TODO: environment needs to be wrapped by TimeLimit wrapper
-        # however, the little catch is that the environment might actually be done
-        # due to termination rather than timeout, but this is much less likely
-        # so we just do it this way for convenience
-        done = False if episode_len == env._max_episode_steps else True
+    buffer = ReplayBuffer()
 
-        state = next_state
-
-        # end of trajectory handling
-        if done or (episode_len == env._max_episode_steps):
-            # TODO: talk about termination handling
-            state, episode_return, episode_len = env.reset(), 0, 0
-
-        # update handling
-        if t >= update_after and (t + 1) % update_every == 0:
-            for j in range(update_every):
-                batch = buffer.sample()
-                algorithm.update_networks(batch)
-
-        # end of epoch handling
-        if (t + 1) % num_steps_per_epoch == 0:
-
-            epoch = (t + 1) // num_steps_per_epoch
-            episode_lens, episode_returns = [], []
-
-            for j in range(num_test_episodes_per_epoch):
-                episode_len, episode_return = test_for_one_episode(test_env, algorithm)
-                episode_lens.append(episode_len)
-                episode_returns.append(episode_return)
-
-            wandb.log({
-                'epoch': epoch,
-                'test_mean_ep_len': np.mean(episode_lens),
-                'test_mean_ep_ret': np.mean(episode_returns)
-            })
-
-    # TODO: save a csv and a model file after training
-
-if __name__ == '__main__':
-
-    algo_name2class = {
-        'ddpg': DDPG,
-        'sac': SAC
-    }
-
-    ON_POLICY_METHODS = ['A2C', 'TRPO', 'PPO']
-    OFF_POLICY_METHODS_DISC = ['DQN', 'QRDQN', 'IQN']
-    OFF_POLICY_METHODS_CONT = ['DDPG', 'TD3', 'SAC']
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--env', type=str, required=True)
-    parser.add_argument('--algo', type=str, required=True)
-    parser.add_argument('--disc_or_cont', type=str, required=True)
-    parser.add_argument('--exp_name', type=str, required=True)
-    parser.add_argument('--run_id', type=str, required=True)
-    parser.add_argument('--config', type=str, required=True, help='Task-specific hyperparameters')
-    args = parser.parse_args()
-
-    if args.discrete_or_continuous == 'disc':
-
-        pass
-
-    elif args.discrete_or_continuous == 'cont':
-
-        env_fn = lambda: RescaleAction(gym.make(args.env), -1, 1)
-        example_env = gym.make(args.env)
-
-        algorithm = algo_name2class[args.algo](
-            input_dim=example_env.observation_space.shape[0],
-            action_dim=example_env.action_space.shape[0],
-        )
-
-        if args.algo in ON_POLICY_METHODS:
-            raise NotImplementedError
-        elif args.algo in OFF_POLICY_METHODS_CONT:
-            buffer = ReplayBuffer()
-        else:
-            assert False, "Unknown algorithm"
-
-        train(env_fn=env_fn, algorithm=algorithm, buffer=buffer, exp_name=args.exp_name, run_id=args.run_id)
-
-    else:
-
-        assert False, "Unknown option for disc_or_cont"
+    train(
+        env_fn=env_fn,
+        algorithm=algorithm,
+        buffer=buffer,
+        log_dir=log_dir  # the place to save training stats and trained model
+    )

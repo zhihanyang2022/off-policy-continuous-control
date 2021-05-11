@@ -1,17 +1,19 @@
-import os
 from typing import Union
+import gin
+import os
+
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-
 from torch.distributions import Normal, Independent
+
 from basics.abstract_algorithms import OffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPGaussianActor, MLPCritic
 from basics.replay_buffer import Batch
 
-
+@gin.configurable(module=__name__)
 class SAC(OffPolicyRLAlgorithm):
 
     def __init__(
@@ -140,9 +142,9 @@ class SAC(OffPolicyRLAlgorithm):
         self.polyak_update(old_net=self.Q1_targ, new_net=self.Q1)
         self.polyak_update(old_net=self.Q2_targ, new_net=self.Q2)
 
-    def save_actor(self, save_dir: str, save_filename: str) -> None:
+    def save_actor(self, save_dir: str) -> None:
         os.makedirs(save_dir, exist_ok=True)
-        torch.save(self.actor.state_dict(), os.path.join(save_dir, save_filename))
+        torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))
 
-    def load_actor(self, save_dir: str, save_filename: str) -> None:
-        self.actor.load_state_dict(torch.load(os.path.join(save_dir, save_filename)))
+    def load_actor(self, save_dir: str) -> None:
+        self.actor.load_state_dict(torch.load(os.path.join(save_dir, 'actor.pth')))
