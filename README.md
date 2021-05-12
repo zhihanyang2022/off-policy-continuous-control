@@ -41,6 +41,10 @@ python run.py --env=Pendulum-v0 --algo=sac --config=configs/classic_control_sac.
 python run.py --env=Pendulum-v0 --algo=sac --config=configs/classic_control_sac.gin --run_id=1 --visualize
 ```
 
+```
+python run.py --env=Ant-v3 --algo=sac --config=configs/mujoco_sac.gin --run_id 1
+python run.py --env=Ant-v3 --algo=sac --config=configs/mujoco_sac.gin --run_id=1 --visualize
+```
 
 
 
