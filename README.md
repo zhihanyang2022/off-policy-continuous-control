@@ -1,51 +1,43 @@
 Utilize gradient clipping, which might improve stability (but I haven't investigated this)
 
-Run command (working directory library):
+## Commands
+
+### Commands for running and visualizing on classic control tasks
+
+For `cartpole-continuous-v0`:
 
 ```bash
-python run.py --env=Pendulum-v0 --algo=td3 --config=configs/pendulum_td3.gin --run_id=1
+python run.py --env cartpole-continuous-v0 --algo ddpg --config configs/classic_control_ddpg.gin --run_id 1 2 3
+python run.py --env cartpole-continuous-v0 --algo ddpg --config configs/classic_control_ddpg.gin --run_id 1 2 3 --visualize
 
+python run.py --env cartpole-continuous-v0 --algo td3 --config configs/classic_control_td3.gin --run_id 1 2 3
+python run.py --env cartpole-continuous-v0 --algo td3 --config configs/classic_control_td3.gin --run_id 1 2 3 --visualize
 
-python run.py --env=cartpole-continuous-v0 --algo=td3 --config=configs/classic_control_td3.gin --run_id 1 2 3
+python run.py --env cartpole-continuous-v0 --algo sac --config configs/classic_control_sac.gin --run_id 1 2 3
+python run.py --env cartpole-continuous-v0 --algo sac --config configs/classic_control_sac.gin --run_id 1 2 3 --visualize
 ```
 
-```bash
-cd off-policy-continuous-control/library
-python run.py --env=Pendulum-v0 --algo=sac --config=configs/pendulum_sac.gin --run_id=1
-python run.py --env=cartpole-continuous-v0 --algo=sac --config=configs/classic_control_sac.gin --run_id 1 2 3
-```
+For `Pendulum-v0`:
 
 ```bash
-cd off-policy-continuous-control/library
-python run.py --env=Pendulum-v0 --algo=ddpg --config=configs/pendulum_ddpg.gin --run_id=1
-python run.py --env=cartpole-continuous-v0 --algo=ddpg --config=configs/classic_control_ddpg.gin --run_id 1 2 3
-```
-
-For running `cartpole-continuous-v0`:
-
-```bash
-python run.py --env=cartpole-continuous-v0 --algo=ddpg --config=configs/classic_control_ddpg.gin --run_id 1 2 3
-python run.py --env=cartpole-continuous-v0 --algo=td3 --config=configs/classic_control_td3.gin --run_id 1 2 3
-python run.py --env=cartpole-continuous-v0 --algo=sac --config=configs/classic_control_sac.gin --run_id 1 2 3
-```
-
-For running `Pendulum-v0`:
-
-```bash
-python run.py --env=Pendulum-v0 --algo=ddpg --config=configs/classic_control_ddpg.gin --run_id 1 2 3
-python run.py --env=Pendulum-v0 --algo=ddpg --config=configs/classic_control_ddpg.gin --run_id=1 --visualize
+python run.py --env=Pendulum-v0 --algo=ddpg --config=configs/classic_control_ddpg.gin --run_id=1 2 3
+python run.py --env=Pendulum-v0 --algo=ddpg --config=configs/classic_control_ddpg.gin --run_id=1 2 3 --visualize
 
 python run.py --env=Pendulum-v0 --algo=td3 --config=configs/classic_control_td3.gin --run_id 1 2 3
+python run.py --env=Pendulum-v0 --algo=td3 --config=configs/classic_control_td3.gin --run_id 1 2 3 --visualize
 
 python run.py --env=Pendulum-v0 --algo=sac --config=configs/classic_control_sac.gin --run_id 1 2 3
-python run.py --env=Pendulum-v0 --algo=sac --config=configs/classic_control_sac.gin --run_id=1 --visualize
+python run.py --env=Pendulum-v0 --algo=sac --config=configs/classic_control_sac.gin --run_id=1 2 3 --visualize
 ```
 
-```
-python run.py --env=Ant-v3 --algo=sac --config=configs/mujoco_sac.gin --run_id 1
-python run.py --env=Ant-v3 --algo=sac --config=configs/mujoco_sac.gin --run_id=1 --visualize
-```
+### Commands for running and visualizing Mujoco tasks
 
+For `Ant-v3`:
+
+```bash
+python run.py --env=Ant-v3 --algo=sac --config=configs/mujoco_sac.gin --run_id 1 2 3
+python run.py --env=Ant-v3 --algo=sac --config=configs/mujoco_sac.gin --run_id 1 2 3 --visualize
+```
 
 
 Talk about how both SAC and TD3 uses a target policy net, which is not present in SAC
