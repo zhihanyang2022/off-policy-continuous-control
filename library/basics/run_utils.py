@@ -110,10 +110,9 @@ def train(
 
         # end of trajectory handling
         if done or (episode_len == max_steps_per_episode):
-            # TODO: talk about termination handling
             train_episode_lens.append(episode_len)
             train_episode_rets.append(episode_ret)
-            state, episode_len = env.reset(), 0
+            state, episode_len, episode_ret = env.reset(), 0, 0
 
         # update handling
         if t >= update_after and (t + 1) % update_every == 0:
@@ -173,5 +172,6 @@ def train(
             )  # this is a weird syntax trick but it just creates a single string
             print(stats_string)
 
+    # save training stats and model
     csv_file.close()
     algorithm.save_actor(log_dir)
