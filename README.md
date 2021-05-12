@@ -16,6 +16,17 @@ cd off-policy-continuous-control/library
 python run.py --env=Pendulum-v0 --algo=ddpg --config=configs/pendulum_ddpg.gin --run_id=1
 ```
 
+Make sure you have mujoco properly installed at whatever directory
+If you get this error after installing requirements.txt:
+
+```bash
+ValueError: numpy.ndarray size changed, may indicate binary incompatibility. Expected 88 from C header, got 80 from PyObject
+```
+
+simply do `pip uninstall numpy` and `pip install numpy`, which sounds silly but works. Thanks to
+
+https://stackoverflow.com/questions/66060487/valueerror-numpy-ndarray-size-changed-may-indicate-binary-incompatibility-exp
+
 I/ use conda, create the env first using conda and then install requirements.txt using pip.
 
 Comment on where working directly should be
