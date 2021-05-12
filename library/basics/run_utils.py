@@ -134,6 +134,9 @@ def train(
             mean_test_episode_len = np.mean(test_episode_lens)
             mean_test_episode_return = np.mean(test_episode_returns)
 
+            train_episode_lens = []
+            train_episode_rets = []
+
             epoch_end_time = time.perf_counter()
             time_elapsed = epoch_end_time - start_time  # in seconds
             avg_time_per_epoch = time_elapsed / epoch  # in seconds
