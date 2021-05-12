@@ -75,6 +75,7 @@ def train(
     test_env = env_fn()
 
     state = env.reset()
+
     episode_len = 0
     episode_ret = 0
     train_episode_lens = []
@@ -124,6 +125,17 @@ def train(
         if (t + 1) % num_steps_per_epoch == 0:
 
             epoch = (t + 1) // num_steps_per_epoch
+
+            # training stats
+
+            mean_train_episode_len = np.mean(train_episode_lens)
+            mean_train_episode_ret = np.mean(train_episode_rets)
+
+            train_episode_lens = []
+            train_episode_rets = []
+
+            # testing stats
+
             test_episode_lens, test_episode_returns = [], []
 
             for j in range(num_test_episodes_per_epoch):
@@ -134,8 +146,7 @@ def train(
             mean_test_episode_len = np.mean(test_episode_lens)
             mean_test_episode_return = np.mean(test_episode_returns)
 
-            train_episode_lens = []
-            train_episode_rets = []
+            # time-related stats
 
             epoch_end_time = time.perf_counter()
             time_elapsed = epoch_end_time - start_time  # in seconds
@@ -144,16 +155,18 @@ def train(
             time_to_go = int(num_epochs_to_go * avg_time_per_epoch)  # in seconds
             time_to_go_readable = str(datetime.timedelta(seconds=time_to_go))
 
+            # actually record / print the stats
+
             csv_writer.writerow([epoch, mean_test_episode_len, mean_test_episode_return, time_to_go_readable])
 
             # 9 = 1 for sign + 5 for int + 1 for decimal point + 2 for decimal places
             # 8 = 2 for seconds + 2 for minutes + 2 for hours + 2 for :
             stats_string = (
                 f"Epoch {epoch:4.0f}"
-                f"Train ep len {np.mean(train_episode_lens):5.0f}"
-                f"Train ep ret {np.mean(train_episode_rets):9.2f}"
-                f"Test ep len {mean_test_episode_len:5.0f}"
-                f"Test ep ret {mean_test_episode_return:9.2f}"
+                f"Train ep len {mean_train_episode_len:5.0f}\n"
+                f"Train ep ret {mean_train_episode_ret:9.2f}\n"
+                f"Test ep len {mean_test_episode_len:5.0f}\n"
+                f"Test ep ret {mean_test_episode_return:9.2f}\n"
                 f"Time rem {time_to_go_readable}"
             )  # this is a weird syntax trick but it just creates a single string
             print(stats_string)
