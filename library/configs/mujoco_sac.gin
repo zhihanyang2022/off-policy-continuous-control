@@ -22,4 +22,4 @@ basics.run_utils.train.num_epochs = 300
 basics.run_utils.train.num_steps_per_epoch = 10000
 basics.run_utils.train.update_every = 50
 basics.run_utils.train.num_test_episodes_per_epoch = 10
-basics.run_utils.train.update_after = 1000
+basics.run_utils.train.update_after = 10000
