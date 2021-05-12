@@ -159,4 +159,4 @@ class SAC(OffPolicyRLAlgorithm):
         torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))
 
     def load_actor(self, save_dir: str) -> None:
-        self.actor.load_state_dict(torch.load(os.path.join(save_dir, 'actor.pth')))
+        self.actor.load_state_dict(torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device('cpu')))
