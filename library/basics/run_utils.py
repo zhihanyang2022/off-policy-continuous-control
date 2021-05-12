@@ -19,12 +19,14 @@ def generate_log_dir(env_name, algo_name, run_id) -> str:
 
 def test_for_one_episode(env, algorithm) -> tuple:
     state, done, episode_return, episode_len = env.reset(), False, 0, 0
+    actions = []
     while not done:
         action = algorithm.act(state, deterministic=True)
         state, reward, done, _ = env.step(action)
         episode_return += reward
         episode_len += 1
-    return episode_len, episode_return
+        actions.append(action)
+    return episode_len, episode_return, actions
 
 
 def visualize_trained_policy(
@@ -76,7 +78,6 @@ def train(
 
     state = env.reset()
     episode_len = 0
-    actions = []
 
     total_steps = num_steps_per_epoch * num_epochs
 
@@ -88,8 +89,6 @@ def train(
             action = algorithm.act(state, deterministic=False)
         else:
             action = env.action_space.sample()
-
-        actions.append(action)
 
         next_state, reward, done, _ = env.step(action)
         episode_len += 1
@@ -122,20 +121,21 @@ def train(
 
             epoch = (t + 1) // num_steps_per_epoch
             test_episode_lens, test_episode_returns = [], []
+            test_actions_all = []
 
             for j in range(num_test_episodes_per_epoch):
-                test_episode_len, test_episode_return = test_for_one_episode(test_env, algorithm)
+                test_episode_len, test_episode_return, test_actions = test_for_one_episode(test_env, algorithm)
                 test_episode_lens.append(test_episode_len)
                 test_episode_returns.append(test_episode_return)
+                test_actions_all.extend(test_actions)
 
             mean_test_episode_len = np.mean(test_episode_lens)
             mean_test_episode_return = np.mean(test_episode_returns)
 
-            action_mean = np.mean(actions)
-            action_std = np.std(actions)
-            action_max = np.max(actions)
-            action_min = np.min(actions)
-            actions = []
+            test_action_mean = np.mean(test_actions_all)
+            test_action_std = np.std(test_actions_all)
+            test_action_max = np.max(test_actions_all)
+            test_action_min = np.min(test_actions_all)
 
             epoch_end_time = time.perf_counter()
             time_elapsed = epoch_end_time - start_time  # in seconds
@@ -149,14 +149,14 @@ def train(
             # 9 = 1 for sign + 5 for int + 1 for decimal point + 2 for decimal places
             # 8 = 2 for seconds + 2 for minutes + 2 for hours + 2 for :
             print(f'''
-                Epoch {epoch:4.0f}\n
-                Ep len {mean_test_episode_len:5.0f}\n
-                Ep ret {mean_test_episode_return:9.2f}\n
-                action_mean {action_mean}\n
-                action_std {action_std}\n
-                action_min {action_min}\n
-                action_max {action_max}\n
-                Time rem {time_to_go_readable}
+Epoch {epoch:4.0f}\n
+Ep len {mean_test_episode_len:5.0f}\n
+Ep ret {mean_test_episode_return:9.2f}\n
+action_mean {test_action_mean}\n
+action_std {test_action_std}\n
+action_min {test_action_min}\n
+action_max {test_action_max}\n
+Time rem {time_to_go_readable}
             ''')
 
     csv_file.close()
