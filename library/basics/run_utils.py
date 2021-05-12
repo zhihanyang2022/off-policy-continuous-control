@@ -149,13 +149,13 @@ def train(
             # 9 = 1 for sign + 5 for int + 1 for decimal point + 2 for decimal places
             # 8 = 2 for seconds + 2 for minutes + 2 for hours + 2 for :
             print(f'''
-Epoch {epoch:4.0f}\n
-Ep len {mean_test_episode_len:5.0f}\n
-Ep ret {mean_test_episode_return:9.2f}\n
-action_mean {test_action_mean}\n
-action_std {test_action_std}\n
-action_min {test_action_min}\n
-action_max {test_action_max}\n
+Epoch {epoch:4.0f}
+Ep len {mean_test_episode_len:5.0f}
+Ep ret {mean_test_episode_return:9.2f}
+action_mean {test_action_mean}
+action_std {test_action_std}
+action_min {test_action_min}
+action_max {test_action_max}
 Time rem {time_to_go_readable}
             ''')
 
