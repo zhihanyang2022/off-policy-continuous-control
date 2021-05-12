@@ -168,8 +168,8 @@ def train(
                 f"| Train ep ret | {mean_train_episode_ret:9.2f}\n"
                 f"| Test ep len  | {mean_test_episode_len:5.0f}\n"
                 f"| Test ep ret  | {mean_test_episode_return:9.2f}\n"
-                f"| Time rem     | {time_to_go_readable}"
-                f"===============================================================\n"
+                f"| Time rem     | {time_to_go_readable}\n"
+                f"==============================================================="
             )  # this is a weird syntax trick but it just creates a single string
             print(stats_string)
 
