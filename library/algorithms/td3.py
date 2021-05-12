@@ -92,7 +92,7 @@ class TD3(OffPolicyRLAlgorithm):
             na = self.actor(batch.ns)
             noise = torch.clip(
                 torch.randn(na.size()) * self.target_noise, -self.noise_clip, self.noise_clip
-            )
+            ).to(get_device())
             smoothed_na = na + noise
             targets = batch.r + \
                       self.gamma * (1 - batch.d) * \
