@@ -61,7 +61,7 @@ python -m spinup.run sac \
 --update_after 9950 \
 --update_every 50 \
 --max_ep_len 1000 \
---seed 0
+--seed 1
 ```
 
 
