@@ -115,7 +115,7 @@ class SAC(OffPolicyRLAlgorithm):
 
         self.Q1_optimizer.zero_grad()
         Q1_loss.backward()
-        self.clip_gradient(self.Q1)
+        #self.clip_gradient(self.Q1)
         self.Q1_optimizer.step()
 
         Q2_predictions = self.Q2(b.s, b.a)
@@ -123,7 +123,7 @@ class SAC(OffPolicyRLAlgorithm):
 
         self.Q2_optimizer.zero_grad()
         Q2_loss.backward()
-        self.clip_gradient(self.Q2)
+        #self.clip_gradient(self.Q2)
         self.Q2_optimizer.step()
 
         # ========================================
