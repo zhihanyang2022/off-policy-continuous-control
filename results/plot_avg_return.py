@@ -43,6 +43,6 @@ plt.xlabel('Epoch')
 plt.ylabel('Return')
 plt.legend(loc='lower right')
 plt.grid()
-plt.show()
+plt.savefig(f'{env_dir}/avg_return.png', dpi=200)
 
 
