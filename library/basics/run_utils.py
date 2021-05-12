@@ -67,7 +67,14 @@ def train(
 
     csv_file = open(f'{log_dir}/progress.csv', 'w+')
     csv_writer = csv.writer(csv_file)
-    csv_writer.writerow(['epoch', 'test_mean_ep_len', 'test_mean_ep_ret', 'time_left'])
+    csv_writer.writerow([
+        'epoch',
+        'train_ep_len',
+        'train_ep_ret',
+        'test_ep_len',
+        'test_ep_ret',
+        'time_rem'
+    ])
 
     # ===================
 
@@ -112,7 +119,7 @@ def train(
         if done or (episode_len == max_steps_per_episode):
             train_episode_lens.append(episode_len)
             train_episode_rets.append(episode_ret)
-            state, episode_len, episode_ret = env.reset(), 0, 0
+            state, episode_len, episode_ret = env.reset(), 0, 0  # reset state and stats trackers
 
         # update handling
         if t >= update_after and (t + 1) % update_every == 0:
@@ -156,7 +163,14 @@ def train(
 
             # actually record / print the stats
 
-            csv_writer.writerow([epoch, mean_test_episode_len, mean_test_episode_return, time_to_go_readable])
+            csv_writer.writerow([
+                epoch,
+                mean_train_episode_len,
+                mean_train_episode_ret,
+                mean_test_episode_len,
+                mean_test_episode_return,
+                time_to_go_readable
+            ])
 
             # 9 = 1 for sign + 5 for int + 1 for decimal point + 2 for decimal places
             # 8 = 2 for seconds + 2 for minutes + 2 for hours + 2 for :
