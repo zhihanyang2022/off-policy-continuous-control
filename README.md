@@ -18,7 +18,7 @@ python run.py --env cartpole-continuous-v0 --algo sac --config configs/classic_c
 ```
 
 <p align="center">
-  <img src="results/cartpole-continuous-v0-v0/avg_return.png" width=600>
+  <img src="results/cartpole-continuous-v0/avg_return.png" width=600>
 </p>
 
 For `Pendulum-v0`:
