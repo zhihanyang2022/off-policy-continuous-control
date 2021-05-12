@@ -14,6 +14,8 @@ from basics.cuda_utils import get_device
 @gin.configurable(module=__name__)
 class TD3(OffPolicyRLAlgorithm):
 
+    """Twin Delayed DDPG"""
+
     def __init__(
         self,
         input_dim,
@@ -24,7 +26,8 @@ class TD3(OffPolicyRLAlgorithm):
         gamma=gin.REQUIRED,
         lr=gin.REQUIRED,
         polyak=gin.REQUIRED,
-        ):
+        policy_delay=gin.REQUIRED
+    ):
 
         # ===== networks =====
 
@@ -50,10 +53,14 @@ class TD3(OffPolicyRLAlgorithm):
         # ===== hyper-parameters =====
 
         self.gamma = gamma
+        self.polyak = polyak
+
         self.action_noise = action_noise
         self.target_noise = target_noise
         self.noise_clip = noise_clip
-        self.polyak = polyak
+
+        self.policy_delay = policy_delay
+        self.num_Q_updates = 0
 
     def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
@@ -107,33 +114,37 @@ class TD3(OffPolicyRLAlgorithm):
         self.clip_gradient(self.Q2)
         self.Q2_optimizer.step()
 
+        self.num_Q_updates += 1
+
         # ==================================================
         # policy loss (not present in Q-learning)
         # ==================================================
 
-        for param in self.Q1.parameters():
-            param.requires_grad = False
-        for param in self.Q2.parameters():
-            param.requires_grad = False
+        if self.num_Q_updates % self.policy_delay == 0:  # delayed policy update; special in TD3
 
-        a = self.actor(batch.s)
-        q1_values = self.Q1(batch.s, a)
+            for param in self.Q1.parameters():
+                param.requires_grad = False
+            for param in self.Q2.parameters():
+                param.requires_grad = False
 
-        policy_loss = - torch.mean(q1_values)  # minimizing this loss is maximizing the q values
+            a = self.actor(batch.s)
+            q1_values = self.Q1(batch.s, a)
 
-        # ==================================================
-        # backpropagation and gradient descent
-        # ==================================================
+            policy_loss = - torch.mean(q1_values)  # minimizing this loss is maximizing the q values
 
-        self.actor_optimizer.zero_grad()
-        policy_loss.backward()
-        self.clip_gradient(self.actor)
-        self.actor_optimizer.step()
+            # ==================================================
+            # backpropagation and gradient descent
+            # ==================================================
 
-        for param in self.Q1.parameters():
-            param.requires_grad = True
-        for param in self.Q2.parameters():
-            param.requires_grad = True
+            self.actor_optimizer.zero_grad()
+            policy_loss.backward()
+            self.clip_gradient(self.actor)
+            self.actor_optimizer.step()
+
+            for param in self.Q1.parameters():
+                param.requires_grad = True
+            for param in self.Q2.parameters():
+                param.requires_grad = True
 
         self.polyak_update(old_net=self.Q1_target, new_net=self.Q1)
         self.polyak_update(old_net=self.Q2_target, new_net=self.Q2)

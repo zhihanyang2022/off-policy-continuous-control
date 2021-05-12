@@ -10,6 +10,7 @@ algorithms.td3.TD3.target_noise = 0.2
 algorithms.td3.TD3.noise_clip = 0.5
 algorithms.td3.TD3.lr = 1e-3
 algorithms.td3.TD3.polyak = 0.995
+algorithms.td3.TD3.policy_delay = 2
 
 import basics.replay_buffer
 

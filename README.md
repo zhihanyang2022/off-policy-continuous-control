@@ -3,6 +3,10 @@ Utilize gradient clipping, which might improve stability (but I haven't investig
 Run command (working directory library):
 
 ```bash
+python run.py --env=Pendulum-v0 --algo=td3 --config=configs/pendulum_td3.gin --run_id=1
+```
+
+```bash
 cd off-policy-continuous-control/library
 python run.py --env=Pendulum-v0 --algo=sac --config=configs/pendulum_sac.gin --run_id=1
 ```
