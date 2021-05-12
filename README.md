@@ -17,6 +17,10 @@ python run.py --env cartpole-continuous-v0 --algo sac --config configs/classic_c
 python run.py --env cartpole-continuous-v0 --algo sac --config configs/classic_control_sac.gin --run_id 1 2 3 --visualize
 ```
 
+<p align="center">
+  <img src="results/cartpole-continuous-v0-v0/avg_return.png" width=600>
+</p>
+
 For `Pendulum-v0`:
 
 ```bash
@@ -29,6 +33,10 @@ python run.py --env=Pendulum-v0 --algo=td3 --config=configs/classic_control_td3.
 python run.py --env=Pendulum-v0 --algo=sac --config=configs/classic_control_sac.gin --run_id 1 2 3
 python run.py --env=Pendulum-v0 --algo=sac --config=configs/classic_control_sac.gin --run_id=1 2 3 --visualize
 ```
+
+<p align="center">
+  <img src="results/Pendulum-v0/avg_return.png" width=600>
+</p>
 
 ### Commands for running and visualizing Mujoco tasks
 
