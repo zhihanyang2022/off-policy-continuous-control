@@ -135,6 +135,7 @@ def train(
             action_std = np.std(actions)
             action_max = np.max(actions)
             action_min = np.min(actions)
+            actions = []
 
             epoch_end_time = time.perf_counter()
             time_elapsed = epoch_end_time - start_time  # in seconds
