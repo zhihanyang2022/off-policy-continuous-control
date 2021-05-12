@@ -42,7 +42,9 @@ python run.py --env Pendulum-v0 --algo sac --config configs/classic_control_sac.
 
 ### Commands for running and visualizing Mujoco tasks
 
-Mujoco tasks are much much harder than classic control tasks. Therefore, instead of just trusting our implementation, we decided to compare it again the [OpenAI Spinning Up benchmark](https://spinningup.openai.com/en/latest/spinningup/bench.html). Due to time constraints, here we only compared them on two tasks, `Ant-v3` and `HalfCheetah-v3`.
+Mujoco tasks are much much harder than classic control tasks. Therefore, instead of just trusting our implementation, we decided to compare it again the [OpenAI Spinning Up benchmark](https://spinningup.openai.com/en/latest/spinningup/bench.html). Due to time constraints, here we only compared them on two tasks, `Ant-v3` and `HalfCheetah-v3`. 
+
+Note that both implementations use near-identical hyper-parameters. TODO: explain the only difference
 
 For `Ant-v3`:
 
