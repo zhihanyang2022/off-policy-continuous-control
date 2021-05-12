@@ -30,18 +30,20 @@ class DDPG(OffPolicyRLAlgorithm):
         # Q_target    : (s, a_) --- network --> scalar
         # actor: s --- network --> a_ (in (0, 1) and hence need to undo normalization)
 
+        self.actor = MLPTanhActor(input_dim, action_dim).to(get_device())
+        self.actor_target = MLPTanhActor(input_dim, action_dim).to(get_device())
+        self.actor_target.eval()
+        self.actor_target.load_state_dict(self.actor.state_dict())
+
         self.Q = MLPCritic(input_dim, action_dim).to(get_device())
         self.Q_target = MLPCritic(input_dim, action_dim).to(get_device())
-        self.actor = MLPTanhActor(input_dim, action_dim).to(get_device())
-
         self.Q_target.eval()  # we won't be passing gradients to this network
         self.Q_target.load_state_dict(self.Q.state_dict())
 
         # ===== optimizers =====
 
-        # ref: https://pytorch.org/docs/stable/optim.html
-        self.Q_optimizer = optim.Adam(self.Q.parameters(), lr=lr)
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
+        self.Q_optimizer = optim.Adam(self.Q.parameters(), lr=lr)
 
         # ===== hyper-parameters =====
 
@@ -78,7 +80,7 @@ class DDPG(OffPolicyRLAlgorithm):
 
         with torch.no_grad():
 
-            na = self.actor(batch.ns)
+            na = self.actor_target(batch.ns)
             # oh my, this bug in the following line took me 2 days or so to find it
             # basically, if batch.mask has shape (64, ) and its multiplier has shape (64, 1)
             # the result is a (64, 64) tensor, but this does not even cause an error!!!
@@ -113,6 +115,7 @@ class DDPG(OffPolicyRLAlgorithm):
         self.Q_optimizer.step()
         self.actor_optimizer.step()
 
+        self.polyak_update(old_net=self.actor_target, new_net=self.actor)
         self.polyak_update(old_net=self.Q_target, new_net=self.Q)
 
     def save_actor(self, save_dir: str) -> None:

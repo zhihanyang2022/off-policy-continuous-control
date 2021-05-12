@@ -32,6 +32,9 @@ class TD3(OffPolicyRLAlgorithm):
         # ===== networks =====
 
         self.actor = MLPTanhActor(input_dim, action_dim).to(get_device())
+        self.actor_target = MLPTanhActor(input_dim, action_dim).to(get_device())
+        self.actor_target.eval()
+        self.actor_target.load_state_dict(self.actor.state_dict())
 
         self.Q1 = MLPCritic(input_dim, action_dim).to(get_device())
         self.Q1_target = MLPCritic(input_dim, action_dim).to(get_device())
@@ -89,7 +92,7 @@ class TD3(OffPolicyRLAlgorithm):
 
         with torch.no_grad():
 
-            na = self.actor(batch.ns)
+            na = self.actor_target(batch.ns)
             noise = torch.clip(
                 torch.randn(na.size()) * self.target_noise, -self.noise_clip, self.noise_clip
             ).to(get_device())
@@ -146,6 +149,7 @@ class TD3(OffPolicyRLAlgorithm):
             for param in self.Q2.parameters():
                 param.requires_grad = True
 
+        self.polyak_update(old_net=self.actor_target, new_net=self.actor)
         self.polyak_update(old_net=self.Q1_target, new_net=self.Q1)
         self.polyak_update(old_net=self.Q2_target, new_net=self.Q2)
 
