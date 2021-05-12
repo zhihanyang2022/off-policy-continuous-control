@@ -1,6 +1,8 @@
 import os
 import gin
 import csv
+import time
+import datetime
 
 import numpy as np
 import torch
@@ -36,7 +38,8 @@ def visualize_trained_policy(
     for i in range(num_videos):
         env = Monitor(
             env_fn(),
-            directory=f'{log_dir}/videos/{i}'
+            directory=f'{log_dir}/videos/{i}',
+            force=True
         )
         test_for_one_episode(env, algorithm)
 
@@ -56,13 +59,15 @@ def train(
         update_after=gin.REQUIRED,  # for exploration
 ) -> None:
 
+    """Follow from OpenAI Spinup's training loop style"""
+
     # ===== logging =====
 
     os.makedirs(log_dir, exist_ok=True)
 
     csv_file = open(f'{log_dir}/progress.csv', 'w+')
     csv_writer = csv.writer(csv_file)
-    csv_writer.writerow(['epoch', 'test_mean_ep_len', 'test_mean_ep_ret'])
+    csv_writer.writerow(['epoch', 'test_mean_ep_len', 'test_mean_ep_ret', 'time_left'])
 
     # ===================
 
@@ -72,8 +77,9 @@ def train(
     state = env.reset()
     episode_len = 0
 
-    """Follow from OpenAI Spinup's training loop style"""
     total_steps = num_steps_per_epoch * num_epochs
+
+    start_time = time.perf_counter()
 
     for t in range(total_steps):
 
@@ -100,7 +106,7 @@ def train(
         # end of trajectory handling
         if done or (episode_len == max_steps_per_episode):
             # TODO: talk about termination handling
-            state, episode_return, episode_len = env.reset(), 0, 0
+            state, episode_len = env.reset(), 0
 
         # update handling
         if t >= update_after and (t + 1) % update_every == 0:
@@ -112,20 +118,28 @@ def train(
         if (t + 1) % num_steps_per_epoch == 0:
 
             epoch = (t + 1) // num_steps_per_epoch
-            episode_lens, episode_returns = [], []
+            test_episode_lens, test_episode_returns = [], []
 
             for j in range(num_test_episodes_per_epoch):
-                episode_len, episode_return = test_for_one_episode(test_env, algorithm)
-                episode_lens.append(episode_len)
-                episode_returns.append(episode_return)
+                test_episode_len, test_episode_return = test_for_one_episode(test_env, algorithm)
+                test_episode_lens.append(test_episode_len)
+                test_episode_returns.append(test_episode_return)
 
-            mean_episode_len = np.mean(episode_lens)
-            mean_episode_return = np.mean(episode_returns)
+            mean_test_episode_len = np.mean(test_episode_lens)
+            mean_test_episode_return = np.mean(test_episode_returns)
 
-            csv_writer.writerow([epoch, mean_episode_len, mean_episode_return])
+            epoch_end_time = time.perf_counter()
+            time_elapsed = epoch_end_time - start_time  # in seconds
+            avg_time_per_epoch = time_elapsed / epoch  # in seconds
+            num_epochs_to_go = num_epochs - epoch
+            time_to_go = int(num_epochs_to_go * avg_time_per_epoch)  # in seconds
+            time_to_go_readable = str(datetime.timedelta(seconds=time_to_go))
+
+            csv_writer.writerow([epoch, mean_test_episode_len, mean_test_episode_return, time_to_go_readable])
 
             # 9 = 1 for sign + 5 for int + 1 for decimal point + 2 for decimal places
-            print(f'Epoch {epoch:4.0f} | Ep len {mean_episode_len:5.0f} | Ep ret {mean_episode_return:9.2f}')
+            # 8 = 2 for seconds + 2 for minutes + 2 for hours + 2 for :
+            print(f'Epoch {epoch:4.0f} | Ep len {mean_test_episode_len:5.0f} | Ep ret {mean_test_episode_return:9.2f} | Time rem {time_to_go_readable}')
 
     csv_file.close()
     algorithm.save_actor(log_dir)
