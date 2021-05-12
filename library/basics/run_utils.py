@@ -76,6 +76,7 @@ def train(
 
     state = env.reset()
     episode_len = 0
+    actions = []
 
     total_steps = num_steps_per_epoch * num_epochs
 
@@ -87,6 +88,8 @@ def train(
             action = algorithm.act(state, deterministic=False)
         else:
             action = env.action_space.sample()
+
+        actions.append(action)
 
         next_state, reward, done, _ = env.step(action)
         episode_len += 1
@@ -128,6 +131,11 @@ def train(
             mean_test_episode_len = np.mean(test_episode_lens)
             mean_test_episode_return = np.mean(test_episode_returns)
 
+            action_mean = np.mean(actions)
+            action_std = np.std(actions)
+            action_max = np.max(actions)
+            action_min = np.min(actions)
+
             epoch_end_time = time.perf_counter()
             time_elapsed = epoch_end_time - start_time  # in seconds
             avg_time_per_epoch = time_elapsed / epoch  # in seconds
@@ -139,7 +147,16 @@ def train(
 
             # 9 = 1 for sign + 5 for int + 1 for decimal point + 2 for decimal places
             # 8 = 2 for seconds + 2 for minutes + 2 for hours + 2 for :
-            print(f'Epoch {epoch:4.0f} | Ep len {mean_test_episode_len:5.0f} | Ep ret {mean_test_episode_return:9.2f} | Time rem {time_to_go_readable}')
+            print(f'''
+                Epoch {epoch:4.0f}\n
+                Ep len {mean_test_episode_len:5.0f}\n
+                Ep ret {mean_test_episode_return:9.2f}\n
+                action_mean {action_mean}\n
+                action_std {action_std}\n
+                action_min {action_min}\n
+                action_max {action_max}\n
+                Time rem {time_to_go_readable}
+            ''')
 
     csv_file.close()
     algorithm.save_actor(log_dir)
