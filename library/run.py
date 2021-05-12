@@ -2,6 +2,7 @@ import gin
 import argparse
 
 import gym
+from domains import *  # import all non-official environments
 from gym.wrappers import RescaleAction
 
 from basics.replay_buffer import ReplayBuffer
