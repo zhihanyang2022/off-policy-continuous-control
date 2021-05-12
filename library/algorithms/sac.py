@@ -140,7 +140,7 @@ class SAC(OffPolicyRLAlgorithm):
 
         self.actor_optimizer.zero_grad()
         policy_loss.backward()
-        self.clip_gradient(self.actor)
+        # self.clip_gradient(self.actor)
         self.actor_optimizer.step()
 
         for param in self.Q1.parameters():
