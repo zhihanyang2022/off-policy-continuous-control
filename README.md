@@ -2,6 +2,8 @@ Utilize gradient clipping, which might improve stability (but I haven't investig
 
 ## Commands
 
+Please change your working directory to `library` first.
+
 ### Commands for running and visualizing on classic control tasks
 
 For `cartpole-continuous-v0`:
@@ -43,8 +45,23 @@ python run.py --env Pendulum-v0 --algo sac --config configs/classic_control_sac.
 For `Ant-v3`:
 
 ```bash
+# using this repo
 python run.py --env Ant-v3 --algo sac --config configs/mujoco_sac.gin --run_id 1 2 3
 python run.py --env Ant-v3 --algo sac --config configs/mujoco_sac.gin --run_id 1 2 3 --visualize
+```
+
+```bash
+# using OpenAI Spinning Up
+python -m spinup.run sac \
+--exp_name ant-sac-pytorch \
+--env Ant-v3 \
+--epochs 300 \
+--steps_per_epoch 10000 \
+--start_steps 10000 \
+--update_after 9950 \
+--update_every 50 \
+--max_ep_len 1000 \
+--seed 0
 ```
 
 
