@@ -39,11 +39,8 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
     print('logdir:', log_dir)
     print('============================================================')
 
-    # def env_fn():
-    #     return RescaleAction(gym.make(args.env), -1, 1)
-
     def env_fn():
-        return gym.make(args.env)
+        return RescaleAction(gym.make(args.env), -1, 1)
 
     algorithm = algo_name2class[args.algo](
         input_dim=env_fn().observation_space.shape[0],
