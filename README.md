@@ -42,6 +42,8 @@ python run.py --env Pendulum-v0 --algo sac --config configs/classic_control_sac.
 
 ### Commands for running and visualizing Mujoco tasks
 
+Mujoco tasks are much much harder than classic control tasks. Therefore, instead of just trusting our algorithm, we decided to compare it again the OpenAI Spinning Up repo. 
+
 For `Ant-v3`:
 
 ```bash
