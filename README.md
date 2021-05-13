@@ -48,6 +48,7 @@ Mujoco tasks are much much harder than classic control tasks. Therefore, instead
 
 **Details you should know** 
 - The background of the plots are screenshots from the OpenAI Spinning Up benchmark. 
+- The animations shown are only the first few seconds of an entire trajectory.
 - Note that both implementations use near-identical hyper-parameters. TODO: explain the only difference
 - Approximate running time (on GPU; CPU should be similar since GPU can't really accelerate linear layers):
  
@@ -78,11 +79,16 @@ python -m spinup.run <ddpg or td3 or sac> \
 --seed 1
 ```
 
-**Training plots and trajectories of trained policies**
+**Learning curves and trajectories of trained policies**
 
-<p align="center">
- <img src='results/repo_vs_benchmark_svgs/ant_sac.svg' width=700>
-</p>
+The easiest way I can think of solving this is using the tables included in GitHub's flavored markdown.
+
+To your specific example it would look something like this:
+
+Learning curve            |  Animation
+:-------------------------:|:-------------------------:
+<img src='results/repo_vs_benchmark_svgs/ant_sac.svg' width=700>  | <img src='diagrams/ant_sac.gif' width=270>
+
 
 
 
