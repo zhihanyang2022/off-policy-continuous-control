@@ -51,7 +51,7 @@ For `Ant-v3`:
 ```bash
 # using this repo
 python run.py --env Ant-v3 --algo sac --config configs/mujoco_sac.gin --run_id 1 2 3
-python run.py --env Ant-v3 --algo sac --config configs/mujoco_sac.gin --run_id 1 2 3 --visualize
+python run.py --env Ant-v3 --algo sac --config configs/mujoco_sac.gin --run_id 1 --visualize
 ```
 
 ```bash

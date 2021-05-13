@@ -11,38 +11,37 @@ args = parser.parse_args()
 
 env_dir = args.env
 
-def ignore_hidden(list_of_folders):
+
+def ignore_hidden_and_png(items):
     """Sometimes we get random hidden folders..."""
-    return [folder for folder in list_of_folders if folder[0] != '.']
+    return [item for item in items if item[0] != '.' and not item.endswith('png')]
 
-for algo_folder in ignore_hidden(os.listdir(env_dir)):
 
-    run_folders = ignore_hidden(os.listdir(os.path.join(env_dir, algo_folder)))
+for algo_folder in ignore_hidden_and_png(os.listdir(env_dir)):
+
+    run_folders = ignore_hidden_and_png(os.listdir(os.path.join(env_dir, algo_folder)))
 
     ep_rets_s = []
 
     for run_folder in run_folders:
-
         csv_path = os.path.join(env_dir, algo_folder, run_folder, 'progress.csv')
 
         df = pd.read_csv(csv_path)
 
-        ep_rets = df['test_mean_ep_ret'].to_numpy()
+        ep_rets = df['test_ep_ret'].to_numpy()
 
         ep_rets_s.append(ep_rets)
 
     ep_rets_s = np.array(ep_rets_s)
-    mean_ep_ret = ep_rets_s.mean(axis=0) # average across all seeds
+    mean_ep_ret = ep_rets_s.mean(axis=0)  # average across all seeds
     sd_ep_ret = ep_rets_s.std(axis=0)
 
-    plt.plot(np.arange(1, len(mean_ep_ret)+1), mean_ep_ret, label=f'{algo_folder} ({len(run_folders)} runs)')
-    plt.fill_between(np.arange(1, len(mean_ep_ret)+1), mean_ep_ret - sd_ep_ret, mean_ep_ret + sd_ep_ret, alpha=0.2)
+    plt.plot(np.arange(1, len(mean_ep_ret) + 1), mean_ep_ret, label=f'{algo_folder} ({len(run_folders)} runs)')
+    plt.fill_between(np.arange(1, len(mean_ep_ret) + 1), mean_ep_ret - sd_ep_ret, mean_ep_ret + sd_ep_ret, alpha=0.2)
 
 plt.title(args.env)
 plt.xlabel('Epoch')
-plt.ylabel('Return')
+plt.ylabel('Test-time Return')
 plt.legend(loc='lower right')
 plt.grid()
 plt.savefig(f'{env_dir}/avg_return.png', dpi=200)
-
-

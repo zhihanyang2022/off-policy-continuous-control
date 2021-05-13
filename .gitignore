@@ -131,3 +131,4 @@ dmypy.json
 # Custom
 .idea/
 /library/wandb/
+/results/.ipynb_checkpoints
