@@ -44,7 +44,7 @@ python run.py --env Pendulum-v0 --algo sac --config configs/classic_control_sac.
 
 Mujoco tasks are much much harder than classic control tasks. Therefore, instead of just trusting our implementation, we decided to compare it again the [OpenAI Spinning Up benchmark](https://spinningup.openai.com/en/latest/spinningup/bench.html). Due to time constraints, here we only compared them on two tasks, `Ant-v3` and `HalfCheetah-v3`, using one seed for each. More runs will be added in the future.
 
-**You should know.** 
+**You should know:** 
 - The background of the plots are screenshots from the OpenAI Spinning Up benchmark. 
 - Note that both implementations use near-identical hyper-parameters. TODO: explain the only difference
 - Running time:
