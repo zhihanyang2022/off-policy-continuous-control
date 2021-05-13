@@ -81,11 +81,7 @@ python -m spinup.run <ddpg or td3 or sac> \
 
 **Learning curves and trajectories of trained policies**
 
-The easiest way I can think of solving this is using the tables included in GitHub's flavored markdown.
-
-To your specific example it would look something like this:
-
-Learning curve            |  Animation
+Learning curve            |  Animation (our SAC)
 :-------------------------:|:-------------------------:
 <img src='results/repo_vs_benchmark_svgs/ant_sac.svg' width=700>  | <img src='diagrams/ant_sac.gif' width=270>
 
