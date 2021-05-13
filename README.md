@@ -46,7 +46,7 @@ Mujoco tasks are much much harder than classic control tasks. Therefore, instead
 
 Note that both implementations use near-identical hyper-parameters. TODO: explain the only difference
 
-For `Ant-v3`:
+For `Ant-v3` (takes slightly less than a day to run):
 
 ```bash
 # using this repo
