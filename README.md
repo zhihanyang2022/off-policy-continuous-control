@@ -51,10 +51,10 @@ Mujoco tasks are much much harder than classic control tasks. Therefore, instead
  
 | Task Name \ Algorithm | DDPG | TD3 | SAC |
 | :-------------------: | :--: | :-: | :-: |
-| `Ant-v3`              |      |     |     |
+| `Ant-v3`              |      |     | 20h |
 | `HalfCheetah-v3`      |      |     |     |
  
-For `Ant-v3` (takes slightly less than a day to run):
+For `Ant-v3`:
 
 ```bash
 # using this repo
