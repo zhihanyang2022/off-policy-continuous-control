@@ -14,6 +14,8 @@ from basics.cuda_utils import get_device
 @gin.configurable(module=__name__)
 class DDPG(OffPolicyRLAlgorithm):
 
+    """Deep deterministic policy gradient"""
+
     def __init__(
             self,
             input_dim,

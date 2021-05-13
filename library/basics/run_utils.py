@@ -5,7 +5,6 @@ import time
 import datetime
 
 import numpy as np
-import torch
 from gym.wrappers import Monitor
 
 from basics.replay_buffer import ReplayBuffer, Transition
