@@ -47,8 +47,15 @@ Mujoco tasks are much much harder than classic control tasks. Therefore, instead
 **You should know:** 
 - The background of the plots are screenshots from the OpenAI Spinning Up benchmark. 
 - Note that both implementations use near-identical hyper-parameters. TODO: explain the only difference
-- Running time:
-  - Around 20 hours (seemed to be similar on CPU and GPU)
+- Approximate running time (seemed to be similar on CPU and GPU):
+  - For `Ant-v3`:
+    - DDPG: TODO
+    - TD3: TODO
+    - SAC: 20-24 hours
+  - For `HalfCheetah-v3`:
+    - DDPG: TODO
+    - TD3: TODO
+    - SAC: TODO
 
 For `Ant-v3` (takes slightly less than a day to run):
 
