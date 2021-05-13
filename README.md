@@ -59,14 +59,16 @@ Mujoco tasks are much much harder than classic control tasks. Therefore, instead
  
 **Commands for running stuff**
 
+For this repo:
+
 ```bash
-# using this repo
 python run.py --env Ant-v3 --algo <ddpg or td3 or sac> --config configs/mujoco_<ddpg or td3 or sac>.gin --run_id 1
 python run.py --env Ant-v3 --algo <ddpg or td3 or sac> --config configs/mujoco_<ddpg or td3 or sac>.gin --run_id 1 --visualize
 ```
 
+For OpenAI Spinning Up:
+
 ```bash
-# using OpenAI Spinning Up
 python -m spinup.run <ddpg or td3 or sac> \
 --exp_name ant-sac-pytorch \
 --env Ant-v3 \
@@ -79,7 +81,7 @@ python -m spinup.run <ddpg or td3 or sac> \
 --seed 1
 ```
 
-**Learning curves and trajectories of trained policies**
+**Learning curves and animations of trained agents**
 
 Learning curve            |  Animation (our SAC)
 :-------------------------:|:-------------------------:
