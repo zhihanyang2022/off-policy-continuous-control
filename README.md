@@ -68,6 +68,9 @@ python -m spinup.run sac \
 --seed 1
 ```
 
+<p align="center">
+ <img src='results/repo_vs_benchmark_svgs/ant_sac.svg' width=700>
+</p>
 
 Talk about how both SAC and TD3 uses a target policy net, which is not present in SAC
 
