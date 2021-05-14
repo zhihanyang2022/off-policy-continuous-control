@@ -111,7 +111,7 @@ class SAC(OffPolicyRLAlgorithm):
                       (min_Q_targ - self.alpha * log_pi_na_given_ns)
 
             assert log_pi_na_given_ns.shape == (bs, 1)
-            assert min_Q.shape == (bs, 1)
+            assert min_Q_targ.shape == (bs, 1)
             assert targets.shape == (bs, 1)
 
         # ========================================
