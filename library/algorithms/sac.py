@@ -96,7 +96,7 @@ class SAC(OffPolicyRLAlgorithm):
     def update_networks(self, b: Batch) -> None:
 
         # ========================================
-        # Step 12: calculating targets
+        # calculating targets
         # ========================================
 
         bs = len(b.ns)
@@ -115,7 +115,7 @@ class SAC(OffPolicyRLAlgorithm):
             assert targets.shape == (bs, 1)
 
         # ========================================
-        # Step 13: learning the Q functions
+        # learning the Q functions
         # ========================================
 
         Q1_predictions = self.Q1(b.s, b.a)
@@ -139,7 +139,7 @@ class SAC(OffPolicyRLAlgorithm):
         self.Q2_optimizer.step()
 
         # ========================================
-        # Step 14: learning the policy
+        # learning the policy
         # ========================================
 
         for param in self.Q1.parameters():
