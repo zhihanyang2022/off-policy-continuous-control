@@ -148,10 +148,12 @@ class SAC(OffPolicyRLAlgorithm):
             param.requires_grad = False
 
         a, log_pi_a_given_s = self.sample_action_from_distribution(b.s, deterministic=False, return_log_prob=True)
-        policy_loss = - torch.mean(torch.min(self.Q1(b.s, a), self.Q2(b.s, a)) - self.alpha * log_pi_a_given_s)
+        min_Q = torch.min(self.Q1(b.s, a), self.Q2(b.s, a))
+        policy_loss = - torch.mean(min_Q - self.alpha * log_pi_a_given_s)
 
         assert a.shape == (bs, self.action_dim)
         assert log_pi_a_given_s.shape == (bs, 1)
+        assert min_Q.shape == (bs, 1)
         assert policy_loss.shape == ()
 
         self.actor_optimizer.zero_grad()
