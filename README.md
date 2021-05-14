@@ -1,6 +1,6 @@
 Utilize gradient clipping, which might improve stability (but I haven't investigated this)
 
-## Commands
+## Results
 
 Please change your working directory to `library` first.
 
@@ -40,23 +40,36 @@ python run.py --env Pendulum-v0 --algo sac --config configs/classic_control_sac.
   <img src="results/Pendulum-v0/avg_return.png" width=600>
 </p>
 
-### Commands for running and visualizing Mujoco tasks
+### Results for Mujoco tasks
 
-Mujoco tasks are much much harder than classic control tasks. Therefore, instead of just trusting our implementation, we decided to compare it again the [OpenAI Spinning Up benchmark](https://spinningup.openai.com/en/latest/spinningup/bench.html). Due to time constraints, here we only compared them on two tasks, `Ant-v3` and `HalfCheetah-v3`. 
+**What we did**
 
-Note that both implementations use near-identical hyper-parameters. TODO: explain the only difference
+Mujoco tasks are much much harder than classic control tasks. Therefore, instead of just trusting our implementation, we decided to compare it again the [OpenAI Spinning Up benchmark](https://spinningup.openai.com/en/latest/spinningup/bench.html). Due to time constraints, here we only compared them on two tasks, `Ant-v3` and `HalfCheetah-v3`, using one seed for each. More runs will be added in the future.
 
-For `Ant-v3`:
+**Details you should know** 
+- The background of the plots are screenshots from the OpenAI Spinning Up benchmark. 
+- The animations shown are only the first few seconds of an entire trajectory.
+- Note that both implementations use near-identical hyper-parameters. TODO: explain the only difference
+- Approximate running time (on GPU; CPU should be similar since GPU can't really accelerate linear layers):
+ 
+| Task Name \ Algorithm | DDPG | TD3 | SAC |
+| :-------------------: | :--: | :-: | :-: |
+| `Ant-v3`              |      |     | 20h |
+| `HalfCheetah-v3`      |      |     |     |
+ 
+**Commands for running stuff**
+
+For this repo:
 
 ```bash
-# using this repo
-python run.py --env Ant-v3 --algo sac --config configs/mujoco_sac.gin --run_id 1 2 3
-python run.py --env Ant-v3 --algo sac --config configs/mujoco_sac.gin --run_id 1 --visualize
+python run.py --env Ant-v3 --algo <ddpg or td3 or sac> --config configs/mujoco_<ddpg or td3 or sac>.gin --run_id 1
+python run.py --env Ant-v3 --algo <ddpg or td3 or sac> --config configs/mujoco_<ddpg or td3 or sac>.gin --run_id 1 --visualize
 ```
 
+For OpenAI Spinning Up:
+
 ```bash
-# using OpenAI Spinning Up
-python -m spinup.run sac \
+python -m spinup.run <ddpg or td3 or sac> \
 --exp_name ant-sac-pytorch \
 --env Ant-v3 \
 --epochs 300 \
@@ -67,6 +80,15 @@ python -m spinup.run sac \
 --max_ep_len 1000 \
 --seed 1
 ```
+
+**Learning curves and animations of trained agents**
+
+Learning curve            |  Animation (our SAC)
+:-------------------------:|:-------------------------:
+<img src='results/repo_vs_benchmark_svgs/ant_sac.svg' width=700>  | <img src='diagrams/ant_sac.gif' width=270>
+
+
+
 
 
 Talk about how both SAC and TD3 uses a target policy net, which is not present in SAC
