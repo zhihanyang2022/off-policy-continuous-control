@@ -51,6 +51,8 @@ class SAC(OffPolicyRLAlgorithm):
         self.alpha = alpha
         self.polyak = polyak
 
+        self.action_dim = action_dim
+
     def sample_action_from_distribution(
             self,
             state: torch.tensor,
@@ -69,26 +71,17 @@ class SAC(OffPolicyRLAlgorithm):
         else:
             u = means
 
-        a = torch.tanh(u)
+        a = torch.tanh(u).view(-1, self.action_dim)  # shape checking
 
         if return_log_prob:
             # the following line of code is not numerically stable:
             # log_pi_a_given_s = mu_given_s.log_prob(u) - torch.sum(torch.log(1 - torch.tanh(u) ** 2), dim=1)
-            # ref: https://github.com/vitchyr/rlkit/blob/0073d73235d7b4265cd9abe1683b30786d863ffe/rlkit/torch/distributions.py#L358
-            # ref: https://github.com/tensorflow/probability/blob/master/tensorflow_probability/python/bijectors/tanh.py#L73
+            # github.com/vitchyr/rlkit/blob/0073d73235d7b4265cd9abe1683b30786d863ffe/rlkit/torch/distributions.py#L358
+            # github.com/tensorflow/probability/blob/master/tensorflow_probability/python/bijectors/tanh.py#L73
             log_pi_a_given_s = mu_given_s.log_prob(u) - (2 * (np.log(2) - u - F.softplus(-2 * u))).sum(dim=1)
-            return a, log_pi_a_given_s
+            return a, log_pi_a_given_s.view(-1, 1)  # add another dim
         else:
             return a
-
-    @staticmethod
-    def clip_gradient(net) -> None:
-        for param in net.parameters():
-            param.grad.data.clamp_(-1, 1)
-
-    def polyak_update(self, old_net: nn.Module, new_net: nn.Module) -> None:
-        for old_param, new_param in zip(old_net.parameters(), new_net.parameters()):
-            old_param.data.copy_(old_param.data * self.polyak + new_param.data * (1 - self.polyak))
 
     def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
@@ -96,17 +89,30 @@ class SAC(OffPolicyRLAlgorithm):
             action = self.sample_action_from_distribution(state, deterministic=deterministic, return_log_prob=False)
             return action.cpu().numpy()[0]  # no need to detach first because we are not using reparametrization trick
 
+    def polyak_update(self, old_net: nn.Module, new_net: nn.Module) -> None:
+        for old_param, new_param in zip(old_net.parameters(), new_net.parameters()):
+            old_param.data.copy_(old_param.data * self.polyak + new_param.data * (1 - self.polyak))
+
     def update_networks(self, b: Batch) -> None:
+
         # ========================================
         # Step 12: calculating targets
         # ========================================
 
+        bs = len(b.ns)
+
         with torch.no_grad():
 
             na, log_pi_na_given_ns = self.sample_action_from_distribution(b.ns, deterministic=False, return_log_prob=True)
+
+            min_Q = torch.min(self.Q1_targ(b.ns, na), self.Q2_targ(b.ns, na))
             targets = b.r + \
                       self.gamma * (1 - b.d) * \
-                      (torch.min(self.Q1_targ(b.ns, na), self.Q2_targ(b.ns, na)) - self.alpha * log_pi_na_given_ns)
+                      (min_Q - self.alpha * log_pi_na_given_ns)
+
+            assert log_pi_na_given_ns.shape == (bs, 1)
+            assert min_Q.shape == (bs, 1)
+            assert targets.shape == (bs, 1)
 
         # ========================================
         # Step 13: learning the Q functions
@@ -115,17 +121,21 @@ class SAC(OffPolicyRLAlgorithm):
         Q1_predictions = self.Q1(b.s, b.a)
         Q1_loss = torch.mean((Q1_predictions - targets) ** 2)
 
+        assert Q1_predictions.shape == (bs, 1)
+        assert Q1_loss.shape == ()
+
         self.Q1_optimizer.zero_grad()
         Q1_loss.backward()
-        # self.clip_gradient(self.Q1)
         self.Q1_optimizer.step()
 
         Q2_predictions = self.Q2(b.s, b.a)
         Q2_loss = torch.mean((Q2_predictions - targets) ** 2)
 
+        assert Q2_predictions.shape == (bs, 1)
+        assert Q2_loss.shape == ()
+
         self.Q2_optimizer.zero_grad()
         Q2_loss.backward()
-        # self.clip_gradient(self.Q2)
         self.Q2_optimizer.step()
 
         # ========================================
@@ -140,9 +150,12 @@ class SAC(OffPolicyRLAlgorithm):
         a, log_pi_a_given_s = self.sample_action_from_distribution(b.s, deterministic=False, return_log_prob=True)
         policy_loss = - torch.mean(torch.min(self.Q1(b.s, a), self.Q2(b.s, a)) - self.alpha * log_pi_a_given_s)
 
+        assert a.shape == (bs, self.action_dim)
+        assert log_pi_a_given_s.shape == (bs, 1)
+        assert policy_loss.shape == ()
+
         self.actor_optimizer.zero_grad()
         policy_loss.backward()
-        # self.clip_gradient(self.actor)
         self.actor_optimizer.step()
 
         for param in self.Q1.parameters():
