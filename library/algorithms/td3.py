@@ -68,17 +68,11 @@ class TD3(OffPolicyRLAlgorithm):
     def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
             state = torch.tensor(state).unsqueeze(0).float().to(get_device())
-            greedy_action = self.actor(state).cpu().numpy()[0]
-            # use [0] instead of un-squeeze because un-squeeze gets rid of all extra brackets but we need one
-            if not deterministic:
-                return np.clip(greedy_action + self.action_noise * np.random.randn(len(greedy_action)), -1.0, 1.0)
-            else:
+            greedy_action = self.actor(state).view(-1).cpu().numpy()  # view as 1d -> to cpu -> to numpy
+            if deterministic:
                 return greedy_action
-
-    @staticmethod
-    def clip_gradient(net) -> None:
-        for param in net.parameters():
-            param.grad.data.clamp_(-1, 1)
+            else:
+                return np.clip(greedy_action + self.action_noise * np.random.randn(len(greedy_action)), -1.0, 1.0)
 
     def polyak_update(self, old_net, new_net) -> None:
         for old_param, new_param in zip(old_net.parameters(), new_net.parameters()):
@@ -86,42 +80,41 @@ class TD3(OffPolicyRLAlgorithm):
 
     def update_networks(self, batch: Batch):
 
-        # ==================================================
-        # bellman equation loss (just like Q-learning)
-        # ==================================================
+        # compute prediction
+
+        Q1_pred = self.Q1(batch.s, batch.a)
+        Q2_pred = self.Q2(batch.s, batch.a)
+
+        # compute target
 
         with torch.no_grad():
 
             na = self.actor_target(batch.ns)
-            noise = torch.clip(
+            noise = torch.clamp(
                 torch.randn(na.size()) * self.target_noise, -self.noise_clip, self.noise_clip
             ).to(get_device())
-            smoothed_na = na + noise
-            targets = batch.r + \
-                      self.gamma * (1 - batch.d) * \
-                      torch.min(self.Q1_target(batch.ns, smoothed_na), self.Q2_target(batch.ns, smoothed_na))
+            smoothed_na = torch.clamp(na + noise, -1, 1)
 
-        Q1_pred = self.Q1(batch.s, batch.a)
+            min_Q_targ = torch.min(self.Q1_target(batch.ns, smoothed_na), self.Q2_target(batch.ns, smoothed_na))
+
+            targets = batch.r + self.gamma * (1 - batch.d) * min_Q_targ
+
+        # compute td error
+
         Q1_loss = torch.mean((Q1_pred - targets) ** 2)
+        Q2_loss = torch.mean((Q2_pred - targets) ** 2)
+
+        # reduce td error
 
         self.Q1_optimizer.zero_grad()
         Q1_loss.backward()
-        self.clip_gradient(self.Q1)
         self.Q1_optimizer.step()
-
-        Q2_pred = self.Q2(batch.s, batch.a)
-        Q2_loss = torch.mean((Q2_pred - targets) ** 2)
 
         self.Q2_optimizer.zero_grad()
         Q2_loss.backward()
-        self.clip_gradient(self.Q2)
         self.Q2_optimizer.step()
 
         self.num_Q_updates += 1
-
-        # ==================================================
-        # policy loss (not present in Q-learning)
-        # ==================================================
 
         if self.num_Q_updates % self.policy_delay == 0:  # delayed policy update; special in TD3
 
@@ -130,18 +123,16 @@ class TD3(OffPolicyRLAlgorithm):
             for param in self.Q2.parameters():
                 param.requires_grad = False
 
+            # compute policy loss
+
             a = self.actor(batch.s)
-            q1_values = self.Q1(batch.s, a)
+            Q1_values = self.Q1(batch.s, a)
+            policy_loss = - torch.mean(Q1_values)
 
-            policy_loss = - torch.mean(q1_values)  # minimizing this loss is maximizing the q values
-
-            # ==================================================
-            # backpropagation and gradient descent
-            # ==================================================
+            # reduce policy loss
 
             self.actor_optimizer.zero_grad()
             policy_loss.backward()
-            self.clip_gradient(self.actor)
             self.actor_optimizer.step()
 
             for param in self.Q1.parameters():
@@ -149,7 +140,8 @@ class TD3(OffPolicyRLAlgorithm):
             for param in self.Q2.parameters():
                 param.requires_grad = True
 
-        self.polyak_update(old_net=self.actor_target, new_net=self.actor)
+            self.polyak_update(old_net=self.actor_target, new_net=self.actor)
+
         self.polyak_update(old_net=self.Q1_target, new_net=self.Q1)
         self.polyak_update(old_net=self.Q2_target, new_net=self.Q2)
 
