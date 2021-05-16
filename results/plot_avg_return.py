@@ -17,6 +17,15 @@ def ignore_hidden_and_png(items):
     return [item for item in items if item[0] != '.' and not item.endswith('png')]
 
 
+def smooth(scalars, retain_prop=0.90):
+    current = scalars[0]
+    smoothed_scalars = [current]
+    for scalar in scalars[1:]:
+        current = retain_prop * current + (1 - retain_prop) * scalar
+        smoothed_scalars.append(current)
+    return smoothed_scalars
+
+
 for algo_folder in ignore_hidden_and_png(os.listdir(env_dir)):
 
     run_folders = ignore_hidden_and_png(os.listdir(os.path.join(env_dir, algo_folder)))
@@ -30,7 +39,7 @@ for algo_folder in ignore_hidden_and_png(os.listdir(env_dir)):
 
         ep_rets = df['test_ep_ret'].to_numpy()
 
-        ep_rets_s.append(ep_rets)
+        ep_rets_s.append(smooth(ep_rets))
 
     ep_rets_s = np.array(ep_rets_s)
     mean_ep_ret = ep_rets_s.mean(axis=0)  # average across all seeds
