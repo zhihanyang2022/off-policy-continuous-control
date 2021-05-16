@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.signal import savgol_filter
+from plot_utils import eleven_neighbor_smooth
 
 
 def ignore_hidden_and_png(items):
@@ -11,22 +11,7 @@ def ignore_hidden_and_png(items):
     return [item for item in items if item[0] != '.' and not item.endswith('png')]
 
 
-def smooth(scalars, retain_prop=0.90):
-    current = scalars[0]
-    smoothed_scalars = [current]
-    for scalar in scalars[1:]:
-        current = retain_prop * current + (1 - retain_prop) * scalar
-        smoothed_scalars.append(current)
-    return smoothed_scalars
-
-
-if __name__ == '__main__':
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--env', type=str, required=True)
-    args = parser.parse_args()
-
-    env_dir = args.env
+def plot_all_runs(env_dir, xs=None):
 
     for algo_folder in ignore_hidden_and_png(os.listdir(env_dir)):
 
@@ -41,14 +26,29 @@ if __name__ == '__main__':
 
             ep_rets = df['test_ep_ret'].to_numpy()
 
-            ep_rets_s.append(smooth(ep_rets))
+            ep_rets_s.append(eleven_neighbor_smooth(list(ep_rets)))
 
         ep_rets_s = np.array(ep_rets_s)
         mean_ep_ret = ep_rets_s.mean(axis=0)  # average across all seeds
-        sd_ep_ret = ep_rets_s.std(axis=0)
+        max_ep_ret = ep_rets_s.max(axis=0)
+        min_ep_ret = ep_rets_s.min(axis=0)
 
-        plt.plot(np.arange(1, len(mean_ep_ret) + 1), mean_ep_ret, label=f'{algo_folder} ({len(run_folders)} runs)')
-        plt.fill_between(np.arange(1, len(mean_ep_ret) + 1), mean_ep_ret - sd_ep_ret, mean_ep_ret + sd_ep_ret, alpha=0.2)
+        if xs is None:
+            xs = np.arange(1, len(mean_ep_ret) + 1)
+
+        plt.plot(xs, mean_ep_ret, label=f'{algo_folder} ({len(run_folders)} runs)', color='black')
+        plt.fill_between(xs, min_ep_ret, max_ep_ret, alpha=0.2, color='black')
+
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--env', type=str, required=True)
+    args = parser.parse_args()
+
+    env_dir = args.env
+
+    plot_all_runs(args.env)
 
     plt.title(args.env)
     plt.xlabel('Epoch')
