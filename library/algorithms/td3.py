@@ -63,6 +63,9 @@ class TD3(OffPolicyRLAlgorithm):
         self.noise_clip = noise_clip
 
         self.policy_delay = policy_delay
+
+        # miscellaneous
+
         self.num_Q_updates = 0
 
     def act(self, state: np.array, deterministic: bool) -> np.array:
@@ -140,7 +143,11 @@ class TD3(OffPolicyRLAlgorithm):
             for param in self.Q2.parameters():
                 param.requires_grad = True
 
+            # # update target networks
+
             self.polyak_update(old_net=self.actor_target, new_net=self.actor)
+
+        # update target networks
 
         self.polyak_update(old_net=self.Q1_target, new_net=self.Q1)
         self.polyak_update(old_net=self.Q2_target, new_net=self.Q2)
