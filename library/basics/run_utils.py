@@ -175,11 +175,11 @@ def train(
             # 8 = 2 for seconds + 2 for minutes + 2 for hours + 2 for :
             stats_string = (
                 f"===============================================================\n"
-                f"| Epoch        | {epoch:4.0f}\n"
-                f"| Train ep len | {mean_train_episode_len:5.0f}\n"
-                f"| Train ep ret | {mean_train_episode_ret:9.2f}\n"
-                f"| Test ep len  | {mean_test_episode_len:5.0f}\n"
-                f"| Test ep ret  | {mean_test_episode_return:9.2f}\n"
+                f"| Epoch        | {epoch}\n"
+                f"| Train ep len | {mean_train_episode_len}\n"
+                f"| Train ep ret | {round(mean_train_episode_ret, 2)}\n"
+                f"| Test ep len  | {mean_test_episode_len}\n"
+                f"| Test ep ret  | {round(mean_test_episode_return, 2)}\n"
                 f"| Time rem     | {time_to_go_readable}\n"
                 f"==============================================================="
             )  # this is a weird syntax trick but it just creates a single string
