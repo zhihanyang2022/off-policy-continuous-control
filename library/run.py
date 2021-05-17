@@ -1,5 +1,6 @@
 import gin
 import argparse
+import json
 
 import gym
 from domains import *  # import all non-official environments
@@ -8,7 +9,7 @@ from gym.wrappers import RescaleAction
 from basics.replay_buffer import ReplayBuffer
 from algorithms import *
 
-from basics.run_utils import generate_log_dir, train, visualize_trained_policy
+from basics.run_utils import make_log_dir, train, visualize_trained_policy
 
 algo_name2class = {
     'ddpg': DDPG,
@@ -29,7 +30,7 @@ gin.parse_config_file(args.config)
 
 for run_id in args.run_id:  # args.run_id is a list of ints; could contain more than one run_ids
 
-    log_dir = generate_log_dir(args.env, args.algo, run_id)
+    log_dir = make_log_dir(args.env, args.algo, run_id)
 
     print('============================================================')
     print('env:', args.env)
@@ -56,7 +57,17 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
             num_videos=3  # number of episodes to record
         )
 
-    else:
+    else:  # actually train
+
+        args_dict = {
+            'env': args.env,
+            'algo': args.algo,
+            'run_id': args.run_id,
+            'config': args.config,
+        }
+
+        with open(f'{log_dir}/args.json', 'w+') as json_f:
+            json.dump(args_dict, json_f)
 
         buffer = ReplayBuffer()
 

@@ -1,8 +1,8 @@
-import os
 import gin
 import csv
 import time
 import datetime
+import os
 
 import numpy as np
 from gym.wrappers import Monitor
@@ -12,8 +12,10 @@ from basics.replay_buffer import ReplayBuffer, Transition
 BASE_LOG_DIR = '../results'
 
 
-def generate_log_dir(env_name, algo_name, run_id) -> str:
-    return f'{BASE_LOG_DIR}/{env_name}/{algo_name}/{run_id}'
+def make_log_dir(env_name, algo_name, run_id) -> str:
+    log_dir = f'{BASE_LOG_DIR}/{env_name}/{algo_name}/{run_id}'
+    os.makedirs(log_dir, exist_ok=True)  # crucial
+    return log_dir
 
 
 def test_for_one_episode(env, algorithm) -> tuple:
@@ -61,8 +63,6 @@ def train(
     """Follow from OpenAI Spinup's training loop style"""
 
     # ===== logging =====
-
-    os.makedirs(log_dir, exist_ok=True)
 
     csv_file = open(f'{log_dir}/progress.csv', 'w+')
     csv_writer = csv.writer(csv_file)
