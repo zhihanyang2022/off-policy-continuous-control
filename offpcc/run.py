@@ -30,6 +30,8 @@ gin.parse_config_file(args.config)
 
 for run_id in args.run_id:  # args.run_id is a list of ints; could contain more than one run_ids
 
+    # for logging
+
     log_dir = make_log_dir(args.env, args.algo, run_id)
 
     print('============================================================')
@@ -40,6 +42,8 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
     print('logdir:', log_dir)
     print('============================================================')
 
+    # rl stuff
+
     def env_fn():
         return RescaleAction(gym.make(args.env), -1, 1)
 
@@ -48,7 +52,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
         action_dim=env_fn().action_space.shape[0],
     )
 
-    if args.visualize:
+    if args.visualize:  # visualize and generate videos inside log_dir
 
         visualize_trained_policy(
             env_fn=env_fn,
@@ -59,6 +63,8 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
 
     else:  # actually train
 
+        # save a json file containing the command line arguments; for reproducibility
+
         args_dict = {
             'env': args.env,
             'algo': args.algo,
@@ -68,6 +74,8 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
 
         with open(f'{log_dir}/args.json', 'w+') as json_f:
             json.dump(args_dict, json_f)
+
+        # rl stuff
 
         buffer = ReplayBuffer()
 
