@@ -57,7 +57,7 @@ def train(
         update_every=gin.REQUIRED,
         # number of environment interactions between gradient updates; the ratio of the two is locked to 1-to-1.
         num_test_episodes_per_epoch=gin.REQUIRED,
-        update_after=gin.REQUIRED,  # for exploration
+        update_after=gin.REQUIRED,  # for exploration; no update; random action from action space
 ) -> None:
 
     """Follow from OpenAI Spinup's training loop style"""
