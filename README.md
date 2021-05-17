@@ -1,3 +1,5 @@
+Interpretation of `progress.csv` headers.
+
 Please note that the environment folders insode results is what YOU would actually
 generate by running experiments. The analysis stuff is for my own research; you could
 take a look but might not be helpful for you.
