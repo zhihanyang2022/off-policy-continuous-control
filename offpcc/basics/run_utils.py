@@ -165,6 +165,7 @@ def train(
 
             csv_writer.writerow([
                 epoch,
+                t+1,
                 mean_train_episode_len,
                 mean_train_episode_ret,
                 mean_test_episode_len,
