@@ -1,0 +1,1 @@
+{"env": "Pendulum-v0", "algo": "sac", "run_id": 1, "config": "configs/classic_control_sac.gin"}
