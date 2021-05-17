@@ -62,7 +62,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
         args_dict = {
             'env': args.env,
             'algo': args.algo,
-            'run_id': args.run_id,
+            'run_id': run_id,
             'config': args.config,
         }
 
