@@ -64,6 +64,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
     else:  # actually train
 
         # save a json file containing the command line arguments; for reproducibility
+        # after a year you won't remember what config file you used ;)
 
         args_dict = {
             'env': args.env,
