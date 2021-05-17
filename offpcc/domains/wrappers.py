@@ -11,16 +11,18 @@ import gym.spaces as spaces
 
 class FilterObsByIndex(gym.ObservationWrapper):
 
+    def _filter(self, array: np.array) -> np.array:
+        return np.array(
+            [x for i, x in enumerate(array) if i in self.indices_to_keep]
+        )
+
     def __init__(self, env, indices_to_keep: list):
 
         super().__init__(env)
         self.indices_to_keep = indices_to_keep
 
-        new_high, new_low = self._filter(self.env.high), self._filter(self.env.low)
+        new_high, new_low = self._filter(self.env.observation_space.high), self._filter(self.env.observation_space.low)
         self.observation_space = spaces.Box(low=new_low, high=new_high)
-
-    def _filter(self, array: np.array) -> np.array:
-        return np.array([x for i, x in enumerate(array) if i in self.indices_to_keep])
 
     def observation(self, observation):
         return self._filter(observation)
@@ -29,6 +31,7 @@ class FilterObsByIndex(gym.ObservationWrapper):
 class ConcatObs(gym.ObservationWrapper):
 
     def __init__(self, env, window_size: int):
+
         super().__init__(env)
 
         # get info on old observation space

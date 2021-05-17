@@ -1,6 +1,4 @@
 from gym.envs.registration import register
-from domains.wrappers import ConcatWrapper
-from domains.cartpole_continuous import *
 
 # Caution: all envs here must set max_episode_steps!!
 

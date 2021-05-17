@@ -162,6 +162,13 @@ Any further steps are undefined behavior.
             self.viewer.close()
 
 
+# https://github.com/openai/gym/wiki/CartPole-v0
+# 0: cart position
+# 1: cart velocity
+# 2: pole angle
+# 3: pole velocity at top
+
+
 def continuous_cartpole_position_env():
     return FilterObsByIndex(ContinuousCartPoleEnv(), indices_to_keep=[0, 2])
 

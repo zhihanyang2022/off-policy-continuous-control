@@ -1,3 +1,7 @@
+Time remaining may not be always accurate:
+- initial random exploration
+- some environments as you learn episodes are harder to simulate (verify this)
+
 Interpretation of `progress.csv` headers.
 
 Please note that the environment folders insode results is what YOU would actually
