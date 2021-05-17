@@ -22,11 +22,11 @@ class ReplayBuffer:
 
     def sample(self) -> Batch:
         assert len(self.memory) >= self.batch_size, "Please increase update_after to be >= batch_size"
-        batch = random.sample(self.memory, self.batch_size)
-        batch = Batch(*zip(*batch))
-        s = torch.tensor(batch.s, dtype=torch.float).view(self.batch_size, -1)
-        a = torch.tensor(batch.a, dtype=torch.float).view(self.batch_size, -1)
-        r = torch.tensor(batch.r, dtype=torch.float).view(self.batch_size, 1)
-        ns = torch.tensor(batch.ns, dtype=torch.float).view(self.batch_size, -1)
-        d = torch.tensor(batch.d, dtype=torch.float).view(self.batch_size, 1)
+        transitions = random.sample(self.memory, self.batch_size)
+        batch_raw = Batch(*zip(*transitions))
+        s = torch.tensor(batch_raw.s, dtype=torch.float).view(self.batch_size, -1)
+        a = torch.tensor(batch_raw.a, dtype=torch.float).view(self.batch_size, -1)
+        r = torch.tensor(batch_raw.r, dtype=torch.float).view(self.batch_size, 1)
+        ns = torch.tensor(batch_raw.ns, dtype=torch.float).view(self.batch_size, -1)
+        d = torch.tensor(batch_raw.d, dtype=torch.float).view(self.batch_size, 1)
         return Batch(*list(map(lambda x: x.to(get_device()), [s, a, r, ns, d])))
