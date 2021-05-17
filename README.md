@@ -1,3 +1,5 @@
+Write a guideline on how to design a gin config file
+
 Utilize gradient clipping, which might improve stability (but I haven't investigated this)
 
 ## Results

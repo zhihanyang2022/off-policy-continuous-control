@@ -21,11 +21,12 @@ class ReplayBuffer:
         self.memory.appendleft(transition)
 
     def sample(self) -> Batch:
+        assert len(self.memory) >= self.batch_size, "Please increase update_after to be >= batch_size"
         batch = random.sample(self.memory, self.batch_size)
         batch = Batch(*zip(*batch))
-        s = torch.tensor(batch.s, dtype=torch.float).view(self.batch_size, -1).to(get_device())
-        a = torch.tensor(batch.a, dtype=torch.float).view(self.batch_size, -1).to(get_device())
-        r = torch.tensor(batch.r, dtype=torch.float).view(self.batch_size, 1).to(get_device())
-        ns = torch.tensor(batch.ns, dtype=torch.float).view(self.batch_size, -1).to(get_device())
-        d = torch.tensor(batch.d, dtype=torch.float).view(self.batch_size, 1).to(get_device())
-        return Batch(s, a, r, ns, d)
+        s = torch.tensor(batch.s, dtype=torch.float).view(self.batch_size, -1)
+        a = torch.tensor(batch.a, dtype=torch.float).view(self.batch_size, -1)
+        r = torch.tensor(batch.r, dtype=torch.float).view(self.batch_size, 1)
+        ns = torch.tensor(batch.ns, dtype=torch.float).view(self.batch_size, -1)
+        d = torch.tensor(batch.d, dtype=torch.float).view(self.batch_size, 1)
+        return Batch(*list(map(lambda x: x.to(get_device()), [s, a, r, ns, d])))
