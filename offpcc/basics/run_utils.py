@@ -52,7 +52,7 @@ def train(
         buffer: ReplayBuffer,
         log_dir,
         max_steps_per_episode=gin.REQUIRED,
-        num_epochs=gin.REQUIRED,  # TODO: all configurable arugments are default to None
+        num_epochs=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
         update_every=gin.REQUIRED,
         # number of environment interactions between gradient updates; the ratio of the two is locked to 1-to-1.
@@ -68,10 +68,11 @@ def train(
     csv_writer = csv.writer(csv_file)
     csv_writer.writerow([
         'epoch',
-        'train_ep_len',
-        'train_ep_ret',
-        'test_ep_len',
-        'test_ep_ret',
+        'timestep',      # number of env interactions OR grad updates (both are equivalent; ratio 1:1)
+        'train_ep_len',  # averaged across epoch
+        'train_ep_ret',  # averaged across epoch
+        'test_ep_len',   # averaged across epoch
+        'test_ep_ret',   # averaged across epoch
         'time_rem'
     ])
 
@@ -176,9 +177,10 @@ def train(
             stats_string = (
                 f"===============================================================\n"
                 f"| Epoch        | {epoch}\n"
-                f"| Train ep len | {mean_train_episode_len}\n"
+                f"| Timestep     | {t+1}\n"
+                f"| Train ep len | {round(mean_train_episode_len, 2)}\n"
                 f"| Train ep ret | {round(mean_train_episode_ret, 2)}\n"
-                f"| Test ep len  | {mean_test_episode_len}\n"
+                f"| Test ep len  | {round(mean_test_episode_len, 2)}\n"
                 f"| Test ep ret  | {round(mean_test_episode_return, 2)}\n"
                 f"| Time rem     | {time_to_go_readable}\n"
                 f"==============================================================="
