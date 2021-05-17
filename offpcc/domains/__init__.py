@@ -23,7 +23,7 @@ register(
 )
 
 register(
-    id='cartpole-continuous-long-p-concat-v0',
+    id='cartpole-continuous-long-p-concat-v0',  # concat obs to approximate MDP
     entry_point='domains.cartpole_continuous:continuous_cartpole_position_concat_env',
     max_episode_steps=1000
 )
@@ -37,7 +37,7 @@ register(
 )
 
 register(
-    id='cartpole-continuous-long-v-concat-v0',
+    id='cartpole-continuous-long-v-concat-v0',  # concat obs to approximate MDP
     entry_point='domains.cartpole_continuous:continuous_cartpole_velocity_concat_env',
     max_episode_steps=1000
 )
