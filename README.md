@@ -1,3 +1,7 @@
+Please note that the environment folders insode results is what YOU would actually
+generate by running experiments. The analysis stuff is for my own research; you could
+take a look but might not be helpful for you.
+
 Write a guideline on how to design a gin config file
 
 Utilize gradient clipping, which might improve stability (but I haven't investigated this)
