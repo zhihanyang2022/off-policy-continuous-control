@@ -162,6 +162,10 @@ Any further steps are undefined behavior.
             self.viewer.close()
 
 
+"""
+Code below is added by me.
+"""
+
 # https://github.com/openai/gym/wiki/CartPole-v0
 # 0: cart position
 # 1: cart velocity
