@@ -28,6 +28,7 @@ args = parser.parse_args()
 
 gin.parse_config_file(args.config)
 
+
 for run_id in args.run_id:  # args.run_id is a list of ints; could contain more than one run_ids
 
     # for logging
@@ -45,6 +46,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
     # rl stuff
 
     def env_fn():
+        """Any wrapper by default copies the observation and action space of its wrappee."""
         return RescaleAction(gym.make(args.env), -1, 1)
 
     algorithm = algo_name2class[args.algo](

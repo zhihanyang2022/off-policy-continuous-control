@@ -5,6 +5,7 @@ import datetime
 import os
 
 import numpy as np
+import gym
 from gym.wrappers import Monitor
 
 from basics.replay_buffer import ReplayBuffer, Transition
