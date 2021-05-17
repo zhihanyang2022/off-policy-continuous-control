@@ -20,12 +20,6 @@ class ReplayBuffer:
     def push(self, transition: Transition) -> None:
         self.memory.appendleft(transition)
 
-    def ready(self) -> bool:
-        # TODO: change to use numpy to avoid this issue
-        # TODO: then everything rely on update_after
-        """Otherwise random.sample raises error."""
-        return len(self.memory) >= self.batch_size
-
     def sample(self) -> Batch:
         batch = random.sample(self.memory, self.batch_size)
         batch = Batch(*zip(*batch))

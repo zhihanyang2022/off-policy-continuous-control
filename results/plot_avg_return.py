@@ -26,7 +26,7 @@ def plot_all_runs(env_dir, xs=None):
 
             ep_rets = df['test_ep_ret'].to_numpy()
 
-            ep_rets_s.append(eleven_neighbor_smooth(list(ep_rets)))
+            ep_rets_s.append(eleven_neighbor_smooth(list(ep_rets), 5))
 
         ep_rets_s = np.array(ep_rets_s)
         mean_ep_ret = ep_rets_s.mean(axis=0)  # average across all seeds
@@ -36,8 +36,8 @@ def plot_all_runs(env_dir, xs=None):
         if xs is None:
             xs = np.arange(1, len(mean_ep_ret) + 1)
 
-        plt.plot(xs, mean_ep_ret, label=f'{algo_folder} ({len(run_folders)} runs)', color='black')
-        plt.fill_between(xs, min_ep_ret, max_ep_ret, alpha=0.2, color='black')
+        plt.plot(xs, mean_ep_ret, label=f'{algo_folder} ({len(run_folders)} runs)')
+        plt.fill_between(xs, min_ep_ret, max_ep_ret, alpha=0.2)
 
 
 if __name__ == '__main__':
