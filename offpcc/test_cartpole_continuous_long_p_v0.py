@@ -1,7 +1,7 @@
 import gym
 from domains import *
 
-env = gym.make('cartpole-continuous-long-p-concat-v0')
+env = gym.make('cartpole-continuous-long-v-concat-v0')
 print(env)
 print(env.observation_space)
 
