@@ -123,9 +123,9 @@ class SAC(OffPolicyRLAlgorithm):
                                                                           return_log_prob=True)
 
             min_Q_targ = torch.min(self.Q1_targ(b.ns, na), self.Q2_targ(b.ns, na))
-            targets = b.r + \
-                      self.gamma * (1 - b.d) * \
-                      (min_Q_targ - self.alpha * log_pi_na_given_ns)
+            entropy = - log_pi_na_given_ns
+
+            targets = b.r + self.gamma * (1 - b.d) * (min_Q_targ + self.alpha * entropy)
 
             assert na.shape == (bs, self.action_dim)
             assert log_pi_na_given_ns.shape == (bs, 1)
@@ -158,8 +158,11 @@ class SAC(OffPolicyRLAlgorithm):
         # compute policy loss
 
         a, log_pi_a_given_s = self.sample_action_from_distribution(b.s, deterministic=False, return_log_prob=True)
+
         min_Q = torch.min(self.Q1(b.s, a), self.Q2(b.s, a))
-        policy_loss = - torch.mean(min_Q - self.alpha * log_pi_a_given_s)
+        entropy = - log_pi_a_given_s
+
+        policy_loss = - torch.mean(min_Q + self.alpha * entropy)
 
         assert a.shape == (bs, self.action_dim)
         assert log_pi_a_given_s.shape == (bs, 1)

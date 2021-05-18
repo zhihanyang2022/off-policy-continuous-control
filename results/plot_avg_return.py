@@ -39,7 +39,7 @@ def plot_all_runs(env_dir, plot_each):
 
         plt.plot(steps, mean_ep_ret, label=f'{algo_folder} ({len(run_folders)} runs)')
         plt.fill_between(steps, mean_ep_ret-std_ep_ret, mean_ep_ret+std_ep_ret, alpha=0.2)
-        plt.ylim(0, 7000)
+        plt.ylim(-2500, 7000)
 
 if __name__ == '__main__':
 
