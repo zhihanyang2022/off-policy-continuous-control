@@ -103,7 +103,7 @@ class SAC(OffPolicyRLAlgorithm):
         for target_param, prediction_param in zip(target_net.parameters(), prediction_net.parameters()):
             target_param.data.copy_(target_param.data * self.polyak + prediction_param.data * (1 - self.polyak))
 
-    def update_networks(self, b: Batch) -> None:
+    def update_networks(self, b: Batch) -> dict:
 
         bs = len(b.ns)  # for shape checking
 
@@ -115,21 +115,21 @@ class SAC(OffPolicyRLAlgorithm):
         assert Q1_predictions.shape == (bs, 1)
         assert Q2_predictions.shape == (bs, 1)
 
-        # compute target
+        # compute target (n stands for next)
 
         with torch.no_grad():
 
             na, log_pi_na_given_ns = self.sample_action_from_distribution(b.ns, deterministic=False,
                                                                           return_log_prob=True)
 
-            min_Q_targ = torch.min(self.Q1_targ(b.ns, na), self.Q2_targ(b.ns, na))
-            entropy = - log_pi_na_given_ns
+            n_min_Q_targ = torch.min(self.Q1_targ(b.ns, na), self.Q2_targ(b.ns, na))
+            n_entropy = - log_pi_na_given_ns
 
-            targets = b.r + self.gamma * (1 - b.d) * (min_Q_targ + self.alpha * entropy)
+            targets = b.r + self.gamma * (1 - b.d) * (n_min_Q_targ + self.alpha * n_entropy)
 
             assert na.shape == (bs, self.action_dim)
             assert log_pi_na_given_ns.shape == (bs, 1)
-            assert min_Q_targ.shape == (bs, 1)
+            assert n_min_Q_targ.shape == (bs, 1)
             assert targets.shape == (bs, 1)
 
         # compute td error
@@ -184,6 +184,18 @@ class SAC(OffPolicyRLAlgorithm):
 
         self.polyak_update(target_net=self.Q1_targ, prediction_net=self.Q1)
         self.polyak_update(target_net=self.Q2_targ, prediction_net=self.Q2)
+
+        return {
+            # for learning the q functions
+            '(qfunc) Q1 pred': float(Q1_predictions.mean()),
+            '(qfunc) Q2 pred': float(Q2_predictions.mean()),
+            '(qfunc) Q1 loss': float(Q1_loss),
+            '(qfunc) Q2 loss': float(Q2_loss),
+            # for learning the actor
+            '(actor) min Q pred': float(min_Q.mean()),
+            '(actor) entropy (sample)': float(entropy.mean()),
+            '(actor) policy loss': float(policy_loss)
+        }
 
     def save_actor(self, save_dir: str) -> None:
         torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))

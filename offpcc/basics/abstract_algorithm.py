@@ -5,10 +5,6 @@ from basics.replay_buffer import Batch
 
 
 class OffPolicyRLAlgorithm(ABC):
-    """
-    Only these methods should be called in basics.trainer.Trainer.
-    Also, they have to be called with the correct signature as described below.
-    """
 
     @abstractmethod
     def act(self, state: np.array, deterministic: bool) -> Union[int, np.array]:
@@ -16,7 +12,7 @@ class OffPolicyRLAlgorithm(ABC):
         pass
 
     @abstractmethod
-    def update_networks(self, b: Batch) -> None:
+    def update_networks(self, b: Batch) -> dict:   # return a dictonary of stats that you want to track; could be empty
         pass
 
     @abstractmethod

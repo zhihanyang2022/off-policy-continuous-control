@@ -3,9 +3,9 @@ import csv
 import time
 import datetime
 import os
+import wandb
 
 import numpy as np
-import gym
 from gym.wrappers import Monitor
 
 from basics.replay_buffer import ReplayBuffer, Transition
@@ -13,10 +13,10 @@ from basics.replay_buffer import ReplayBuffer, Transition
 BASE_LOG_DIR = '../results'
 
 
-def make_log_dir(env_name, algo_name, run_id) -> str:
-    log_dir = f'{BASE_LOG_DIR}/{env_name}/{algo_name}/{run_id}'
-    os.makedirs(log_dir, exist_ok=True)  # crucial
-    return log_dir
+# def make_log_dir(env_name, algo_name, run_id) -> str:
+#     log_dir = f'{BASE_LOG_DIR}/{env_name}/{algo_name}/{run_id}'
+#     os.makedirs(log_dir, exist_ok=True)  # crucial
+#     return log_dir
 
 
 def test_for_one_episode(env, algorithm) -> tuple:
@@ -51,51 +51,40 @@ def train(
         env_fn,
         algorithm,
         buffer: ReplayBuffer,
-        log_dir,
         max_steps_per_episode=gin.REQUIRED,
         num_epochs=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
-        update_every=gin.REQUIRED,
-        # number of environment interactions between gradient updates; the ratio of the two is locked to 1-to-1.
+        update_every=gin.REQUIRED,  # number of env interactions between grad updates; but the ratio is locked to 1-to-1
         num_test_episodes_per_epoch=gin.REQUIRED,
         update_after=gin.REQUIRED,  # for exploration; no update; random action from action space
 ) -> None:
 
     """Follow from OpenAI Spinup's training loop style"""
 
-    # ===== logging =====
-
-    csv_file = open(f'{log_dir}/progress.csv', 'w+')
-    csv_writer = csv.writer(csv_file)
-    csv_writer.writerow([
-        'epoch',
-        'timestep',      # number of env interactions OR grad updates (both are equivalent; ratio 1:1)
-        'train_ep_len',  # averaged across epoch
-        'train_ep_ret',  # averaged across epoch
-        'test_ep_len',   # averaged across epoch
-        'test_ep_ret',   # averaged across epoch
-        'time_rem'
-    ])
-
-    # ===================
+    # prepare environments
 
     env = env_fn()
     test_env = env_fn()
 
     state = env.reset()
 
+    # prepare stats trackers
+
     episode_len = 0
     episode_ret = 0
     train_episode_lens = []
     train_episode_rets = []
+    algo_specific_stats_tracker = []
 
     total_steps = num_steps_per_epoch * num_epochs
 
     start_time = time.perf_counter()
 
+    # training loop
+
     for t in range(total_steps):
 
-        if t >= update_after:  # num_exploration_steps have passed
+        if t >= update_after:  # exploration is done
             action = algorithm.act(state, deterministic=False)
         else:
             action = env.action_space.sample()
@@ -104,20 +93,20 @@ def train(
         episode_len += 1
         episode_ret += reward
 
-        # ignore the done flag if done is caused by hitting the maximum episode steps
-        # TODO: environment needs to be wrapped by TimeLimit wrapper
-        # however, the little catch is that the environment might actually be done
+        # Ignore the done flag if done is caused by hitting the maximum episode steps.
+        # However, the little catch is that the environment might actually be done
         # due to termination rather than timeout, but this is much less likely
-        # so we just do it this way for convenience
+        # so we just do it this way for convenience.
 
-        done = False if episode_len == max_steps_per_episode else done
+        cutoff = episode_len == max_steps_per_episode
+        done = False if cutoff else done
 
         buffer.push(Transition(state, action, reward, next_state, done))
 
-        state = next_state
+        state = next_state  # crucial, crucial step
 
         # end of trajectory handling
-        if done or (episode_len == max_steps_per_episode):
+        if done or cutoff:
             train_episode_lens.append(episode_len)
             train_episode_rets.append(episode_ret)
             state, episode_len, episode_ret = env.reset(), 0, 0  # reset state and stats trackers
@@ -126,12 +115,25 @@ def train(
         if t >= update_after and (t + 1) % update_every == 0:
             for j in range(update_every):
                 batch = buffer.sample()
-                algorithm.update_networks(batch)
+                algo_specific_stats = algorithm.update_networks(batch)
+                algo_specific_stats_tracker.append(algo_specific_stats)
 
         # end of epoch handling
         if (t + 1) % num_steps_per_epoch == 0:
 
             epoch = (t + 1) // num_steps_per_epoch
+
+            # algo specific stats
+
+            keys = algo_specific_stats[0].keys()  # get keys from the first one; all dicts SHOULD share the same keys
+            algo_specific_stats_over_epoch = {}  # average over all dicts collected in one epoch
+            for k in keys:
+                values = []
+                for dictionary in algo_specific_stats:
+                    values.append(dictionary[k])
+                algo_specific_stats_over_epoch[k] = np.mean(values)
+
+            algo_specific_stats_tracker = []
 
             # training stats
 
@@ -151,7 +153,7 @@ def train(
                 test_episode_returns.append(test_episode_return)
 
             mean_test_episode_len = np.mean(test_episode_lens)
-            mean_test_episode_return = np.mean(test_episode_returns)
+            mean_test_episode_ret = np.mean(test_episode_returns)
 
             # time-related stats
 
@@ -164,18 +166,18 @@ def train(
 
             # actually record / print the stats
 
-            csv_writer.writerow([
-                epoch,
-                t+1,
-                mean_train_episode_len,
-                mean_train_episode_ret,
-                mean_test_episode_len,
-                mean_test_episode_return,
-                time_to_go_readable
-            ])
+            dict_for_wandb = {
+                'epoch': epoch,
+                'timestep': t+1,
+                'train_ep_len': mean_train_episode_len,
+                'train_ep_ret': mean_train_episode_ret,
+                'test_ep_len': mean_test_episode_len,
+                'test_ep_ret': mean_test_episode_ret,
+            }
+            dict_for_wandb.update(algo_specific_stats_over_epoch)
 
-            # 9 = 1 for sign + 5 for int + 1 for decimal point + 2 for decimal places
-            # 8 = 2 for seconds + 2 for minutes + 2 for hours + 2 for :
+            wandb.log(dict_for_wandb)
+
             stats_string = (
                 f"===============================================================\n"
                 f"| Epoch        | {epoch}\n"
@@ -183,12 +185,11 @@ def train(
                 f"| Train ep len | {round(mean_train_episode_len, 2)}\n"
                 f"| Train ep ret | {round(mean_train_episode_ret, 2)}\n"
                 f"| Test ep len  | {round(mean_test_episode_len, 2)}\n"
-                f"| Test ep ret  | {round(mean_test_episode_return, 2)}\n"
+                f"| Test ep ret  | {round(mean_test_episode_ret, 2)}\n"
                 f"| Time rem     | {time_to_go_readable}\n"
                 f"==============================================================="
             )  # this is a weird syntax trick but it just creates a single string
             print(stats_string)
 
-    # save training stats and model
-    csv_file.close()
-    algorithm.save_actor(log_dir)
+    # save model after training loop finishes
+    algorithm.save_actor(wandb.run.dir)  # will get uploaded to cloud after script finishes

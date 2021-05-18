@@ -7,3 +7,4 @@ seaborn
 gin-config
 pandas
 jupyter  # for running analysis notebooks
+wandb
