@@ -11,7 +11,7 @@ algorithms.sac.SAC.polyak = 0.995
 
 import basics.replay_buffer
 
-basics.replay_buffer.ReplayBuffer.capacity = 3_000_000  # store everything
+basics.replay_buffer.ReplayBuffer.capacity = 1_000_000
 basics.replay_buffer.ReplayBuffer.batch_size = 100
 
 import basics.run_utils
