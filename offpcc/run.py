@@ -28,15 +28,15 @@ args = parser.parse_args()
 
 gin.parse_config_file(args.config)
 
-wandb.init(
+for run_id in args.run_id:  # args.run_id is a list of ints; could contain more than one run_ids
+
+    wandb.init(
         project=os.getenv('OFFPCC_WANDB_PROJECT'),
         entity=os.getenv('OFFPCC_WANDB_ENTITY'),
         group=f"{args.env}/{args.algo}",
         settings=wandb.Settings(_disable_stats=True),
-        name=f'run_id={args.run_id}'
-)
-
-for run_id in args.run_id:  # args.run_id is a list of ints; could contain more than one run_ids
+        name=f'run_id={run_id}'
+    )
 
     def env_fn():
         """Any wrapper by default copies the observation and action space of its wrappee."""
