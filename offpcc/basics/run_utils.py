@@ -125,11 +125,11 @@ def train(
 
             # algo specific stats
 
-            keys = algo_specific_stats[0].keys()  # get keys from the first one; all dicts SHOULD share the same keys
+            keys = algo_specific_stats_tracker[0].keys()  # get keys from the first one; all dicts SHOULD share the same keys
             algo_specific_stats_over_epoch = {}  # average over all dicts collected in one epoch
             for k in keys:
                 values = []
-                for dictionary in algo_specific_stats:
+                for dictionary in algo_specific_stats_tracker:
                     values.append(dictionary[k])
                 algo_specific_stats_over_epoch[k] = np.mean(values)
 
