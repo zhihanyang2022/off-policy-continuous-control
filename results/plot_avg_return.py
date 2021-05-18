@@ -11,7 +11,7 @@ def ignore_hidden_and_png(items):
     return [item for item in items if item[0] != '.' and not item.endswith('png')]
 
 
-def plot_all_runs(env_dir, xs=None):
+def plot_all_runs(env_dir, plot_each):
 
     for algo_folder in ignore_hidden_and_png(os.listdir(env_dir)):
 
@@ -24,31 +24,33 @@ def plot_all_runs(env_dir, xs=None):
 
             df = pd.read_csv(csv_path)
 
+            steps = df['timestep'].to_numpy()
             ep_rets = df['test_ep_ret'].to_numpy()
+            ep_rets = neighbor_smooth(list(ep_rets), 11)
 
-            ep_rets_s.append(neighbor_smooth(list(ep_rets), 5))
+            if plot_each == 'True':
+                plt.plot(steps, ep_rets, alpha=0.4, linestyle='--')
+
+            ep_rets_s.append(ep_rets)
 
         ep_rets_s = np.array(ep_rets_s)
         mean_ep_ret = ep_rets_s.mean(axis=0)  # average across all seeds
-        max_ep_ret = ep_rets_s.max(axis=0)
-        min_ep_ret = ep_rets_s.min(axis=0)
+        std_ep_ret = ep_rets_s.std(axis=0)
 
-        if xs is None:
-            xs = np.arange(1, len(mean_ep_ret) + 1)
-
-        plt.plot(xs, mean_ep_ret, label=f'{algo_folder} ({len(run_folders)} runs)')
-        plt.fill_between(xs, min_ep_ret, max_ep_ret, alpha=0.2)
-
+        plt.plot(steps, mean_ep_ret, label=f'{algo_folder} ({len(run_folders)} runs)')
+        plt.fill_between(steps, mean_ep_ret-std_ep_ret, mean_ep_ret+std_ep_ret, alpha=0.2)
+        plt.ylim(0, 7000)
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--env', type=str, required=True)
+    parser.add_argument('--plot_each', type=str, required=False, default='False')
     args = parser.parse_args()
 
     env_dir = args.env
 
-    plot_all_runs(args.env)
+    plot_all_runs(args.env, args.plot_each)
 
     plt.title(args.env)
     plt.xlabel('Epoch')
