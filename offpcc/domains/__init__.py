@@ -17,27 +17,27 @@ register(
 # partially observable: position only
 
 register(
-    id='cartpole-continuous-p-v0',
-    entry_point='domains.cartpole_continuous:ContinuousCartPoleEnvPositionOnly',
-    max_episode_steps=200
+    id='cartpole-continuous-long-p-v0',
+    entry_point='domains.cartpole_continuous:continuous_cartpole_position_env',
+    max_episode_steps=1000
 )
 
 register(
-    id='cartpole-continuous-long-p-v0',
-    entry_point='domains.cartpole_continuous:ContinuousCartPoleEnvPositionOnly',
+    id='cartpole-continuous-long-p-concat-v0',  # concat obs to approximate MDP
+    entry_point='domains.cartpole_continuous:continuous_cartpole_position_concat_env',
     max_episode_steps=1000
 )
 
 # partially observable: velocity only
 
 register(
-    id='cartpole-continuous-v-v0',
-    entry_point='domains.cartpole_continuous:ContinuousCartPoleEnvVelocityOnly',
-    max_episode_steps=200
+    id='cartpole-continuous-long-v-v0',
+    entry_point='domains.cartpole_continuous:continuous_cartpole_velocity_env',
+    max_episode_steps=1000
 )
 
 register(
-    id='cartpole-continuous-long-v-v0',
-    entry_point='domains.cartpole_continuous:ContinuousCartPoleEnvVelocityOnly',
+    id='cartpole-continuous-long-v-concat-v0',  # concat obs to approximate MDP
+    entry_point='domains.cartpole_continuous:continuous_cartpole_velocity_concat_env',
     max_episode_steps=1000
 )

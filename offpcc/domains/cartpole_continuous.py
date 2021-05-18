@@ -10,6 +10,7 @@ import gym
 from gym import spaces, logger
 from gym.utils import seeding
 import numpy as np
+from domains.wrappers import ConcatObs, FilterObsByIndex
 
 
 class ContinuousCartPoleEnv(gym.Env):
@@ -36,7 +37,7 @@ class ContinuousCartPoleEnv(gym.Env):
 
         # Angle limit set to 2 * theta_threshold_radians so failing observation
         # is still within bounds
-        high = np.array([
+        self.high = np.array([
             self.x_threshold * 2,
             np.finfo(np.float32).max,
             self.theta_threshold_radians * 2,
@@ -47,7 +48,7 @@ class ContinuousCartPoleEnv(gym.Env):
             high=self.max_action,
             shape=(1,)
         )
-        self.observation_space = spaces.Box(-high, high)
+        self.observation_space = spaces.Box(-self.high, self.high)
 
         self.seed()
         self.viewer = None
@@ -65,7 +66,7 @@ class ContinuousCartPoleEnv(gym.Env):
         sintheta = math.sin(theta)
         temp = (force + self.polemass_length * theta_dot * theta_dot * sintheta) / self.total_mass
         thetaacc = (self.gravity * sintheta - costheta * temp) / \
-            (self.length * (4.0/3.0 - self.masspole * costheta * costheta / self.total_mass))
+                   (self.length * (4.0 / 3.0 - self.masspole * costheta * costheta / self.total_mass))
         xacc = temp - self.polemass_length * thetaacc * costheta / self.total_mass
         x = x + self.tau * x_dot
         x_dot = x_dot + self.tau * xacc
@@ -81,9 +82,9 @@ class ContinuousCartPoleEnv(gym.Env):
         self.state = self.stepPhysics(force)
         x, x_dot, theta, theta_dot = self.state
         done = x < -self.x_threshold \
-            or x > self.x_threshold \
-            or theta < -self.theta_threshold_radians \
-            or theta > self.theta_threshold_radians
+               or x > self.x_threshold \
+               or theta < -self.theta_threshold_radians \
+               or theta > self.theta_threshold_radians
         done = bool(done)
 
         if not done:
@@ -114,7 +115,7 @@ Any further steps are undefined behavior.
         screen_height = 400
 
         world_width = self.x_threshold * 2
-        scale = screen_width /world_width
+        scale = screen_width / world_width
         carty = 100  # TOP OF CART
         polewidth = 10.0
         polelen = scale * 1.0
@@ -130,7 +131,7 @@ Any further steps are undefined behavior.
             self.carttrans = rendering.Transform()
             cart.add_attr(self.carttrans)
             self.viewer.add_geom(cart)
-            l, r, t, b = -polewidth / 2, polewidth / 2, polelen-polewidth / 2, -polewidth / 2
+            l, r, t, b = -polewidth / 2, polewidth / 2, polelen - polewidth / 2, -polewidth / 2
             pole = rendering.FilledPolygon([(l, b), (l, t), (r, t), (r, b)])
             pole.set_color(.8, .6, .4)
             self.poletrans = rendering.Transform(translation=(0, axleoffset))
@@ -159,3 +160,32 @@ Any further steps are undefined behavior.
     def close(self):
         if self.viewer:
             self.viewer.close()
+
+
+"""
+Code below is added by me.
+"""
+
+# https://github.com/openai/gym/wiki/CartPole-v0
+# 0: cart position
+# 1: cart velocity
+# 2: pole angle
+# 3: pole velocity at top
+
+
+def continuous_cartpole_position_env():
+    return FilterObsByIndex(ContinuousCartPoleEnv(), indices_to_keep=[0, 2])
+
+
+def continuous_cartpole_position_concat_env():
+    return ConcatObs(continuous_cartpole_position_env(), 3)
+
+
+def continuous_cartpole_velocity_env():
+    return FilterObsByIndex(ContinuousCartPoleEnv(), indices_to_keep=[1, 3])
+
+
+def continuous_cartpole_velocity_concat_env():
+    return ConcatObs(continuous_cartpole_velocity_env(), 3)
+
+
