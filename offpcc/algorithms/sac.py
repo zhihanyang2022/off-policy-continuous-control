@@ -99,9 +99,9 @@ class SAC(OffPolicyRLAlgorithm):
             action = self.sample_action_from_distribution(state, deterministic=deterministic, return_log_prob=False)
             return action.view(-1).cpu().numpy()  # view as 1d -> to cpu -> to numpy
 
-    def polyak_update(self, old_net: nn.Module, new_net: nn.Module) -> None:
-        for old_param, new_param in zip(old_net.parameters(), new_net.parameters()):
-            old_param.data.copy_(old_param.data * self.polyak + new_param.data * (1 - self.polyak))
+    def polyak_update(self, target_net: nn.Module, prediction_net: nn.Module) -> None:
+        for target_param, prediction_param in zip(target_net.parameters(), prediction_net.parameters()):
+            target_param.data.copy_(target_param.data * self.polyak + prediction_param.data * (1 - self.polyak))
 
     def update_networks(self, b: Batch) -> None:
 
@@ -182,8 +182,8 @@ class SAC(OffPolicyRLAlgorithm):
 
         # update target networks
 
-        self.polyak_update(old_net=self.Q1_targ, new_net=self.Q1)
-        self.polyak_update(old_net=self.Q2_targ, new_net=self.Q2)
+        self.polyak_update(target_net=self.Q1_targ, prediction_net=self.Q1)
+        self.polyak_update(target_net=self.Q2_targ, prediction_net=self.Q2)
 
     def save_actor(self, save_dir: str) -> None:
         torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))
