@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def eleven_neighbor_smooth(scalars: list, num_neighbors) -> list:
+def neighbor_smooth(scalars: list, num_neighbors) -> list:
     num_each_side = int(num_neighbors / 2 - 1)
     scalars = [scalars[0]] * num_each_side + scalars + [scalars[-1]] * num_each_side
     output = []

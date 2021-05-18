@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from plot_utils import eleven_neighbor_smooth
+from plot_utils import neighbor_smooth
 
 
 def ignore_hidden_and_png(items):
@@ -26,7 +26,7 @@ def plot_all_runs(env_dir, xs=None):
 
             ep_rets = df['test_ep_ret'].to_numpy()
 
-            ep_rets_s.append(eleven_neighbor_smooth(list(ep_rets), 5))
+            ep_rets_s.append(neighbor_smooth(list(ep_rets), 5))
 
         ep_rets_s = np.array(ep_rets_s)
         mean_ep_ret = ep_rets_s.mean(axis=0)  # average across all seeds
