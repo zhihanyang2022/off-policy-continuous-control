@@ -29,8 +29,8 @@ args = parser.parse_args()
 gin.parse_config_file(args.config)
 
 wandb.init(
-        project=os.getenv('OFFPCC_PROJECT'),
-        entity=os.getenv('OFFPCC_ENTITY'),
+        project=os.getenv('OFFPCC_WANDB_PROJECT'),
+        entity=os.getenv('OFFPCC_WANDB_ENTITY'),
         group=f"{args.env}/{args.algo}",
         settings=wandb.Settings(_disable_stats=True),
         name=f'run_id={args.run_id}'

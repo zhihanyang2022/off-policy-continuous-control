@@ -1,3 +1,10 @@
+```
+OFFPCC_WANDB_PROJECT="offpcc"; export OFFPCC_WANDB_PROJECT
+OFFPCC_WANDB_ENTITY="pomdpr"; export OFFPCC_WANDB_ENTITY
+```
+
+Talk about how to set project and entity
+
 Time remaining may not be always accurate:
 - initial random exploration
 - some environments as you learn episodes are harder to simulate (verify this)
