@@ -29,21 +29,21 @@ def test_for_one_episode(env, algorithm) -> tuple:
     return episode_len, episode_return
 
 
-def visualize_trained_policy(
-        env_fn,
-        algorithm,
-        log_dir,
-        num_videos
-) -> None:
-    algorithm.load_actor(log_dir)
-
-    for i in range(num_videos):
-        env = Monitor(
-            env_fn(),
-            directory=f'{log_dir}/videos/{i}',
-            force=True
-        )
-        test_for_one_episode(env, algorithm)
+# def visualize_trained_policy(
+#         env_fn,
+#         algorithm,
+#         log_dir,
+#         num_videos
+# ) -> None:
+#     algorithm.load_actor(log_dir)
+#
+#     for i in range(num_videos):
+#         env = Monitor(
+#             env_fn(),
+#             directory=f'{log_dir}/videos/{i}',
+#             force=True
+#         )
+#         test_for_one_episode(env, algorithm)
 
 
 @gin.configurable(module=__name__)

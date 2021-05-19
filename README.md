@@ -1,3 +1,7 @@
+This repo does not take care of plotting results or visualizing policies. Plotting is done directly through wandb.
+Visualizing policies require you to first download trained policies and use a different repository. Doing so ensures
+that this repo is as clean as possible for modifcation / adding new algorithms. 
+
 Add this to your bashrc or bash_profile and source it.
 
 ```bash
