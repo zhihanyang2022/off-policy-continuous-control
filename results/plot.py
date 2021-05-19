@@ -3,8 +3,9 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
+
 from plot_utils import neighbor_smooth
+
 plt.rc('font', family='serif')
 
 
