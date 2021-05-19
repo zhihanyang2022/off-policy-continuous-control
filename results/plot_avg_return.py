@@ -12,7 +12,14 @@ def ignore_hidden_and_png(items):
     return [item for item in items if item[0] != '.' and not item.endswith('png')]
 
 
-def plot_all_runs(env_dir, plot_each):
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--env', type=str, required=True)
+    parser.add_argument('--plot_each', type=str, required=False, default='False')
+    args = parser.parse_args()
+
+    env_dir = args.env
 
     for algo_folder in ignore_hidden_and_png(os.listdir(env_dir)):
 
@@ -29,7 +36,7 @@ def plot_all_runs(env_dir, plot_each):
             ep_rets = df['test_ep_ret'].to_numpy()
             ep_rets = neighbor_smooth(list(ep_rets), 11)
 
-            if plot_each == 'True':
+            if args.plot_each == 'True':  # terrible idea when plotting multiple algorithms
                 plt.plot(steps, ep_rets, alpha=0.4, linestyle='--')
 
             ep_rets_s.append(ep_rets)
@@ -39,19 +46,7 @@ def plot_all_runs(env_dir, plot_each):
         std_ep_ret = ep_rets_s.std(axis=0)
 
         plt.plot(steps, mean_ep_ret, label=f'{algo_folder} ({len(run_folders)} runs)')
-        plt.fill_between(steps, mean_ep_ret-std_ep_ret, mean_ep_ret+std_ep_ret, alpha=0.2)
-
-
-if __name__ == '__main__':
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--env', type=str, required=True)
-    parser.add_argument('--plot_each', type=str, required=False, default='False')
-    args = parser.parse_args()
-
-    env_dir = args.env
-
-    plot_all_runs(args.env, args.plot_each)
+        plt.fill_between(steps, mean_ep_ret - std_ep_ret, mean_ep_ret + std_ep_ret, alpha=0.2)
 
     plt.title(args.env)
     plt.xlabel('Timestep')
