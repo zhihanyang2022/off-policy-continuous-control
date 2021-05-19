@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from plot_utils import neighbor_smooth
+plt.rc('font', family='serif')
 
 
 def ignore_hidden_and_png(items):
@@ -48,6 +49,10 @@ if __name__ == '__main__':
     plt.xlabel('Timestep')
     plt.ylabel('Test-time Return')
     plt.legend(loc='lower right')
+
     plt.grid()
+    plt.gca().spines['right'].set_visible(False)
+    plt.gca().spines['top'].set_visible(False)
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
+
     plt.savefig(f'{env_dir}/avg_return.png', dpi=200)
