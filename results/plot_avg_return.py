@@ -16,7 +16,6 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--env', type=str, required=True)
-    parser.add_argument('--plot_each', type=str, required=False, default='False')
     args = parser.parse_args()
 
     env_dir = args.env
@@ -35,9 +34,6 @@ if __name__ == '__main__':
             steps = df['timestep'].to_numpy()
             ep_rets = df['test_ep_ret'].to_numpy()
             ep_rets = neighbor_smooth(list(ep_rets), 11)
-
-            if args.plot_each == 'True':  # terrible idea when plotting multiple algorithms
-                plt.plot(steps, ep_rets, alpha=0.4, linestyle='--')
 
             ep_rets_s.append(ep_rets)
 
