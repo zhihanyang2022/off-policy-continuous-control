@@ -4,6 +4,7 @@ import time
 import datetime
 import os
 import wandb
+import csv
 
 import numpy as np
 from gym.wrappers import Monitor
@@ -13,10 +14,9 @@ from basics.replay_buffer import ReplayBuffer, Transition
 BASE_LOG_DIR = '../results'
 
 
-# def make_log_dir(env_name, algo_name, run_id) -> str:
-#     log_dir = f'{BASE_LOG_DIR}/{env_name}/{algo_name}/{run_id}'
-#     os.makedirs(log_dir, exist_ok=True)  # crucial
-#     return log_dir
+def make_log_dir(env_name, algo_name, run_id) -> str:
+    log_dir = f'{BASE_LOG_DIR}/{env_name}/{algo_name}/{run_id}'
+    return log_dir
 
 
 def test_for_one_episode(env, algorithm) -> tuple:
@@ -29,21 +29,20 @@ def test_for_one_episode(env, algorithm) -> tuple:
     return episode_len, episode_return
 
 
-# def visualize_trained_policy(
-#         env_fn,
-#         algorithm,
-#         log_dir,
-#         num_videos
-# ) -> None:
-#     algorithm.load_actor(log_dir)
-#
-#     for i in range(num_videos):
-#         env = Monitor(
-#             env_fn(),
-#             directory=f'{log_dir}/videos/{i}',
-#             force=True
-#         )
-#         test_for_one_episode(env, algorithm)
+def visualize_trained_policy(
+        env_fn,
+        algorithm,
+        log_dir,
+        num_videos
+) -> None:
+    algorithm.load_actor(log_dir)
+    for i in range(num_videos):
+        env = Monitor(
+            env_fn(),
+            directory=f'{log_dir}/videos/{i+1}',
+            force=True
+        )
+        test_for_one_episode(env, algorithm)
 
 
 @gin.configurable(module=__name__)
@@ -61,12 +60,18 @@ def train(
 
     """Follow from OpenAI Spinup's training loop style"""
 
-    # prepare environments
+    # prepare for logging (csv)
 
-    env = env_fn()
-    test_env = env_fn()
-
-    state = env.reset()
+    csv_file = open(f'{wandb.run.dir}/progress.csv', 'w+')
+    csv_writer = csv.writer(csv_file)
+    csv_writer.writerow([
+        'epoch',
+        'timestep',  # number of env interactions OR grad updates (both are equivalent; ratio 1:1)
+        'train_ep_len',  # averaged across epoch
+        'train_ep_ret',  # averaged across epoch
+        'test_ep_len',  # averaged across epoch
+        'test_ep_ret',  # averaged across epoch
+    ])
 
     # prepare stats trackers
 
@@ -79,6 +84,13 @@ def train(
     total_steps = num_steps_per_epoch * num_epochs
 
     start_time = time.perf_counter()
+
+    # prepare environments
+
+    env = env_fn()
+    test_env = env_fn()
+
+    state = env.reset()
 
     # training loop
 
@@ -167,6 +179,8 @@ def train(
 
             # actually record / print the stats
 
+            # (wandb logging)
+
             dict_for_wandb = {
                 'epoch': epoch,
                 'timestep': t+1,
@@ -178,6 +192,20 @@ def train(
             dict_for_wandb.update(algo_specific_stats_over_epoch)
 
             wandb.log(dict_for_wandb)
+
+            # (csv logging - will be uploaded to wandb at the very end)
+
+            csv_writer.writerow([
+                epoch,
+                t + 1,
+                mean_train_episode_len,
+                mean_train_episode_ret,
+                mean_test_episode_len,
+                mean_test_episode_ret,
+                time_to_go_readable
+            ])
+
+            # (console logging)
 
             stats_string = (
                 f"===============================================================\n"
@@ -192,5 +220,6 @@ def train(
             )  # this is a weird syntax trick but it just creates a single string
             print(stats_string)
 
-    # save model after training loop finishes
+    # save stats and model after training loop finishes
     algorithm.save_networks(wandb.run.dir)  # will get uploaded to cloud after script finishes
+    csv_file.close()

@@ -204,6 +204,10 @@ class SAC(OffPolicyRLAlgorithm):
         torch.save(self.Q2.state_dict(), os.path.join(save_dir, 'Q2.pth'))
         torch.save(self.Q2_targ.state_dict(), os.path.join(save_dir, 'Q2_targ.pth'))
 
+    def load_actor(self, save_dir: str) -> None:
+        self.actor.load_state_dict(
+            torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
+
     def load_networks(self, save_dir: str) -> None:
         self.actor.load_state_dict(
             torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))

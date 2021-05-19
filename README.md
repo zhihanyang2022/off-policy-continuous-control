@@ -1,6 +1,15 @@
+Best practice is to generate one video for the first run.
+
+To use certain functionalities, you would have to put files in place in certain ways in certain directories
+
+There are muliple ways of tracking stats that happen simultaneously, each with its own purpose.
+- csv logging: it might be tricky to download stats from wandb and log locally; so instead this stores
+the basic performance stats if you want to plot them yourself with higher quality and more customization
+
 This repo does not take care of plotting results or visualizing policies. Plotting is done directly through wandb.
 Visualizing policies require you to first download trained policies and use a different repository. Doing so ensures
-that this repo is as clean as possible for modifcation / adding new algorithms. 
+that this repo is as clean as possible for training algorithms. New algorithms of the same nature should also be easily
+added. 
 
 Add this to your bashrc or bash_profile and source it.
 

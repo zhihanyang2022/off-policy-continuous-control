@@ -20,5 +20,9 @@ class OffPolicyRLAlgorithm(ABC):
         pass
 
     @abstractmethod
+    def load_actor(self, save_dir: str) -> None:
+        pass
+
+    @abstractmethod
     def load_networks(self, save_dir: str) -> None:
         pass
