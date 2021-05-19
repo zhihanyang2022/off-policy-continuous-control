@@ -1,6 +1,8 @@
+Add this to your bashrc or bash_profile and source it.
+
 ```
-OFFPCC_WANDB_PROJECT="offpcc"; export OFFPCC_WANDB_PROJECT
-OFFPCC_WANDB_ENTITY="pomdpr"; export OFFPCC_WANDB_ENTITY
+export OFFPCC_WANDB_PROJECT="offpcc"
+export OFFPCC_WANDB_ENTITY="pomdpr"
 ```
 
 Talk about how to set project and entity
