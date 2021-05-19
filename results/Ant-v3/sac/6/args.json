@@ -1,1 +1,0 @@
-{"env": "Ant-v3", "algo": "sac", "run_id": 3, "config": "configs/mujoco_sac.gin"}
