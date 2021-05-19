@@ -197,9 +197,21 @@ class SAC(OffPolicyRLAlgorithm):
             '(actor) policy loss': float(policy_loss)
         }
 
-    def save_actor(self, save_dir: str) -> None:
+    def save_networks(self, save_dir: str) -> None:
         torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))
+        torch.save(self.Q1.state_dict(), os.path.join(save_dir, 'Q1.pth'))
+        torch.save(self.Q1_targ.state_dict(), os.path.join(save_dir, 'Q1_targ.pth'))
+        torch.save(self.Q2.state_dict(), os.path.join(save_dir, 'Q2.pth'))
+        torch.save(self.Q2_targ.state_dict(), os.path.join(save_dir, 'Q2_targ.pth'))
 
-    def load_actor(self, save_dir: str) -> None:
+    def load_networks(self, save_dir: str) -> None:
         self.actor.load_state_dict(
             torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
+        self.Q1.load_state_dict(
+            torch.load(os.path.join(save_dir, 'Q1.pth'), map_location=torch.device(get_device())))
+        self.Q1_targ.load_state_dict(
+            torch.load(os.path.join(save_dir, 'Q1_targ.pth'), map_location=torch.device(get_device())))
+        self.Q2.load_state_dict(
+            torch.load(os.path.join(save_dir, 'Q2.pth'), map_location=torch.device(get_device())))
+        self.Q2_targ.load_state_dict(
+            torch.load(os.path.join(save_dir, 'Q2_targ.pth'), map_location=torch.device(get_device())))
