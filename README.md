@@ -1,6 +1,6 @@
 Add this to your bashrc or bash_profile and source it.
 
-```
+```bash
 export OFFPCC_WANDB_PROJECT="offpcc"
 export OFFPCC_WANDB_ENTITY="pomdpr"
 ```
