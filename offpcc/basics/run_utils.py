@@ -202,7 +202,6 @@ def train(
                 mean_train_episode_ret,
                 mean_test_episode_len,
                 mean_test_episode_ret,
-                time_to_go_readable
             ])
 
             # (console logging)

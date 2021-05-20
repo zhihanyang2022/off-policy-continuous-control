@@ -69,6 +69,9 @@ class TD3(OffPolicyRLAlgorithm):
         self.num_Q_updates = 0  # for delaying updates
         self.action_dim = action_dim  # for shape checking
 
+        # for logging; the actor does not get updated every iteration, so stats is not available every iteration
+        self.mean_Q1_val = 0
+
     def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
             state = torch.tensor(state).unsqueeze(0).float().to(get_device())
@@ -95,7 +98,7 @@ class TD3(OffPolicyRLAlgorithm):
 
         with torch.no_grad():
 
-            na = self.actor_target(b.ns)
+            na = self.actor_targ(b.ns)
             noise = torch.clamp(
                 torch.randn(na.size()) * self.target_noise, -self.noise_clip, self.noise_clip
             ).to(get_device())
@@ -142,6 +145,7 @@ class TD3(OffPolicyRLAlgorithm):
             Q1_val = self.Q1(b.s, a)  # val stands for values
             policy_loss = - torch.mean(Q1_val)
 
+            self.mean_Q1_val = float(Q1_val.mean())
             assert a.shape == (bs, self.action_dim)
             assert Q1_val.shape == (bs, 1)
             assert policy_loss.shape == ()
@@ -157,7 +161,7 @@ class TD3(OffPolicyRLAlgorithm):
             for param in self.Q2.parameters():
                 param.requires_grad = True
 
-            # # update target networks
+            # update target networks
 
             self.polyak_update(target_net=self.actor_targ, prediction_net=self.actor)
 
@@ -171,7 +175,7 @@ class TD3(OffPolicyRLAlgorithm):
             '(qfunc) Q1 loss': float(Q1_loss),
             '(qfunc) Q2 loss': float(Q2_loss),
             # for learning the actor
-            '(actor) Q1 val': float(Q1_val.mean())  # no need to track policy loss; just its negation
+            '(actor) Q1 val': self.mean_Q1_val  # no need to track policy loss; just its negation
         }
 
     def save_networks(self, save_dir: str) -> None:

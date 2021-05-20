@@ -3,8 +3,6 @@ numpy==1.19.5
 gym==0.15.7
 mujoco-py==2.0.2.13
 matplotlib
-seaborn
 gin-config
 pandas
-jupyter  # for running analysis notebooks
 wandb
