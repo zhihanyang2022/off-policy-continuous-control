@@ -3,6 +3,7 @@ import gin
 import numpy as np
 
 import torch
+import torch.nn as nn
 import torch.optim as optim
 
 from basics.abstract_algorithm import OffPolicyRLAlgorithm
@@ -29,31 +30,30 @@ class TD3(OffPolicyRLAlgorithm):
         policy_delay=gin.REQUIRED
     ):
 
-        # ===== networks =====
+        # networks
 
         self.actor = MLPTanhActor(input_dim, action_dim).to(get_device())
-        self.actor_target = MLPTanhActor(input_dim, action_dim).to(get_device())
-        self.actor_target.eval()
-        self.actor_target.load_state_dict(self.actor.state_dict())
+        self.actor_targ = MLPTanhActor(input_dim, action_dim).to(get_device())
+        self.actor_targ.eval()
+        self.actor_targ.load_state_dict(self.actor.state_dict())
 
         self.Q1 = MLPCritic(input_dim, action_dim).to(get_device())
-        self.Q1_target = MLPCritic(input_dim, action_dim).to(get_device())
-        self.Q1_target.eval()
-        self.Q1_target.load_state_dict(self.Q1.state_dict())
+        self.Q1_targ = MLPCritic(input_dim, action_dim).to(get_device())
+        self.Q1_targ.eval()
+        self.Q1_targ.load_state_dict(self.Q1.state_dict())
 
         self.Q2 = MLPCritic(input_dim, action_dim).to(get_device())
-        self.Q2_target = MLPCritic(input_dim, action_dim).to(get_device())
-        self.Q2_target.eval()
-        self.Q2_target.load_state_dict(self.Q2.state_dict())
+        self.Q2_targ = MLPCritic(input_dim, action_dim).to(get_device())
+        self.Q2_targ.eval()
+        self.Q2_targ.load_state_dict(self.Q2.state_dict())
 
-        # ===== optimizers =====
+        # optimizers
 
-        # ref: https://pytorch.org/docs/stable/optim.html
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
         self.Q1_optimizer = optim.Adam(self.Q1.parameters(), lr=lr)
         self.Q2_optimizer = optim.Adam(self.Q2.parameters(), lr=lr)
 
-        # ===== hyper-parameters =====
+        # hyper-parameters
 
         self.gamma = gamma
         self.polyak = polyak
@@ -66,7 +66,8 @@ class TD3(OffPolicyRLAlgorithm):
 
         # miscellaneous
 
-        self.num_Q_updates = 0
+        self.num_Q_updates = 0  # for delaying updates
+        self.action_dim = action_dim  # for shape checking
 
     def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
@@ -77,18 +78,20 @@ class TD3(OffPolicyRLAlgorithm):
             else:
                 return np.clip(greedy_action + self.action_noise * np.random.randn(len(greedy_action)), -1.0, 1.0)
 
-    def polyak_update(self, old_net, new_net) -> None:
-        for old_param, new_param in zip(old_net.parameters(), new_net.parameters()):
-            old_param.data.copy_(old_param.data * self.polyak + new_param.data * (1 - self.polyak))
+    def polyak_update(self, target_net: nn.Module, prediction_net: nn.Module) -> None:
+        for target_param, prediction_param in zip(target_net.parameters(), prediction_net.parameters()):
+            target_param.data.copy_(target_param.data * self.polyak + prediction_param.data * (1 - self.polyak))
 
     def update_networks(self, batch: Batch):
+
+        bs = len(b.ns)  # for shape checking
 
         # compute prediction
 
         Q1_pred = self.Q1(batch.s, batch.a)
         Q2_pred = self.Q2(batch.s, batch.a)
 
-        # compute target
+        # compute target (n stands for next)
 
         with torch.no_grad():
 
@@ -98,14 +101,21 @@ class TD3(OffPolicyRLAlgorithm):
             ).to(get_device())
             smoothed_na = torch.clamp(na + noise, -1, 1)
 
-            min_Q_targ = torch.min(self.Q1_target(batch.ns, smoothed_na), self.Q2_target(batch.ns, smoothed_na))
+            n_min_Q_targ = torch.min(self.Q1_targ(batch.ns, smoothed_na), self.Q2_targ(batch.ns, smoothed_na))
 
-            targets = batch.r + self.gamma * (1 - batch.d) * min_Q_targ
+            targets = batch.r + self.gamma * (1 - batch.d) * n_min_Q_targ
+
+            assert na.shape == (bs, self.action_dim)
+            assert n_min_Q_targ.shape == (bs, 1)
+            assert targets.shape == (bs, 1)
 
         # compute td error
 
         Q1_loss = torch.mean((Q1_pred - targets) ** 2)
         Q2_loss = torch.mean((Q2_pred - targets) ** 2)
+
+        assert Q1_loss.shape == ()
+        assert Q2_loss.shape == ()
 
         # reduce td error
 
@@ -129,8 +139,12 @@ class TD3(OffPolicyRLAlgorithm):
             # compute policy loss
 
             a = self.actor(batch.s)
-            Q1_values = self.Q1(batch.s, a)
-            policy_loss = - torch.mean(Q1_values)
+            Q1_val = self.Q1(batch.s, a)  # val stands for values
+            policy_loss = - torch.mean(Q1_val)
+
+            assert a.shape == (bs, self.action_dim)
+            assert Q1_val.shape == (bs, 1)
+            assert policy_loss.shape == ()
 
             # reduce policy loss
 
@@ -145,15 +159,30 @@ class TD3(OffPolicyRLAlgorithm):
 
             # # update target networks
 
-            self.polyak_update(old_net=self.actor_target, new_net=self.actor)
+            self.polyak_update(target_net=self.actor_targ, prediction_net=self.actor)
 
-        # update target networks
+            self.polyak_update(target_net=self.Q1_targ, prediction_net=self.Q1)
+            self.polyak_update(target_net=self.Q2_targ, prediction_net=self.Q2)
 
-        self.polyak_update(old_net=self.Q1_target, new_net=self.Q1)
-        self.polyak_update(old_net=self.Q2_target, new_net=self.Q2)
-
-    def save_actor(self, save_dir: str) -> None:
+    def save_networks(self, save_dir: str) -> None:
         torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))
+        torch.save(self.Q1.state_dict(), os.path.join(save_dir, 'Q1.pth'))
+        torch.save(self.Q1_targ.state_dict(), os.path.join(save_dir, 'Q1_targ.pth'))
+        torch.save(self.Q2.state_dict(), os.path.join(save_dir, 'Q2.pth'))
+        torch.save(self.Q2_targ.state_dict(), os.path.join(save_dir, 'Q2_targ.pth'))
 
     def load_actor(self, save_dir: str) -> None:
-        self.actor.load_state_dict(torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
+        self.actor.load_state_dict(
+            torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
+
+    def load_networks(self, save_dir: str) -> None:
+        self.actor.load_state_dict(
+            torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
+        self.Q1.load_state_dict(
+            torch.load(os.path.join(save_dir, 'Q1.pth'), map_location=torch.device(get_device())))
+        self.Q1_targ.load_state_dict(
+            torch.load(os.path.join(save_dir, 'Q1_targ.pth'), map_location=torch.device(get_device())))
+        self.Q2.load_state_dict(
+            torch.load(os.path.join(save_dir, 'Q2.pth'), map_location=torch.device(get_device())))
+        self.Q2_targ.load_state_dict(
+            torch.load(os.path.join(save_dir, 'Q2_targ.pth'), map_location=torch.device(get_device())))

@@ -17,6 +17,7 @@ from basics.cuda_utils import get_device
 
 @gin.configurable(module=__name__)
 class SAC(OffPolicyRLAlgorithm):
+
     """Soft actor-critic"""
 
     def __init__(
