@@ -1,7 +1,7 @@
 import os
 import gin
-import numpy as np
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -82,28 +82,28 @@ class TD3(OffPolicyRLAlgorithm):
         for target_param, prediction_param in zip(target_net.parameters(), prediction_net.parameters()):
             target_param.data.copy_(target_param.data * self.polyak + prediction_param.data * (1 - self.polyak))
 
-    def update_networks(self, batch: Batch):
+    def update_networks(self, b: Batch):
 
         bs = len(b.ns)  # for shape checking
 
         # compute prediction
 
-        Q1_pred = self.Q1(batch.s, batch.a)
-        Q2_pred = self.Q2(batch.s, batch.a)
+        Q1_pred = self.Q1(b.s, b.a)
+        Q2_pred = self.Q2(b.s, b.a)
 
         # compute target (n stands for next)
 
         with torch.no_grad():
 
-            na = self.actor_target(batch.ns)
+            na = self.actor_target(b.ns)
             noise = torch.clamp(
                 torch.randn(na.size()) * self.target_noise, -self.noise_clip, self.noise_clip
             ).to(get_device())
             smoothed_na = torch.clamp(na + noise, -1, 1)
 
-            n_min_Q_targ = torch.min(self.Q1_targ(batch.ns, smoothed_na), self.Q2_targ(batch.ns, smoothed_na))
+            n_min_Q_targ = torch.min(self.Q1_targ(b.ns, smoothed_na), self.Q2_targ(b.ns, smoothed_na))
 
-            targets = batch.r + self.gamma * (1 - batch.d) * n_min_Q_targ
+            targets = b.r + self.gamma * (1 - b.d) * n_min_Q_targ
 
             assert na.shape == (bs, self.action_dim)
             assert n_min_Q_targ.shape == (bs, 1)
@@ -138,8 +138,8 @@ class TD3(OffPolicyRLAlgorithm):
 
             # compute policy loss
 
-            a = self.actor(batch.s)
-            Q1_val = self.Q1(batch.s, a)  # val stands for values
+            a = self.actor(b.s)
+            Q1_val = self.Q1(b.s, a)  # val stands for values
             policy_loss = - torch.mean(Q1_val)
 
             assert a.shape == (bs, self.action_dim)
@@ -163,6 +163,16 @@ class TD3(OffPolicyRLAlgorithm):
 
             self.polyak_update(target_net=self.Q1_targ, prediction_net=self.Q1)
             self.polyak_update(target_net=self.Q2_targ, prediction_net=self.Q2)
+
+        return {
+            # for learning the q functions
+            '(qfunc) Q1 pred': float(Q1_pred.mean()),
+            '(qfunc) Q2 pred': float(Q2_pred.mean()),
+            '(qfunc) Q1 loss': float(Q1_loss),
+            '(qfunc) Q2 loss': float(Q2_loss),
+            # for learning the actor
+            '(actor) Q1 val': float(Q1_val.mean())  # no need to track policy loss; just its negation
+        }
 
     def save_networks(self, save_dir: str) -> None:
         torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))

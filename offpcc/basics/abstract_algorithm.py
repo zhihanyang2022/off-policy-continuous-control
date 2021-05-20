@@ -17,12 +17,15 @@ class OffPolicyRLAlgorithm(ABC):
 
     @abstractmethod
     def save_networks(self, save_dir: str) -> None:
+        """Save all the networks"""
         pass
 
     @abstractmethod
     def load_actor(self, save_dir: str) -> None:
+        """Load the actor network only"""
         pass
 
     @abstractmethod
     def load_networks(self, save_dir: str) -> None:
+        """Load all the networks"""
         pass
