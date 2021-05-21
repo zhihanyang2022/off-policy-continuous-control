@@ -186,6 +186,6 @@ def continuous_cartpole_velocity_env():
 
 
 def continuous_cartpole_velocity_concat_env():
-    return ConcatObs(continuous_cartpole_velocity_env(), 3)
+    return ConcatObs(continuous_cartpole_velocity_env(), 7)
 
 

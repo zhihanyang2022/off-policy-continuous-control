@@ -8,6 +8,7 @@ from domains import *  # import all non-official environments
 from gym.wrappers import RescaleAction
 
 from basics.replay_buffer import ReplayBuffer
+from basics.replay_buffer_recurrent import RecurrentReplayBuffer
 from algorithms import *
 
 from basics.run_utils import train, make_log_dir, visualize_trained_policy
@@ -15,7 +16,8 @@ from basics.run_utils import train, make_log_dir, visualize_trained_policy
 algo_name2class = {
     'ddpg': DDPG,
     'td3': TD3,
-    'sac': SAC
+    'sac': SAC,
+    'sac_lstm': SAC_LSTM
 }
 
 parser = argparse.ArgumentParser()
@@ -59,7 +61,13 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
             name=f'run_id={run_id}'
         )
 
-        buffer = ReplayBuffer()
+        if args.algo.endswith('lstm'):
+            buffer = RecurrentReplayBuffer(
+                o_dim=env_fn().observation_space.shape[0],
+                a_dim=env_fn().action_space.shape[0]
+            )
+        else:
+            buffer = ReplayBuffer()
 
         train(
             env_fn=env_fn,

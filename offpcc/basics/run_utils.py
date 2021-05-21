@@ -6,6 +6,7 @@ import os
 import wandb
 import csv
 
+from copy import deepcopy
 import numpy as np
 from gym.wrappers import Monitor
 
@@ -21,6 +22,7 @@ def make_log_dir(env_name, algo_name, run_id) -> str:
 
 def test_for_one_episode(env, algorithm) -> tuple:
     state, done, episode_return, episode_len = env.reset(), False, 0, 0
+    algorithm.restart()  # crucial, crucial step for recurrent agents
     while not done:
         action = algorithm.act(state, deterministic=True)
         state, reward, done, _ = env.step(action)
@@ -113,7 +115,7 @@ def train(
         cutoff = episode_len == max_steps_per_episode
         done = False if cutoff else done
 
-        buffer.push(Transition(state, action, reward, next_state, done))
+        buffer.push(state, action, reward, next_state, done, cutoff)
 
         state = next_state  # crucial, crucial step
 
@@ -122,6 +124,7 @@ def train(
             train_episode_lens.append(episode_len)
             train_episode_rets.append(episode_ret)
             state, episode_len, episode_ret = env.reset(), 0, 0  # reset state and stats trackers
+            algorithm.restart()  # crucial, crucial step for recurrent agents
 
         # update handling
         if t >= update_after and (t + 1) % update_every == 0:
@@ -161,7 +164,8 @@ def train(
             test_episode_lens, test_episode_returns = [], []
 
             for j in range(num_test_episodes_per_epoch):
-                test_episode_len, test_episode_return = test_for_one_episode(test_env, algorithm)
+                test_algorithm = deepcopy(algorithm)  # crucial, crucial step for recurrent agents
+                test_episode_len, test_episode_return = test_for_one_episode(test_env, test_algorithm)
                 test_episode_lens.append(test_episode_len)
                 test_episode_returns.append(test_episode_return)
 

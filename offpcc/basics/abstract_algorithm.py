@@ -12,7 +12,7 @@ class OffPolicyRLAlgorithm(ABC):
         pass
 
     @abstractmethod
-    def update_networks(self, b: Batch) -> dict:   # return a dictonary of stats that you want to track; could be empty
+    def update_networks(self, b: Batch) -> dict:  # return a dictonary of stats that you want to track; could be empty
         pass
 
     @abstractmethod
@@ -28,4 +28,8 @@ class OffPolicyRLAlgorithm(ABC):
     @abstractmethod
     def load_networks(self, save_dir: str) -> None:
         """Load all the networks"""
+        pass
+
+    def restart(self) -> None:
+        """For recurrent agents only; called at the beginning of each episode"""
         pass

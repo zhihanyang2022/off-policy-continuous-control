@@ -17,8 +17,8 @@ class ReplayBuffer:
         self.memory = deque(maxlen=capacity)
         self.batch_size = batch_size
 
-    def push(self, transition: Transition) -> None:
-        self.memory.appendleft(transition)
+    def push(self, s, a, r, ns, d, cutoff) -> None:
+        self.memory.appendleft(Transition(s, a, r, ns, d))
 
     def sample(self) -> Batch:
         assert len(self.memory) >= self.batch_size, "Please increase update_after to be >= batch_size"
