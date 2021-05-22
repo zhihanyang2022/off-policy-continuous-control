@@ -45,10 +45,8 @@ class RecurrentGaussianActor(nn.Module):
     def do_inference(self, observation: torch.tensor, hidden_states: tuple) -> tuple:
 
         # x = F.relu(self.pre_lstm(observation))
-        x, hidden_states = self.lstm(observation, hidden_states)  # update hidden states
-
-        x = F.relu(self.mlp_layer_1(x))
-        x = F.relu(self.mlp_layer_2(x))
+        x, hidden_states = self.layer1(observation, hidden_states)  # update hidden states
+        x = F.relu(self.layer2(x))
 
         means, log_stds = self.means_layer(x), self.log_stds_layer(x)
         stds = torch.exp(torch.clamp(log_stds, self.LOG_STD_MIN, self.LOG_STD_MAX))
