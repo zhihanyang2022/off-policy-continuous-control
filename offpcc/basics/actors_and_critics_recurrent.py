@@ -34,6 +34,9 @@ class RecurrentGaussianActor(nn.Module):
     def forward(self, observations: torch.tensor) -> tuple:
 
         # x = F.relu(self.pre_lstm(observations))
+
+        self.layer1.flatten_parameters()
+
         x, _ = self.layer1(observations)
         x = F.relu(self.layer2(x))
 
@@ -43,6 +46,8 @@ class RecurrentGaussianActor(nn.Module):
         return means, stds
 
     def do_inference(self, observation: torch.tensor, hidden_states: tuple) -> tuple:
+
+        self.layer1.flatten_parameters()
 
         # x = F.relu(self.pre_lstm(observation))
         x, hidden_states = self.layer1(observation, hidden_states)  # update hidden states
@@ -66,6 +71,8 @@ class RecurrentCritic(nn.Module):
         self.q_values = nn.Linear(in_features=256, out_features=1)
 
     def forward(self, observations: torch.tensor, actions: torch.tensor):
+
+        self.layer1.flatten_parameters()
 
         # x = F.relu(self.pre_lstm(observations))
         x, _ = self.layer1(observations)
