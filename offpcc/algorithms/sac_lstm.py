@@ -202,7 +202,7 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         policy_loss = rescale_loss(torch.mean(m * policy_loss_elementwise), m)
 
         assert a.shape == (bs, num_bptt, self.action_dim)
-        assert log_pi_a_given_s.shape == (bs, num_bptt - 2, 1)
+        assert log_pi_a_given_s.shape == (bs, num_bptt, 1)
         assert min_Q.shape == (bs, num_bptt - 2, 1)
         assert policy_loss.shape == ()
 
