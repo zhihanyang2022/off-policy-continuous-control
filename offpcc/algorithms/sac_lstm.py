@@ -117,6 +117,10 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         for target_param, prediction_param in zip(target_net.parameters(), prediction_net.parameters()):
             target_param.data.copy_(target_param.data * self.polyak + prediction_param.data * (1 - self.polyak))
 
+    @staticmethod
+    def burn_in(tensor):
+        return tensor[:, 2:, :]
+
     def update_networks(self, b: RecurrentBatch) -> dict:
 
         bs, num_bptt = b.r.shape[0], b.r.shape[1]
@@ -148,13 +152,20 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
             assert n_min_Q_targ.shape == (bs, num_bptt, 1)
             assert targets.shape == (bs, num_bptt, 1)
 
+        # burn-in
+
+        Q1_predictions = self.burn_in(Q1_predictions)
+        Q2_predictions = self.burn_in(Q2_predictions)
+        targets = self.burn_in(targets)
+        m = self.burn_in(b.m)
+
         # compute td error
 
         Q1_loss_elementwise = Q_loss_fn(Q1_predictions, targets)
-        Q1_loss = rescale_loss(torch.mean(b.m * Q1_loss_elementwise), b.m)
+        Q1_loss = rescale_loss(torch.mean(m * Q1_loss_elementwise), m)
 
         Q2_loss_elementwise = Q_loss_fn(Q2_predictions, targets)
-        Q2_loss = rescale_loss(torch.mean(b.m * Q2_loss_elementwise), b.m)
+        Q2_loss = rescale_loss(torch.mean(m * Q2_loss_elementwise), m)
 
         assert Q1_loss.shape == ()
         assert Q2_loss.shape == ()
@@ -184,12 +195,15 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         min_Q = torch.min(self.Q1(b.o, a), self.Q2(b.o, a))
         entropy = - log_pi_a_given_s
 
+        min_Q = self.burn_in(min_Q)
+        entropy = self.burn_in(entropy)
+
         policy_loss_elementwise = - (min_Q + self.alpha * entropy)
-        policy_loss = rescale_loss(torch.mean(b.m * policy_loss_elementwise), b.m)
+        policy_loss = rescale_loss(torch.mean(m * policy_loss_elementwise), m)
 
         assert a.shape == (bs, num_bptt, self.action_dim)
-        assert log_pi_a_given_s.shape == (bs, num_bptt, 1)
-        assert min_Q.shape == (bs, num_bptt, 1)
+        assert log_pi_a_given_s.shape == (bs, num_bptt - 2, 1)
+        assert min_Q.shape == (bs, num_bptt - 2, 1)
         assert policy_loss.shape == ()
 
         # reduce policy loss
