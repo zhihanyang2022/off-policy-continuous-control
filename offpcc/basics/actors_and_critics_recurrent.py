@@ -21,9 +21,9 @@ class RecurrentGaussianActor(nn.Module):
 
         super().__init__()
 
-        self.pre_lstm = nn.Linear(in_features=input_dim, out_features=64)
-        self.lstm = nn.LSTM(input_size=64, hidden_size=64, batch_first=True)
-        self.lstm.flatten_parameters()  # added this to resolve some arbitrary warning
+        # self.pre_lstm = nn.Linear(in_features=input_dim, out_features=64)
+        self.lstm = nn.LSTM(input_size=input_dim, hidden_size=64, batch_first=True)
+        # self.lstm.flatten_parameters()  # added this to resolve some arbitrary warning
 
         self.mlp_layer_1 = nn.Linear(in_features=64, out_features=256)
         self.mlp_layer_2 = nn.Linear(in_features=256, out_features=256)
@@ -36,8 +36,8 @@ class RecurrentGaussianActor(nn.Module):
 
     def forward(self, observations: torch.tensor) -> tuple:
 
-        x = F.relu(self.pre_lstm(observations))
-        x, _ = self.lstm(x)
+        # x = F.relu(self.pre_lstm(observations))
+        x, _ = self.lstm(observations)
 
         x = F.relu(self.mlp_layer_1(x))
         x = F.relu(self.mlp_layer_2(x))
@@ -49,8 +49,8 @@ class RecurrentGaussianActor(nn.Module):
 
     def do_inference(self, observation: torch.tensor, hidden_states: tuple) -> tuple:
 
-        x = F.relu(self.pre_lstm(observation))
-        x, hidden_states = self.lstm(x, hidden_states)  # update hidden states
+        # x = F.relu(self.pre_lstm(observation))
+        x, hidden_states = self.lstm(observation, hidden_states)  # update hidden states
 
         x = F.relu(self.mlp_layer_1(x))
         x = F.relu(self.mlp_layer_2(x))
@@ -67,9 +67,8 @@ class RecurrentCritic(nn.Module):
 
         super().__init__()
 
-        self.pre_lstm = nn.Linear(in_features=input_dim, out_features=64)
-        self.lstm = nn.LSTM(input_size=64, hidden_size=64, batch_first=True)
-        self.lstm.flatten_parameters()  # added this to resolve some arbitrary warning
+        # self.pre_lstm = nn.Linear(in_features=input_dim, out_features=64)
+        self.lstm = nn.LSTM(input_size=input_dim, hidden_size=64, batch_first=True)
 
         self.mlp_layer_1 = nn.Linear(in_features=64+action_dim, out_features=256)
         self.mlp_layer_2 = nn.Linear(in_features=256, out_features=256)
@@ -78,8 +77,8 @@ class RecurrentCritic(nn.Module):
 
     def forward(self, observations: torch.tensor, actions: torch.tensor):
 
-        x = F.relu(self.pre_lstm(observations))
-        x, _ = self.lstm(x)  # mentally think about the output of lstm as "states"
+        # x = F.relu(self.pre_lstm(observations))
+        x, _ = self.lstm(observations)  # mentally think about the output of lstm as "states"
 
         x = F.relu(self.mlp_layer_1(torch.cat([x, actions], dim=2)))
         x = F.relu(self.mlp_layer_2(x))
