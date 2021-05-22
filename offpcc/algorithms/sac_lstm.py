@@ -8,12 +8,15 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.distributions import Normal, Independent
+from torch.nn import SmoothL1Loss
 
 from basics.abstract_algorithm import OffPolicyRLAlgorithm
 from basics.actors_and_critics_recurrent import RecurrentGaussianActor, RecurrentCritic
 from basics.replay_buffer_recurrent import RecurrentBatch
 from basics.cuda_utils import get_device
 
+
+Q_loss_fn = SmoothL1Loss(reduction='none')
 
 def rescale_loss(loss: torch.tensor, mask: torch.tensor) -> torch.tensor:
     return loss / mask.sum() * np.prod(mask.shape)
@@ -147,10 +150,10 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # compute td error
 
-        Q1_loss_elementwise = (Q1_predictions - targets) ** 2
+        Q1_loss_elementwise = Q_loss_fn(Q1_predictions, targets)
         Q1_loss = rescale_loss(torch.mean(b.m * Q1_loss_elementwise), b.m)
 
-        Q2_loss_elementwise = (Q2_predictions - targets) ** 2
+        Q2_loss_elementwise = Q_loss_fn(Q2_predictions, targets)
         Q2_loss = rescale_loss(torch.mean(b.m * Q2_loss_elementwise), b.m)
 
         assert Q1_loss.shape == ()
