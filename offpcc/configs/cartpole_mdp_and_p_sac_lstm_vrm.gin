@@ -12,9 +12,9 @@ algorithms.sac_lstm.SAC_LSTM.polyak = 0.995
 import basics.replay_buffer_recurrent
 
 basics.replay_buffer_recurrent.RecurrentReplayBuffer.max_episode_len = 1_000
-basics.replay_buffer_recurrent.RecurrentReplayBuffer.num_bptt = 5             # enough for cartpole & cartpole p
+basics.replay_buffer_recurrent.RecurrentReplayBuffer.num_bptt = 10             # enough for cartpole & cartpole p
 basics.replay_buffer_recurrent.RecurrentReplayBuffer.capacity = 1_000
-basics.replay_buffer_recurrent.RecurrentReplayBuffer.batch_size = 20          # num_bptt * batch_size = 100 (identical to non-recurrent SAC)
+basics.replay_buffer_recurrent.RecurrentReplayBuffer.batch_size = 10           # num_bptt * batch_size = 100 (identical to non-recurrent SAC)
 
 import basics.run_utils
 

@@ -119,7 +119,7 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
     @staticmethod
     def burn_in(tensor):
-        return tensor[:, 2:, :]
+        return tensor[:, 5:, :]  # first few should be avoided; not actually stateful
 
     def update_networks(self, b: RecurrentBatch) -> dict:
 
