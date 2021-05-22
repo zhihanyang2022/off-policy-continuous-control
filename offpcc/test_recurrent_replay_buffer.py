@@ -6,7 +6,7 @@ buffer = RecurrentReplayBuffer(1, 1, capacity=5, max_episode_len=10, num_bptt=5,
 
 for i in range(20):  # more than capacity capacity
     for j in range(3):  # less than max_episode_len
-        buffer.push(np.array([i]), np.array([i]), 0.5, np.array([i]), int(j == 6), int(j == 9))
+        buffer.push(np.array([i]), np.array([i]), 0.5, np.array([i]), int(j == 2), int(j == 9))
 
 print('Observations')
 print(buffer.o.reshape(5, 10))
@@ -28,8 +28,8 @@ print(buffer.ep_len)
 
 print('Sample')
 sample = buffer.sample()
-print(sample.o.view(5, 3))
-print(sample.a.view(5, 3))
-print(sample.r.view(5, 3))
-print(sample.d.view(5, 3))
-print(sample.m.view(5, 3))
+print(sample.o.view(5, 5))
+print(sample.a.view(5, 5))
+print(sample.r.view(5, 5))
+print(sample.d.view(5, 5))
+print(sample.m.view(5, 5))

@@ -31,6 +31,7 @@ class RecurrentReplayBuffer:
         self.d = np.zeros((capacity, max_episode_len, 1))
         self.m = np.zeros((capacity, max_episode_len, 1))  # mask
         self.ep_len = np.zeros((capacity,))
+        self.ready_for_sampling = np.zeros((capacity,))
 
         # pointers
 
@@ -39,7 +40,6 @@ class RecurrentReplayBuffer:
 
         # trackers
 
-        self.num_episodes = 0
         self.just_finished_an_episode = False
 
         # hyper-parameters
@@ -63,10 +63,11 @@ class RecurrentReplayBuffer:
             self.d[self.episode_ptr] = 0
             self.m[self.episode_ptr] = 0
             self.ep_len[self.episode_ptr] = 0
+            self.ready_for_sampling[self.episode_ptr] = 0
 
             self.just_finished_an_episode = False
 
-        # fill
+        # fill placeholders
 
         self.o[self.episode_ptr, self.time_ptr] = o
         self.a[self.episode_ptr, self.time_ptr] = a
@@ -78,6 +79,10 @@ class RecurrentReplayBuffer:
 
         if d or cutoff:
 
+            # fill placeholders
+
+            self.ready_for_sampling[self.episode_ptr] = 1
+
             # reset pointers
 
             self.episode_ptr = (self.episode_ptr + 1) % self.capacity
@@ -85,8 +90,6 @@ class RecurrentReplayBuffer:
 
             # update trackers
 
-            if self.num_episodes < self.capacity:
-                self.num_episodes += 1
             self.just_finished_an_episode = True
 
         else:
@@ -107,13 +110,15 @@ class RecurrentReplayBuffer:
 
         # sample could take place in the middle of an episode
         # therefore, a partial episode could be sampled
-        # however, this shouldn't cause a problem because it is masked appropriately
+        # however, this isn't incorrect because it is masked appropriately
+        # nevertheless, I find it more elegant to avoid learning from them
+        # because they could be very short
 
         # sample episode indices
         # assign higher probability to longer episodes
 
-        options = np.arange(self.num_episodes)
-        probas = self._as_probas(self.ep_len[:self.num_episodes])
+        options = np.where(self.ready_for_sampling == 1)[0]
+        probas = self._as_probas(self.ep_len[options])
         ep_idxs = np.random.choice(options, p=probas, size=self.batch_size)
 
         # for selected episodes, get their length
@@ -133,6 +138,7 @@ class RecurrentReplayBuffer:
         # 4 4 4 4 4 4 4 4 4 4
 
         col_idxs = []
+
         for ep_len in ep_lens:
 
             final_index = ep_len - 1  # the last valid index of the episode
@@ -147,7 +153,7 @@ class RecurrentReplayBuffer:
 
             end_index = start_index + (self.num_bptt - 1)  # correct for over addition
 
-            col_idxs.append(np.arange(start_index, end_index+1, 1))  # correct for not including upper bound
+            col_idxs.append(np.arange(start_index, end_index + 1, 1))  # correct for not including upper bound
 
         col_idxs = np.array(col_idxs)
 
