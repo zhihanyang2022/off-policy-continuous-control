@@ -22,7 +22,7 @@ class RecurrentReplayBuffer:
         batch_size=gin.REQUIRED
     ):
 
-        # num_bptt
+        # placeholders
 
         self.o = np.zeros((capacity, max_episode_len, o_dim))
         self.a = np.zeros((capacity, max_episode_len, a_dim))
@@ -32,10 +32,17 @@ class RecurrentReplayBuffer:
         self.m = np.zeros((capacity, max_episode_len, 1))  # mask
         self.ep_len = np.zeros((capacity,))
 
+        # pointers
+
         self.episode_ptr = 0
         self.time_ptr = 0
 
+        # trackers
+
         self.num_episodes = 0
+        self.just_finished_an_episode = False
+
+        # hyper-parameters
 
         self.capacity = capacity
         self.o_dim = o_dim
@@ -44,6 +51,20 @@ class RecurrentReplayBuffer:
         self.batch_size = batch_size
 
     def push(self, o, a, r, no, d, cutoff):
+
+        # zero-out current slot at the beginning of an episode
+
+        if self.just_finished_an_episode:
+
+            self.o[self.episode_ptr] = 0
+            self.a[self.episode_ptr] = 0
+            self.r[self.episode_ptr] = 0
+            self.no[self.episode_ptr] = 0
+            self.d[self.episode_ptr] = 0
+            self.m[self.episode_ptr] = 0
+            self.ep_len[self.episode_ptr] = 0
+
+            self.just_finished_an_episode = False
 
         # fill
 
@@ -57,24 +78,20 @@ class RecurrentReplayBuffer:
 
         if d or cutoff:
 
-            # update pointers
+            # reset pointers
 
             self.episode_ptr = (self.episode_ptr + 1) % self.capacity
             self.time_ptr = 0
+
+            # update trackers
+
             if self.num_episodes < self.capacity:
                 self.num_episodes += 1
-
-            # empty next slot
-
-            self.o[self.episode_ptr] = 0
-            self.a[self.episode_ptr] = 0
-            self.r[self.episode_ptr] = 0
-            self.no[self.episode_ptr] = 0
-            self.d[self.episode_ptr] = 0
-            self.m[self.episode_ptr] = 0
-            self.ep_len[self.episode_ptr] = 0
+            self.just_finished_an_episode = True
 
         else:
+
+            # update pointers
 
             self.time_ptr += 1
 
@@ -87,6 +104,10 @@ class RecurrentReplayBuffer:
         return torch.tensor(np_array).float().to(get_device())
 
     def sample(self):
+
+        # sample could take place in the middle of an episode
+        # therefore, a partial episode could be sampled
+        # however, this shouldn't cause a problem because it is masked appropriately
 
         # sample episode indices
         # assign higher probability to longer episodes
@@ -114,14 +135,19 @@ class RecurrentReplayBuffer:
         col_idxs = []
         for ep_len in ep_lens:
 
-            if ep_len > self.num_bptt:  # low < high is a must for numpy
-                start = np.random.randint(ep_len - self.num_bptt)
+            final_index = ep_len - 1  # the last valid index of the episode
+
+            # first +1 is to correct for over subtraction
+            # second +1 is to correct for the fact that np.random.randint does not include upper bound
+
+            if ep_len >= self.num_bptt:
+                start_index = np.random.randint((final_index - self.num_bptt + 1) + 1)
             elif ep_len < self.num_bptt:  # this is the case for which mask is actually useful
-                start = 0
+                start_index = 0
 
-            end = start + self.num_bptt
+            end_index = start_index + (self.num_bptt - 1)  # correct for over addition
 
-            col_idxs.append(np.arange(start, end, 1))
+            col_idxs.append(np.arange(start_index, end_index+1, 1))  # correct for not including upper bound
 
         col_idxs = np.array(col_idxs)
 
