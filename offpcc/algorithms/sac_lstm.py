@@ -67,7 +67,7 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         self.hidden = None
 
     def restart(self) -> None:
-        self.hidden = (torch.zeros(1, 1, 64), torch.zeros(1, 1, 64))
+        self.hidden = (torch.zeros(1, 1, 64).to(get_device()), torch.zeros(1, 1, 64).to(get_device()))
 
     def sample_action_from_distribution(
             self,
