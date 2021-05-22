@@ -12,9 +12,9 @@ algorithms.sac_lstm.SAC_LSTM.polyak = 0.995
 import basics.replay_buffer_recurrent
 
 basics.replay_buffer_recurrent.RecurrentReplayBuffer.max_episode_len = 1_000
-basics.replay_buffer_recurrent.RecurrentReplayBuffer.num_bptt = 10
+basics.replay_buffer_recurrent.RecurrentReplayBuffer.num_bptt = 5
 basics.replay_buffer_recurrent.RecurrentReplayBuffer.capacity = 1_000
-basics.replay_buffer_recurrent.RecurrentReplayBuffer.batch_size = 4
+basics.replay_buffer_recurrent.RecurrentReplayBuffer.batch_size = 10
 
 import basics.run_utils
 
