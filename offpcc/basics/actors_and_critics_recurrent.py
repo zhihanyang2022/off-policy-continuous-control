@@ -23,6 +23,7 @@ class RecurrentGaussianActor(nn.Module):
 
         self.pre_lstm = nn.Linear(in_features=input_dim, out_features=64)
         self.lstm = nn.LSTM(input_size=64, hidden_size=64, batch_first=True)
+        self.lstm.flatten_parameters()  # added this to resolve some arbitrary warning
 
         self.mlp_layer_1 = nn.Linear(in_features=64, out_features=256)
         self.mlp_layer_2 = nn.Linear(in_features=256, out_features=256)
@@ -68,6 +69,7 @@ class RecurrentCritic(nn.Module):
 
         self.pre_lstm = nn.Linear(in_features=input_dim, out_features=64)
         self.lstm = nn.LSTM(input_size=64, hidden_size=64, batch_first=True)
+        self.lstm.flatten_parameters()  # added this to resolve some arbitrary warning
 
         self.mlp_layer_1 = nn.Linear(in_features=64+action_dim, out_features=256)
         self.mlp_layer_2 = nn.Linear(in_features=256, out_features=256)
