@@ -203,7 +203,7 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         assert a.shape == (bs, num_bptt, self.action_dim)
         assert log_pi_a_given_s.shape == (bs, num_bptt, 1)
-        assert min_Q.shape == (bs, num_bptt - 2, 1)
+        assert min_Q.shape == (bs, num_bptt - 5, 1)
         assert policy_loss.shape == ()
 
         # reduce policy loss
