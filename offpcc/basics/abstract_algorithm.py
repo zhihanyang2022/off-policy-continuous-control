@@ -7,12 +7,13 @@ from basics.replay_buffer import Batch
 class OffPolicyRLAlgorithm(ABC):
 
     @abstractmethod
-    def act(self, state: np.array, deterministic: bool) -> Union[int, np.array]:
-        """int is for discrete action space; np.array is for continuous action space"""
+    def act(self, state: np.array, deterministic: bool) -> np.array:
+        """Only called during online rollout"""
         pass
 
     @abstractmethod
     def update_networks(self, b: Batch) -> dict:  # return a dictonary of stats that you want to track; could be empty
+        """Only called during learning"""
         pass
 
     @abstractmethod
@@ -31,5 +32,5 @@ class OffPolicyRLAlgorithm(ABC):
         pass
 
     def restart(self) -> None:
-        """For recurrent agents only; called at the beginning of each episode"""
+        """For recurrent agents only; called at the beginning of each episode to reset hidden states"""
         pass

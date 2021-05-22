@@ -77,7 +77,7 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
             track_hidden: bool
     ) -> Union[torch.tensor, tuple]:  # tuple of 2 tensors if return_log_prob is True; else torch.tensor
 
-        if track_hidden:
+        if track_hidden:  # for online rollout (not for learning)
             means, stds, self.hidden = self.actor.do_inference(observation, self.hidden)
         else:
             means, stds = self.actor(observation)

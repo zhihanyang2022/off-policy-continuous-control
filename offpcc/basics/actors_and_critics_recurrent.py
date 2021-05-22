@@ -76,9 +76,6 @@ class RecurrentCritic(nn.Module):
 
         self.q_values = nn.Linear(in_features=256, out_features=1)
 
-        self.LOG_STD_MAX = 2
-        self.LOG_STD_MIN = -20
-
     def forward(self, observations: torch.tensor, actions: torch.tensor):
 
         x = F.relu(self.pre_lstm(observations))

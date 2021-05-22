@@ -6,11 +6,13 @@ import os
 import wandb
 import csv
 
+from typing import Union
 from copy import deepcopy
 import numpy as np
 from gym.wrappers import Monitor
 
 from basics.replay_buffer import ReplayBuffer, Transition
+from basics.replay_buffer_recurrent import RecurrentReplayBuffer
 
 BASE_LOG_DIR = '../results'
 
@@ -51,7 +53,7 @@ def visualize_trained_policy(
 def train(
         env_fn,
         algorithm,
-        buffer: ReplayBuffer,
+        buffer: Union[ReplayBuffer, RecurrentReplayBuffer],
         max_steps_per_episode=gin.REQUIRED,
         num_epochs=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
@@ -93,6 +95,8 @@ def train(
     test_env = env_fn()
 
     state = env.reset()
+
+    algorithm.restart()
 
     # training loop
 
