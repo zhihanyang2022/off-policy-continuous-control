@@ -26,6 +26,9 @@ print(buffer.m.reshape(5, 10))
 print('Ep len')
 print(buffer.ep_len)
 
+print('Ready for sampling')
+print(buffer.ready_for_sampling)
+
 print('Sample')
 sample = buffer.sample()
 print(sample.o.view(5, 5))

@@ -173,7 +173,7 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # compute policy loss
 
-        a, log_pi_a_given_s = self.sample_action_from_distribution(b.s,
+        a, log_pi_a_given_s = self.sample_action_from_distribution(b.o,
                                                                    deterministic=False,
                                                                    return_log_prob=True,
                                                                    track_hidden=False)

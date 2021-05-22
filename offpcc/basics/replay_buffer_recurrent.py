@@ -40,7 +40,7 @@ class RecurrentReplayBuffer:
 
         # trackers
 
-        self.just_finished_an_episode = False
+        self.starting_new_episode = True
 
         # hyper-parameters
 
@@ -54,7 +54,7 @@ class RecurrentReplayBuffer:
 
         # zero-out current slot at the beginning of an episode
 
-        if self.just_finished_an_episode:
+        if self.starting_new_episode:
 
             self.o[self.episode_ptr] = 0
             self.a[self.episode_ptr] = 0
@@ -65,7 +65,7 @@ class RecurrentReplayBuffer:
             self.ep_len[self.episode_ptr] = 0
             self.ready_for_sampling[self.episode_ptr] = 0
 
-            self.just_finished_an_episode = False
+            self.starting_new_episode = False
 
         # fill placeholders
 
@@ -90,7 +90,7 @@ class RecurrentReplayBuffer:
 
             # update trackers
 
-            self.just_finished_an_episode = True
+            self.starting_new_episode = True
 
         else:
 
