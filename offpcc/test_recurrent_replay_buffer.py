@@ -2,10 +2,10 @@ import numpy as np
 
 from basics.replay_buffer_recurrent import RecurrentReplayBuffer
 
-buffer = RecurrentReplayBuffer(1, 1, capacity=5, max_episode_len=10, num_bptt=3, batch_size=5)
+buffer = RecurrentReplayBuffer(1, 1, capacity=5, max_episode_len=10, num_bptt=5, batch_size=5)
 
 for i in range(20):  # more than capacity capacity
-    for j in range(7):  # less than max_episode_len
+    for j in range(3):  # less than max_episode_len
         buffer.push(np.array([i]), np.array([i]), 0.5, np.array([i]), int(j == 6), int(j == 9))
 
 print('Observations')
