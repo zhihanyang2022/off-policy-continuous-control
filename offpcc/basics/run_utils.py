@@ -96,8 +96,6 @@ def train(
 
     state = env.reset()
 
-    algorithm.restart()
-
     # training loop
 
     for t in range(total_steps):

@@ -6,7 +6,7 @@ import torch
 
 from basics.cuda_utils import get_device
 
-RecurrentBatch = namedtuple('RecurrentBatch', 'o a r no d m')
+RecurrentBatch = namedtuple('RecurrentBatch', 'o a r d m')
 
 
 @gin.configurable(module=__name__)
@@ -24,12 +24,11 @@ class RecurrentReplayBuffer:
 
         # placeholders
 
-        self.o = np.zeros((capacity, max_episode_len, o_dim))
+        self.o = np.zeros((capacity, max_episode_len+1, o_dim))
         self.a = np.zeros((capacity, max_episode_len, a_dim))
         self.r = np.zeros((capacity, max_episode_len, 1))
-        self.no = np.zeros((capacity, max_episode_len, o_dim))
         self.d = np.zeros((capacity, max_episode_len, 1))
-        self.m = np.zeros((capacity, max_episode_len, 1))  # mask
+        self.m = np.zeros((capacity, max_episode_len, 1))  # mask, in case episode_len < num_bptt
         self.ep_len = np.zeros((capacity,))
         self.ready_for_sampling = np.zeros((capacity,))
 
@@ -59,7 +58,6 @@ class RecurrentReplayBuffer:
             self.o[self.episode_ptr] = 0
             self.a[self.episode_ptr] = 0
             self.r[self.episode_ptr] = 0
-            self.no[self.episode_ptr] = 0
             self.d[self.episode_ptr] = 0
             self.m[self.episode_ptr] = 0
             self.ep_len[self.episode_ptr] = 0
@@ -72,7 +70,6 @@ class RecurrentReplayBuffer:
         self.o[self.episode_ptr, self.time_ptr] = o
         self.a[self.episode_ptr, self.time_ptr] = a
         self.r[self.episode_ptr, self.time_ptr] = r
-        self.no[self.episode_ptr, self.time_ptr] = no
         self.d[self.episode_ptr, self.time_ptr] = d
         self.m[self.episode_ptr, self.time_ptr] = 1
         self.ep_len[self.episode_ptr] += 1
@@ -81,6 +78,7 @@ class RecurrentReplayBuffer:
 
             # fill placeholders
 
+            self.o[self.episode_ptr, self.time_ptr+1] = no
             self.ready_for_sampling[self.episode_ptr] = 1
 
             # reset pointers
@@ -110,7 +108,7 @@ class RecurrentReplayBuffer:
 
         # sample could take place in the middle of an episode
         # therefore, a partial episode could be sampled
-        # however, this isn't incorrect because it is masked appropriately
+        # this isn't incorrect because it is masked appropriately
         # nevertheless, I find it more elegant to avoid learning from them
         # because they could be very short
 
@@ -129,7 +127,8 @@ class RecurrentReplayBuffer:
         # the example right above this section:
         # https://numpy.org/doc/stable/reference/arrays.indexing.html#combining-advanced-and-basic-indexing
 
-        row_idxs = np.repeat(ep_idxs.reshape(-1, 1), repeats=self.num_bptt, axis=1)
+        row_idxs_for_o = np.repeat(ep_idxs.reshape(-1, 1), repeats=self.num_bptt+1, axis=1)
+        row_idxs_for_others = np.repeat(ep_idxs.reshape(-1, 1), repeats=self.num_bptt, axis=1)
 
         # suppose epi_idxs = [1, 2, 3, 4] and num_bptt = 10, then row_idxs =
         # 1 1 1 1 1 1 1 1 1 1
@@ -137,7 +136,8 @@ class RecurrentReplayBuffer:
         # 3 3 3 3 3 3 3 3 3 3
         # 4 4 4 4 4 4 4 4 4 4
 
-        col_idxs = []
+        col_idxs_for_o = []
+        col_idxs_for_others = []
 
         for ep_len in ep_lens:
 
@@ -153,19 +153,21 @@ class RecurrentReplayBuffer:
 
             end_index = start_index + (self.num_bptt - 1)  # correct for over addition
 
-            col_idxs.append(np.arange(start_index, end_index + 1, 1))  # correct for not including upper bound
+            col_idxs_for_o.append(np.arange(start_index, end_index + 1 + 1, 1))  # correct for not including upper bound
+            col_idxs_for_others.append(np.arange(start_index, end_index + 1, 1))
 
-        col_idxs = np.array(col_idxs)
+        col_idxs_for_o = np.array(col_idxs_for_o)
+        col_idxs_for_others = np.array(col_idxs_for_others)
 
-        assert row_idxs.shape == col_idxs.shape == (self.batch_size, self.num_bptt)
+        assert row_idxs_for_o.shape == col_idxs_for_o.shape == (self.batch_size, self.num_bptt + 1)
+        assert row_idxs_for_others.shape == col_idxs_for_others.shape == (self.batch_size, self.num_bptt)
 
         # numpy advanced indexing
 
-        o = self._prepare(self.o[row_idxs, col_idxs]).view(self.batch_size, self.num_bptt, self.o_dim)
-        a = self._prepare(self.a[row_idxs, col_idxs]).view(self.batch_size, self.num_bptt, self.a_dim)
-        r = self._prepare(self.r[row_idxs, col_idxs]).view(self.batch_size, self.num_bptt, 1)
-        no = self._prepare(self.no[row_idxs, col_idxs]).view(self.batch_size, self.num_bptt, self.o_dim)
-        d = self._prepare(self.d[row_idxs, col_idxs]).view(self.batch_size, self.num_bptt, 1)
-        m = self._prepare(self.m[row_idxs, col_idxs]).view(self.batch_size, self.num_bptt, 1)
+        o = self._prepare(self.o[row_idxs_for_o, col_idxs_for_o]).view(self.batch_size, self.num_bptt+1, self.o_dim)
+        a = self._prepare(self.a[row_idxs_for_others, col_idxs_for_others]).view(self.batch_size, self.num_bptt, self.a_dim)
+        r = self._prepare(self.r[row_idxs_for_others, col_idxs_for_others]).view(self.batch_size, self.num_bptt, 1)
+        d = self._prepare(self.d[row_idxs_for_others, col_idxs_for_others]).view(self.batch_size, self.num_bptt, 1)
+        m = self._prepare(self.m[row_idxs_for_others, col_idxs_for_others]).view(self.batch_size, self.num_bptt, 1)
 
-        return RecurrentBatch(o, a, r, no, d, m)
+        return RecurrentBatch(o, a, r, d, m)

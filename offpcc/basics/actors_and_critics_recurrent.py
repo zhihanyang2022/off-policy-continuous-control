@@ -21,7 +21,6 @@ class RecurrentGaussianActor(nn.Module):
 
         super().__init__()
 
-        # self.pre_lstm = nn.Linear(in_features=input_dim, out_features=64)
         self.layer1 = nn.LSTM(input_size=input_dim, hidden_size=256, batch_first=True)
         self.layer2 = nn.Linear(in_features=256, out_features=256)
 
@@ -32,8 +31,6 @@ class RecurrentGaussianActor(nn.Module):
         self.LOG_STD_MIN = -20
 
     def forward(self, observations: torch.tensor) -> tuple:
-
-        # x = F.relu(self.pre_lstm(observations))
 
         self.layer1.flatten_parameters()
 
@@ -49,7 +46,6 @@ class RecurrentGaussianActor(nn.Module):
 
         self.layer1.flatten_parameters()
 
-        # x = F.relu(self.pre_lstm(observation))
         x, hidden_states = self.layer1(observation, hidden_states)  # update hidden states
         x = F.relu(self.layer2(x))
 
@@ -65,7 +61,6 @@ class RecurrentCritic(nn.Module):
 
         super().__init__()
 
-        # self.pre_lstm = nn.Linear(in_features=input_dim, out_features=64)
         self.layer1 = nn.LSTM(input_size=input_dim, hidden_size=256, batch_first=True)
         self.layer2 = nn.Linear(in_features=256+action_dim, out_features=256)
         self.q_values = nn.Linear(in_features=256, out_features=1)
@@ -74,7 +69,6 @@ class RecurrentCritic(nn.Module):
 
         self.layer1.flatten_parameters()
 
-        # x = F.relu(self.pre_lstm(observations))
         x, _ = self.layer1(observations)
         x = F.relu(self.layer2(torch.cat([x, actions], dim=2)))
 
