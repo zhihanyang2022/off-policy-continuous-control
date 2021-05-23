@@ -8,7 +8,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.distributions import Normal, Independent
-from torch.nn import SmoothL1Loss
 
 from basics.abstract_algorithm import OffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPGaussianActor, MLPCritic
@@ -73,7 +72,7 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         self.h_and_c = None
 
     def restart(self) -> None:
-        self.h_and_c = (torch.zeros(1, 1, 256).to(get_device()), torch.zeros(1, 1, 256).to(get_device()))
+        self.h_and_c = None  # lstm will treat a None hidden state as zeros
 
     def sample_action_from_distribution(
             self,
