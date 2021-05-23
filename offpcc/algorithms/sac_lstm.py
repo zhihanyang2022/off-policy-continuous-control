@@ -38,7 +38,7 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # networks
 
-        self.lstm = nn.LSTM(input_size=input_dim, hidden_size=hidden_size, batch_first=True)
+        self.lstm = nn.LSTM(input_size=input_dim, hidden_size=hidden_size, batch_first=True).to(get_device())
 
         self.actor = MLPGaussianActor(input_dim=hidden_size, action_dim=action_dim).to(get_device())
 
