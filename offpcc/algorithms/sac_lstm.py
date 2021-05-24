@@ -106,7 +106,7 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
     def act(self, observation: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
             observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
-            self.lstm.flatten_parameters()
+            self.lstm_for_actor.flatten_parameters()
             hidden, self.h_and_c = self.lstm_for_actor(observation, self.h_and_c)
             action = self.sample_action_from_distribution(
                 hidden,
