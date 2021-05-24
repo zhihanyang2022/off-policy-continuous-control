@@ -147,9 +147,9 @@ class RecurrentReplayBuffer:
             # first +1 is to correct for over subtraction
             # second +1 is to correct for the fact that np.random.randint does not include upper bound
 
-            if ep_len >= self.num_bptt:
+            if ep_len > self.num_bptt:
                 start_index = np.random.randint((final_index - self.num_bptt + 1) + 1)
-            elif ep_len < self.num_bptt:  # this is the case for which mask is actually useful
+            elif ep_len <= self.num_bptt:  # this is the case for which mask is actually useful
                 start_index = 0
 
             end_index = start_index + (self.num_bptt - 1)  # correct for over addition

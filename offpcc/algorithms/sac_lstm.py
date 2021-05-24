@@ -133,13 +133,6 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         critic_h, _ = self.critic_lstm(b.o)
         critic_h_1_T, critic_h_2_Tplus1 = critic_h[:, :-1, :], critic_h[:, 1:, :]  # T represents num_bptt
 
-        # prepare lstm to receive gradient from all losses (Q1_loss, Q2_loss, policy_loss)
-        # retain_graph needs to be used because lstm is shared among the three
-
-        # assert h.shape == (bs, num_bptt + 1, self.hidden_size)
-        # assert h_1_T.shape == (bs, num_bptt, self.hidden_size)
-        # assert h_2_Tplus1.shape == (bs, num_bptt, self.hidden_size)
-
         # compute prediction
 
         Q1_predictions = self.Q1(critic_h_1_T, b.a)
@@ -197,8 +190,6 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
             param.requires_grad = False
         for param in self.Q2.parameters():
             param.requires_grad = False
-        for param in self.critic_lstm.parameters():
-            param.requires_grad = False
 
         a, log_pi_a_given_s = self.sample_action_from_distribution(actor_h_1_T,
                                                                    deterministic=False,
@@ -228,8 +219,6 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         for param in self.Q1.parameters():
             param.requires_grad = True
         for param in self.Q2.parameters():
-            param.requires_grad = True
-        for param in self.critic_lstm.parameters():
             param.requires_grad = True
 
         # update target networks
