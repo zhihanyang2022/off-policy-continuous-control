@@ -136,9 +136,6 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         # prepare lstm to receive gradient from all losses (Q1_loss, Q2_loss, policy_loss)
         # retain_graph needs to be used because lstm is shared among the three
 
-        self.actor_lstm_optimizer.zero_grad()
-        self.critic_lstm_optimizer.zero_grad()
-
         # assert h.shape == (bs, num_bptt + 1, self.hidden_size)
         # assert h_1_T.shape == (bs, num_bptt, self.hidden_size)
         # assert h_2_Tplus1.shape == (bs, num_bptt, self.hidden_size)
@@ -182,20 +179,26 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # reduce td error
 
+        self.critic_lstm_optimizer.zero_grad()
+
         self.Q1_optimizer.zero_grad()
         Q1_loss.backward(retain_graph=True)
         self.Q1_optimizer.step()
 
         self.Q2_optimizer.zero_grad()
-        Q2_loss.backward(retain_graph=True)
+        Q2_loss.backward()
         self.Q2_optimizer.step()
+
+        self.critic_lstm_optimizer.step()
+
+        # compute policy loss
 
         for param in self.Q1.parameters():
             param.requires_grad = False
         for param in self.Q2.parameters():
             param.requires_grad = False
-
-        # compute policy loss
+        for param in self.critic_lstm.parameters():
+            param.requires_grad = False
 
         a, log_pi_a_given_s = self.sample_action_from_distribution(actor_h_1_T,
                                                                    deterministic=False,
@@ -214,19 +217,20 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # reduce policy loss
 
+        self.actor_lstm_optimizer.zero_grad()
         self.actor_optimizer.zero_grad()
+
         policy_loss.backward()
+
+        self.actor_lstm_optimizer.step()
         self.actor_optimizer.step()
 
         for param in self.Q1.parameters():
             param.requires_grad = True
         for param in self.Q2.parameters():
             param.requires_grad = True
-
-        # perform gradient descent for lstm
-
-        self.actor_lstm_optimizer.step()
-        self.critic_lstm_optimizer.step()
+        for param in self.critic_lstm.parameters():
+            param.requires_grad = True
 
         # update target networks
 
