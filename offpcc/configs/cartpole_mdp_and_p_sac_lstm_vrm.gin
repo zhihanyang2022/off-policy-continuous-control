@@ -7,7 +7,7 @@ import algorithms.sac_lstm
 algorithms.sac_lstm.SAC_LSTM.hidden_size = 256
 algorithms.sac_lstm.SAC_LSTM.gamma = 0.99
 algorithms.sac_lstm.SAC_LSTM.alpha = 0.2
-algorithms.sac_lstm.SAC_LSTM.lr = 1e-3
+algorithms.sac_lstm.SAC_LSTM.lr = 3e-4
 algorithms.sac_lstm.SAC_LSTM.polyak = 0.995
 
 import basics.replay_buffer_recurrent
