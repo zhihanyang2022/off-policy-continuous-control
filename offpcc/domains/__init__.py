@@ -41,3 +41,17 @@ register(
     entry_point='domains.cartpole_continuous:continuous_cartpole_velocity_concat_env',
     max_episode_steps=1000
 )
+
+# car heaven hell
+
+register(
+    id='car-heaven-hell-v0',
+    entry_point='domains.car:CarEnv',
+    max_episode_steps=160
+)
+
+register(
+    id='car-heaven-hell-concat-v0',
+    entry_point='domains.car:car_heaven_hell_concat_v0',
+    max_episode_steps=160
+)
