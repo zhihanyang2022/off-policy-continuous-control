@@ -228,10 +228,6 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         for param in self.Q2.parameters():
             param.requires_grad = True
 
-        # perform gradient descent for lstm
-
-        self.lstm_optimizer.step()
-
         # update target networks
 
         self.polyak_update(target_net=self.Q1_targ, prediction_net=self.Q1)
