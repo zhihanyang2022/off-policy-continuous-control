@@ -37,7 +37,8 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # networks
 
-        self.lstm = nn.LSTM(input_size=input_dim, hidden_size=hidden_size, batch_first=True).to(get_device())
+        self.lstm_for_critic = nn.LSTM(input_size=input_dim, hidden_size=hidden_size, batch_first=True).to(get_device())
+        self.lstm_for_actor  = nn.LSTM(input_size=input_dim, hidden_size=hidden_size, batch_first=True).to(get_device())
 
         self.actor = MLPGaussianActor(input_dim=hidden_size, action_dim=action_dim).to(get_device())
 
@@ -53,7 +54,8 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # optimizers
 
-        self.lstm_optimizer = optim.Adam(self.lstm.parameters(), lr=lr)
+        self.lstm_for_critic_optimizer = optim.Adam(self.lstm_for_critic.parameters(), lr=lr)
+        self.lstm_for_actor_optimizer = optim.Adam(self.lstm_for_actor.parameters(), lr=lr)
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
         self.Q1_optimizer = optim.Adam(self.Q1.parameters(), lr=lr)
         self.Q2_optimizer = optim.Adam(self.Q2.parameters(), lr=lr)
@@ -105,7 +107,7 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         with torch.no_grad():
             observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
             self.lstm.flatten_parameters()
-            hidden, self.h_and_c = self.lstm(observation, self.h_and_c)
+            hidden, self.h_and_c = self.lstm_for_actor(observation, self.h_and_c)
             action = self.sample_action_from_distribution(
                 hidden,
                 deterministic=deterministic,
@@ -123,8 +125,8 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # compute hidden
 
-        self.lstm.flatten_parameters()
-        h, _ = self.lstm(b.o)
+        self.lstm_for_critic.flatten_parameters()
+        h, _ = self.lstm_for_critic(b.o)
         h_1_T, h_2_Tplus1 = h[:, :-1, :], h[:, 1:, :]  # T represents num_bptt
 
         assert h.shape == (bs, num_bptt + 1, self.hidden_size)
@@ -168,12 +170,12 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         assert Q1_loss.shape == ()
         assert Q2_loss.shape == ()
 
+        # reduce td error
+
         # prepare lstm to receive gradient from all losses (Q1_loss, Q2_loss, policy_loss)
         # retain_graph needs to be used because lstm is shared among the three
 
-        self.lstm_optimizer.zero_grad()
-
-        # reduce td error
+        self.lstm_for_critic_optimizer.zero_grad()
 
         self.Q1_optimizer.zero_grad()
         Q1_loss.backward(retain_graph=True)
@@ -183,12 +185,18 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         Q2_loss.backward(retain_graph=True)
         self.Q2_optimizer.step()
 
+        self.lstm_for_critic_optimizer.step()
+
         for param in self.Q1.parameters():
             param.requires_grad = False
         for param in self.Q2.parameters():
             param.requires_grad = False
 
         # compute policy loss
+
+        self.lstm_for_actor.flatten_parameters()
+        h, _ = self.lstm_for_actor(b.o)
+        h_1_T, h_2_Tplus1 = h[:, :-1, :], h[:, 1:, :]  # T represents num_bptt
 
         a, log_pi_a_given_s = self.sample_action_from_distribution(h_1_T,
                                                                    deterministic=False,
@@ -207,9 +215,13 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # reduce policy loss
 
+        self.lstm_for_actor_optimizer.zero_grad()
+
         self.actor_optimizer.zero_grad()
-        policy_loss.backward(retain_graph=True)
+        policy_loss.backward()
         self.actor_optimizer.step()
+
+        self.lstm_for_actor_optimizer.step()
 
         for param in self.Q1.parameters():
             param.requires_grad = True
