@@ -24,11 +24,11 @@ class RecurrentReplayBuffer:
 
         # placeholders
 
-        self.o = np.zeros((capacity, max_episode_len+1, o_dim))
-        self.a = np.zeros((capacity, max_episode_len, a_dim))
-        self.r = np.zeros((capacity, max_episode_len, 1))
-        self.d = np.zeros((capacity, max_episode_len, 1))
-        self.m = np.zeros((capacity, max_episode_len, 1))  # mask, in case episode_len < num_bptt
+        self.o = np.zeros((capacity, max_episode_len+1+(num_bptt-1), o_dim))
+        self.a = np.zeros((capacity, max_episode_len+(num_bptt-1), a_dim))
+        self.r = np.zeros((capacity, max_episode_len+(num_bptt-1), 1))
+        self.d = np.zeros((capacity, max_episode_len+(num_bptt-1), 1))
+        self.m = np.zeros((capacity, max_episode_len+(num_bptt-1), 1))  # mask, in case episode_len < num_bptt
         self.ep_len = np.zeros((capacity,))
         self.ready_for_sampling = np.zeros((capacity,))
 
@@ -79,6 +79,7 @@ class RecurrentReplayBuffer:
             # fill placeholders
 
             self.o[self.episode_ptr, self.time_ptr+1] = no
+            self.ep_len[self.episode_ptr] += self.num_bptt - 1
             self.ready_for_sampling[self.episode_ptr] = 1
 
             # reset pointers
