@@ -187,7 +187,7 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         self.Q1_optimizer.step()
 
         self.Q2_optimizer.zero_grad()
-        Q2_loss.backward()
+        Q2_loss.backward(retain_graph=True)
         self.Q2_optimizer.step()
 
         for param in self.Q1.parameters():
