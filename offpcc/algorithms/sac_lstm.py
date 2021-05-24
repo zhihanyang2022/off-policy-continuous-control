@@ -54,8 +54,8 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # optimizers
 
-        self.actor_lstm_optimizer = optim.Adam(self.lstm.parameters(), lr=lr)
-        self.critic_lstm_optimizer = optim.Adam(self.lstm.parameters(), lr=lr)
+        self.actor_lstm_optimizer = optim.Adam(self.actor_lstm.parameters(), lr=lr)
+        self.critic_lstm_optimizer = optim.Adam(self.critic_lstm.parameters(), lr=lr)
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
         self.Q1_optimizer = optim.Adam(self.Q1.parameters(), lr=lr)
         self.Q2_optimizer = optim.Adam(self.Q2.parameters(), lr=lr)
