@@ -204,7 +204,7 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
                                                                    deterministic=False,
                                                                    return_log_prob=True)
 
-        min_Q = torch.min(self.Q1(critic_h_1_T, a), self.Q2(critic_h_1_T, a))
+        min_Q = torch.min(self.Q1(critic_h_1_T.detach(), a), self.Q2(critic_h_1_T.detach(), a))
         entropy = - log_pi_a_given_s
 
         policy_loss_elementwise = - (min_Q + self.alpha * entropy)
