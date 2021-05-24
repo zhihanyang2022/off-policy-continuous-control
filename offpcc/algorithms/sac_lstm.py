@@ -37,7 +37,8 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # networks
 
-        self.lstm = nn.LSTM(input_size=input_dim, hidden_size=hidden_size, batch_first=True).to(get_device())
+        self.actor_lstm = nn.LSTM(input_size=input_dim, hidden_size=hidden_size, batch_first=True).to(get_device())
+        self.critic_lstm = nn.LSTM(input_size=input_dim, hidden_size=hidden_size, batch_first=True).to(get_device())
 
         self.actor = MLPGaussianActor(input_dim=hidden_size, action_dim=action_dim).to(get_device())
 
@@ -53,7 +54,8 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # optimizers
 
-        self.lstm_optimizer = optim.Adam(self.lstm.parameters(), lr=lr)
+        self.actor_lstm_optimizer = optim.Adam(self.lstm.parameters(), lr=lr)
+        self.critic_lstm_optimizer = optim.Adam(self.lstm.parameters(), lr=lr)
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
         self.Q1_optimizer = optim.Adam(self.Q1.parameters(), lr=lr)
         self.Q2_optimizer = optim.Adam(self.Q2.parameters(), lr=lr)
@@ -104,8 +106,8 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
     def act(self, observation: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
             observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
-            self.lstm.flatten_parameters()
-            hidden, self.h_and_c = self.lstm(observation, self.h_and_c)
+            self.actor_lstm.flatten_parameters()
+            hidden, self.h_and_c = self.actor_lstm(observation, self.h_and_c)
             action = self.sample_action_from_distribution(
                 hidden,
                 deterministic=deterministic,
@@ -123,18 +125,28 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # compute hidden
 
-        self.lstm.flatten_parameters()
-        h, _ = self.lstm(b.o)
-        h_1_T, h_2_Tplus1 = h[:, :-1, :], h[:, 1:, :]  # T represents num_bptt
+        self.actor_lstm.flatten_parameters()
+        actor_h, _ = self.actor_lstm(b.o)
+        actor_h_1_T, actor_h_2_Tplus1 = actor_h[:, :-1, :], actor_h[:, 1:, :]  # T represents num_bptt
 
-        assert h.shape == (bs, num_bptt + 1, self.hidden_size)
-        assert h_1_T.shape == (bs, num_bptt, self.hidden_size)
-        assert h_2_Tplus1.shape == (bs, num_bptt, self.hidden_size)
+        self.critic_lstm.flatten_parameters()
+        critic_h, _ = self.actor_lstm(b.o)
+        critic_h_1_T, critic_h_2_Tplus1 = critic_h[:, :-1, :], critic_h[:, 1:, :]  # T represents num_bptt
+
+        # prepare lstm to receive gradient from all losses (Q1_loss, Q2_loss, policy_loss)
+        # retain_graph needs to be used because lstm is shared among the three
+
+        self.actor_lstm_optimizer.zero_grad()
+        self.critic_lstm_optimizer.zero_grad()
+
+        # assert h.shape == (bs, num_bptt + 1, self.hidden_size)
+        # assert h_1_T.shape == (bs, num_bptt, self.hidden_size)
+        # assert h_2_Tplus1.shape == (bs, num_bptt, self.hidden_size)
 
         # compute prediction
 
-        Q1_predictions = self.Q1(h_1_T, b.a)
-        Q2_predictions = self.Q2(h_1_T, b.a)
+        Q1_predictions = self.Q1(critic_h_1_T, b.a)
+        Q2_predictions = self.Q2(critic_h_1_T, b.a)
 
         assert Q1_predictions.shape == (bs, num_bptt, 1)
         assert Q2_predictions.shape == (bs, num_bptt, 1)
@@ -143,11 +155,11 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         with torch.no_grad():
 
-            na, log_pi_na_given_ns = self.sample_action_from_distribution(h_2_Tplus1,
+            na, log_pi_na_given_ns = self.sample_action_from_distribution(actor_h_2_Tplus1,
                                                                           deterministic=False,
                                                                           return_log_prob=True)
 
-            n_min_Q_targ = torch.min(self.Q1_targ(h_2_Tplus1, na), self.Q2_targ(h_2_Tplus1, na))
+            n_min_Q_targ = torch.min(self.Q1_targ(critic_h_2_Tplus1, na), self.Q2_targ(critic_h_2_Tplus1, na))
             n_entropy = - log_pi_na_given_ns
 
             targets = b.r + self.gamma * (1 - b.d) * (n_min_Q_targ + self.alpha * n_entropy)
@@ -168,11 +180,6 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         assert Q1_loss.shape == ()
         assert Q2_loss.shape == ()
 
-        # prepare lstm to receive gradient from all losses (Q1_loss, Q2_loss, policy_loss)
-        # retain_graph needs to be used because lstm is shared among the three
-
-        self.lstm_optimizer.zero_grad()
-
         # reduce td error
 
         self.Q1_optimizer.zero_grad()
@@ -180,7 +187,7 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         self.Q1_optimizer.step()
 
         self.Q2_optimizer.zero_grad()
-        Q2_loss.backward(retain_graph=True)
+        Q2_loss.backward()
         self.Q2_optimizer.step()
 
         for param in self.Q1.parameters():
@@ -190,11 +197,11 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # compute policy loss
 
-        a, log_pi_a_given_s = self.sample_action_from_distribution(h_1_T,
+        a, log_pi_a_given_s = self.sample_action_from_distribution(actor_h_1_T,
                                                                    deterministic=False,
                                                                    return_log_prob=True)
 
-        min_Q = torch.min(self.Q1(h_1_T, a), self.Q2(h_1_T, a))
+        min_Q = torch.min(self.Q1(critic_h_1_T, a), self.Q2(critic_h_1_T, a))
         entropy = - log_pi_a_given_s
 
         policy_loss_elementwise = - (min_Q + self.alpha * entropy)
@@ -218,7 +225,8 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
 
         # perform gradient descent for lstm
 
-        self.lstm_optimizer.step()
+        self.actor_lstm_optimizer.step()
+        self.critic_lstm_optimizer.step()
 
         # update target networks
 
