@@ -130,7 +130,7 @@ class SAC_LSTM(OffPolicyRLAlgorithm):
         actor_h_1_T, actor_h_2_Tplus1 = actor_h[:, :-1, :], actor_h[:, 1:, :]  # T represents num_bptt
 
         self.critic_lstm.flatten_parameters()
-        critic_h, _ = self.actor_lstm(b.o)
+        critic_h, _ = self.critic_lstm(b.o)
         critic_h_1_T, critic_h_2_Tplus1 = critic_h[:, :-1, :], critic_h[:, 1:, :]  # T represents num_bptt
 
         # prepare lstm to receive gradient from all losses (Q1_loss, Q2_loss, policy_loss)
