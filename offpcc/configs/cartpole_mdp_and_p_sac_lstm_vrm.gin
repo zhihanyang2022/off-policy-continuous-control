@@ -23,6 +23,6 @@ basics.run_utils.train.max_steps_per_episode = 1000  # should match with gym tim
 
 basics.run_utils.train.num_epochs = 300
 basics.run_utils.train.num_steps_per_epoch = 1_000
-basics.run_utils.train.update_every = 1
+basics.run_utils.train.update_every = 50
 basics.run_utils.train.num_test_episodes_per_epoch = 1
 basics.run_utils.train.update_after = 1_000             # 1000 / 50 = around 20 random episodes
