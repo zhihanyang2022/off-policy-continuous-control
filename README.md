@@ -1,3 +1,5 @@
+Epoch steps should be greater than or equal to the number of timesteps per episode, for logging purposes
+
 Every single environment must be wrapped by TimeLimit, not necessarily the outermost though, explains how my code works
 
 For episodic tasks, you want to set max_episode_len to be 1 + the actual max_episode_len

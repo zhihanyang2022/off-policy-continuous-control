@@ -1,0 +1,23 @@
+import basics.actors_and_critics
+
+basics.actors_and_critics.make_MLP.hidden_dimensions = (256, 256)
+
+import algorithms.ddpg
+
+algorithms.ddpg.DDPG.gamma = 0.99
+algorithms.ddpg.DDPG.action_noise = 0.1
+algorithms.ddpg.DDPG.lr = 1e-3
+algorithms.ddpg.DDPG.polyak = 0.995
+
+import basics.replay_buffer
+
+basics.replay_buffer.ReplayBuffer.capacity = 1_000_000
+basics.replay_buffer.ReplayBuffer.batch_size = 100
+
+import basics.run_utils
+
+basics.run_utils.train.num_epochs = 300
+basics.run_utils.train.num_steps_per_epoch = 1000
+basics.run_utils.train.update_every = 50
+basics.run_utils.train.num_test_episodes_per_epoch = 3
+basics.run_utils.train.update_after = 1000

@@ -120,8 +120,21 @@ class DDPG(OffPolicyRLAlgorithm):
         self.polyak_update(old_net=self.actor_target, new_net=self.actor)
         self.polyak_update(old_net=self.Q_target, new_net=self.Q)
 
-    def save_actor(self, save_dir: str) -> None:
+        return {}
+
+    def save_networks(self, save_dir: str) -> None:
         torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))
+        torch.save(self.Q.state_dict(), os.path.join(save_dir, 'Q.pth'))
+        torch.save(self.Q_target.state_dict(), os.path.join(save_dir, 'Q_targ.pth'))
 
     def load_actor(self, save_dir: str) -> None:
-        self.actor.load_state_dict(torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
+        self.actor.load_state_dict(
+            torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
+
+    def load_networks(self, save_dir: str) -> None:
+        self.actor.load_state_dict(
+            torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
+        self.Q1.load_state_dict(
+            torch.load(os.path.join(save_dir, 'Q1.pth'), map_location=torch.device(get_device())))
+        self.Q1_target.load_state_dict(
+            torch.load(os.path.join(save_dir, 'Q1_targ.pth'), map_location=torch.device(get_device())))
