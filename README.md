@@ -1,3 +1,7 @@
+Every single environment must be wrapped by TimeLimit, not necessarily the outermost though, explains how my code works
+
+For episodic tasks, you want to set max_episode_len to be 1 + the actual max_episode_len
+
 Best practice is to generate one video for the first run.
 
 To use certain functionalities, you would have to put files in place in certain ways in certain directories

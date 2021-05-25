@@ -37,9 +37,11 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
         """Any wrapper by default copies the observation and action space of its wrappee."""
         return RescaleAction(gym.make(args.env), -1, 1)
 
+    example_env = env_fn()
+
     algorithm = algo_name2class[args.algo](
-        input_dim=env_fn().observation_space.shape[0],
-        action_dim=env_fn().action_space.shape[0],
+        input_dim=example_env.observation_space.shape[0],
+        action_dim=example_env.action_space.shape[0],
     )
 
     if args.visualize:
@@ -61,16 +63,20 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
             name=f'run_id={run_id}'
         )
 
-        if args.algo.endswith('lstm'):
+        if args.algo.endswith('lstm'):  # TODO(future): change if new algorithms are added
             buffer = RecurrentReplayBuffer(
-                o_dim=env_fn().observation_space.shape[0],
-                a_dim=env_fn().action_space.shape[0]
+                o_dim=example_env.observation_space.shape[0],
+                a_dim=example_env.action_space.shape[0]
             )
         else:
             buffer = ReplayBuffer()
 
+        # for env.spec and wh max_episode_steps would be in there
+        # see https://github.com/openai/gym/blob/master/gym/wrappers/time_limit.py#L10
+
         train(
             env_fn=env_fn,
             algorithm=algorithm,
-            buffer=buffer
+            buffer=buffer,
+            max_steps_per_episode=example_env.spec.max_episode_steps  # for handling bootstrapping correctly
         )
