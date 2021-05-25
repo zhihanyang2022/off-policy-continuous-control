@@ -1,8 +1,6 @@
 import gin
-import csv
 import time
 import datetime
-import os
 import wandb
 import csv
 
@@ -11,7 +9,7 @@ from copy import deepcopy
 import numpy as np
 from gym.wrappers import Monitor
 
-from basics.replay_buffer import ReplayBuffer, Transition
+from basics.replay_buffer import ReplayBuffer
 from basics.replay_buffer_recurrent import RecurrentReplayBuffer
 
 BASE_LOG_DIR = '../results'
@@ -133,7 +131,7 @@ def train(
             cutoff = False
 
         # store the transition
-        buffer.push(state, action, reward, next_state, done, cutoff)
+        buffer.push(state, action, reward, next_state, done, cutoff)  # storing cutoff; only used by recurrent agent
 
         # crucial, crucial preparation for next step
         state = next_state
