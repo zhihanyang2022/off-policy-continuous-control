@@ -105,21 +105,37 @@ def train(
         else:
             action = env.action_space.sample()
 
-        next_state, reward, done, _ = env.step(action)
+        next_state, reward, done, info = env.step(action)
         episode_len += 1
         episode_ret += reward
 
-        # Ignore the done flag if done is caused by hitting the maximum episode steps.
-        # However, the little catch is that the environment might actually be done
-        # due to termination rather than timeout, but this is much less likely
-        # so we just do it this way for convenience.
+        # carefully decide what "done" should be
 
-        cutoff = episode_len == max_steps_per_episode
-        done = False if cutoff else done
+        if episode_len == max_steps_per_episode:
+            assert 'TimeLimit.truncated' in info.keys(), 'You should wrap you environment in a TimeLimit wrapper'
 
+        if 'TimeLimit.truncated' in info.keys():  # true only when elapsed_steps >= max_episode_steps
+
+            # here's how truncated is computed
+            # - at max_episode_steps & done=True -> truncated=False
+            # - at max_episode_steps & done=False -> truncated=True
+            # better than SpinUp's way, since SpinUp assumes truncated whenever at max_episode_steps
+            # ref: https://github.com/openai/gym/blob/master/gym/wrappers/time_limit.py#L14 for calculation of truncated
+
+            cutoff = info.get('TimeLimit.truncated')
+            done = False if cutoff else True
+
+            assert done or cutoff, "Both done and cutoff are false at max_episode_steps"
+
+        else:
+
+            cutoff = False
+
+        # store the transition
         buffer.push(state, action, reward, next_state, done, cutoff)
 
-        state = next_state  # crucial, crucial step
+        # crucial, crucial preparation for next step
+        state = next_state
 
         # end of trajectory handling
         if done or cutoff:
