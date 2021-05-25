@@ -109,25 +109,26 @@ def train(
         episode_len += 1
         episode_ret += reward
 
-        # carefully decide what "done" should be
+        # carefully decide what "done" should be at max_episode_steps
 
         if episode_len == max_steps_per_episode:
-            assert 'TimeLimit.truncated' in info.keys(), 'You should wrap you environment in a TimeLimit wrapper'
 
-        if 'TimeLimit.truncated' in info.keys():  # true only when elapsed_steps >= max_episode_steps
-
-            # here's how truncated is computed
+            # here's how truncated is computed behind the scene
             # - at max_episode_steps & done=True -> truncated=False
             # - at max_episode_steps & done=False -> truncated=True
             # better than SpinUp's way, since SpinUp assumes truncated whenever at max_episode_steps
             # ref: https://github.com/openai/gym/blob/master/gym/wrappers/time_limit.py#L14 for calculation of truncated
 
-            cutoff = info.get('TimeLimit.truncated')
+            cutoff = info.get('TimeLimit.truncated')  # this key is only available at max_steps_per_episode
             done = False if cutoff else True
 
             assert done or cutoff, "Both done and cutoff are false at max_episode_steps"
 
         else:
+
+            # when not at max_episode_steps, done's given by the original env and the TimeLimit wrapper are the same
+            # caution: by original env I mean the env NOT wrapped by a TimeLimit wrapper; by default all envs from
+            # OpenAI gym are wrapped by a TimeLimit wrapper
 
             cutoff = False
 

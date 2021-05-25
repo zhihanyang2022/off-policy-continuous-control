@@ -6,7 +6,7 @@ import algorithms.sac
 
 algorithms.sac.SAC.gamma = 0.99
 algorithms.sac.SAC.alpha = 0.2
-algorithms.sac.SAC.lr = 1e-3
+algorithms.sac.SAC.lr = 3e-4
 algorithms.sac.SAC.polyak = 0.995
 
 import basics.replay_buffer
