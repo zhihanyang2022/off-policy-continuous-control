@@ -1,3 +1,4 @@
+# please use python 3.6 (otherwise can't install tensorflow < 2.0.0)
 torch==1.7.0
 numpy==1.19.5
 gym==0.15.7
@@ -6,3 +7,12 @@ matplotlib
 gin-config
 pandas
 wandb
+cloudpickle==1.2.1
+gym[atari,box2d,classic_control]~=0.15.3
+numpy
+pandas
+psutil
+scipy
+seaborn
+tensorflow==1.8.0
+tqdm

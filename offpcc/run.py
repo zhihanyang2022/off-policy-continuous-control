@@ -4,7 +4,7 @@ import wandb
 import os
 
 import gym
-from domains import *  # import all non-official environments
+from domains import *
 from gym.wrappers import RescaleAction
 
 from basics.replay_buffer import ReplayBuffer
