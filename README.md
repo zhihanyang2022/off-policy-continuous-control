@@ -1,3 +1,5 @@
+Include scripts to run code from spinning up (and hopefully from stable-baselines3 in the future).
+
 Epoch steps should be greater than or equal to the number of timesteps per episode, for logging purposes
 
 Every single environment must be wrapped by TimeLimit, not necessarily the outermost though, explains how my code works

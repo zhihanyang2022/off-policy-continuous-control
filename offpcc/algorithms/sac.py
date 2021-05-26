@@ -10,7 +10,7 @@ import torch.optim as optim
 from torch.distributions import Normal, Independent
 
 from basics.abstract_algorithm import OffPolicyRLAlgorithm
-from basics.actors_and_critics import MLPGaussianActor, MLPCritic
+from basics.actors_and_critics import MLPGaussianActor, MLPCritic, set_requires_grad_flag
 from basics.replay_buffer import Batch
 from basics.cuda_utils import get_device
 
@@ -36,12 +36,12 @@ class SAC(OffPolicyRLAlgorithm):
 
         self.Q1 = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
         self.Q1_targ = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
-        self.Q1_targ.eval()
+        set_requires_grad_flag(self.Q1_targ, False)
         self.Q1_targ.load_state_dict(self.Q1.state_dict())
 
         self.Q2 = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
         self.Q2_targ = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
-        self.Q2_targ.eval()
+        set_requires_grad_flag(self.Q2_targ, False)
         self.Q2_targ.load_state_dict(self.Q2.state_dict())
 
         # optimizers
@@ -151,12 +151,10 @@ class SAC(OffPolicyRLAlgorithm):
         Q2_loss.backward()
         self.Q2_optimizer.step()
 
-        for param in self.Q1.parameters():
-            param.requires_grad = False
-        for param in self.Q2.parameters():
-            param.requires_grad = False
-
         # compute policy loss
+
+        set_requires_grad_flag(self.Q1, False)
+        set_requires_grad_flag(self.Q2, False)
 
         a, log_pi_a_given_s = self.sample_action_from_distribution(b.s, deterministic=False, return_log_prob=True)
 
@@ -176,10 +174,8 @@ class SAC(OffPolicyRLAlgorithm):
         policy_loss.backward()
         self.actor_optimizer.step()
 
-        for param in self.Q1.parameters():
-            param.requires_grad = True
-        for param in self.Q2.parameters():
-            param.requires_grad = True
+        set_requires_grad_flag(self.Q1, True)
+        set_requires_grad_flag(self.Q2, True)
 
         # update target networks
 
