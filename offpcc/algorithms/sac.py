@@ -21,13 +21,13 @@ class SAC(OffPolicyRLAlgorithm):
     """Soft actor-critic"""
 
     def __init__(
-            self,
-            input_dim: int,
-            action_dim: int,
-            gamma: float = gin.REQUIRED,
-            alpha: float = gin.REQUIRED,
-            lr: float = gin.REQUIRED,
-            polyak: float = gin.REQUIRED
+        self,
+        input_dim: int,
+        action_dim: int,
+        gamma: float = gin.REQUIRED,
+        alpha: float = gin.REQUIRED,
+        lr: float = gin.REQUIRED,
+        polyak: float = gin.REQUIRED
     ):
 
         # networks

@@ -17,14 +17,14 @@ class DDPG(OffPolicyRLAlgorithm):
     """Deep deterministic policy gradient"""
 
     def __init__(
-            self,
-            input_dim,
-            action_dim,
-            action_noise=gin.REQUIRED,
-            gamma=gin.REQUIRED,
-            lr=gin.REQUIRED,
-            polyak=gin.REQUIRED,
-        ):
+        self,
+        input_dim,
+        action_dim,
+        action_noise=gin.REQUIRED,
+        gamma=gin.REQUIRED,
+        lr=gin.REQUIRED,
+        polyak=gin.REQUIRED,
+    ):
 
         # networks
 
