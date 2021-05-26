@@ -1,3 +1,10 @@
+Requirements: please first install spinup first
+
+Logging to wandb currently only works for pytorch 3 algorithms only in spinup, talk about forked spinup
+and where exactly the new code has been added
+
+Have a spinup installation guide and a clone of spinup
+
 Include scripts to run code from spinning up (and hopefully from stable-baselines3 in the future).
 
 Epoch steps should be greater than or equal to the number of timesteps per episode, for logging purposes
