@@ -68,7 +68,7 @@ class MLPCritic(nn.Module):
 
     def __init__(self, input_dim, action_dim):
         super().__init__()
-        self.net = make_MLP(num_in=input_dim + action_dim, num_out=1, final_activation=nn.Identity())
+        self.net = make_MLP(num_in=input_dim + action_dim, num_out=1, final_activation=lambda x : x)
 
     def forward(self, states: torch.tensor, actions: torch.tensor):
         return self.net(torch.cat([states, actions], dim=-1))

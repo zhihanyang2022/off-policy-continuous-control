@@ -6,7 +6,6 @@ import wandb
 import gym
 from gym.wrappers import RescaleAction
 
-from basics.run_spinup_utils import train_ddpg, train_td3, train_sac
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--env', type=str, required=True)
@@ -15,8 +14,6 @@ parser.add_argument('--seed', nargs='+', type=int, required=True)
 parser.add_argument('--config', type=str, required=True, help='Task-specific hyperparameters')
 
 args = parser.parse_args()
-
-gin.parse_config_file(args.config)
 
 for seed in args.seed:
 
@@ -30,6 +27,12 @@ for seed in args.seed:
         settings=wandb.Settings(_disable_stats=True),
         name=f'seed={seed}'
     )
+
+    # it's weird but wandb.init has to be done before these since these code
+    # will invoke wandb.run.dir, which is not None only after init
+
+    from basics.run_spinup_utils import train_ddpg, train_td3, train_sac
+    gin.parse_config_file(args.config)
 
     if args.algo == 'ddpg':
         train_ddpg(

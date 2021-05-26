@@ -38,4 +38,4 @@ basics.run_spinup_utils.train_ddpg.num_epochs = 100
 basics.run_spinup_utils.train_ddpg.num_steps_per_epoch = 1000
 basics.run_spinup_utils.train_ddpg.update_every = 50
 basics.run_spinup_utils.train_ddpg.num_test_episodes_per_epoch = 3
-basics.run_spinup_utils.train_ddpg.update_after = 1000
+basics.run_spinup_utils.train_ddpg.update_after = 950
