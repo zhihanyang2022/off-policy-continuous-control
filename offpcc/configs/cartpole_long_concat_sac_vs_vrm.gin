@@ -27,13 +27,13 @@ basics.run_spinup_utils.train_sac.capacity = 1_000_000
 basics.run_spinup_utils.train_sac.batch_size = 100
 
 
-basics.run_utils.train.num_epochs = 100
+basics.run_utils.train.num_epochs = 300
 basics.run_utils.train.num_steps_per_epoch = 1000
 basics.run_utils.train.update_every = 50
 basics.run_utils.train.num_test_episodes_per_epoch = 3
 basics.run_utils.train.update_after = 1000
 
-basics.run_spinup_utils.train_sac.num_epochs = 100
+basics.run_spinup_utils.train_sac.num_epochs = 300
 basics.run_spinup_utils.train_sac.num_steps_per_epoch = 1000
 basics.run_spinup_utils.train_sac.update_every = 50
 basics.run_spinup_utils.train_sac.num_test_episodes_per_epoch = 3

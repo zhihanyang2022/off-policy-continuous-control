@@ -45,13 +45,13 @@ register(
 # car heaven hell
 
 register(
-    id='car-heaven-hell-v0',
+    id='car-flag-v0',
     entry_point='domains.car:CarEnv',
     max_episode_steps=160
 )
 
 register(
-    id='car-heaven-hell-concat-v0',
-    entry_point='domains.car:car_heaven_hell_concat_v0',
+    id='car-flag-concat-v0',
+    entry_point='domains.car:car_flag_concat',
     max_episode_steps=160
 )

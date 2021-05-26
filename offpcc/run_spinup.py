@@ -4,6 +4,7 @@ import gin
 import wandb
 
 import gym
+from domains import *
 from gym.wrappers import RescaleAction
 
 

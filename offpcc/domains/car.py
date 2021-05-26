@@ -419,5 +419,5 @@ class CarEnv(gym.Env):
             self.viewer = None
 
 
-def car_heaven_hell_concat_v0():
+def car_flag_concat():
     return ConcatObs(CarEnv(), 20)

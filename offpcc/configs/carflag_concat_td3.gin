@@ -34,14 +34,14 @@ basics.run_spinup_utils.train_td3.capacity = 1_000_000
 basics.run_spinup_utils.train_td3.batch_size = 100
 
 
-basics.run_utils.train.num_epochs = 300
-basics.run_utils.train.num_steps_per_epoch = 10000
+basics.run_utils.train.num_epochs = 200
+basics.run_utils.train.num_steps_per_epoch = 1000
 basics.run_utils.train.update_every = 50
-basics.run_utils.train.num_test_episodes_per_epoch = 10
-basics.run_utils.train.update_after = 10000
+basics.run_utils.train.num_test_episodes_per_epoch = 3
+basics.run_utils.train.update_after = 1000
 
-basics.run_spinup_utils.train_td3.num_epochs = 300
-basics.run_spinup_utils.train_td3.num_steps_per_epoch = 10000
+basics.run_spinup_utils.train_td3.num_epochs = 200
+basics.run_spinup_utils.train_td3.num_steps_per_epoch = 1000
 basics.run_spinup_utils.train_td3.update_every = 50
-basics.run_spinup_utils.train_td3.num_test_episodes_per_epoch = 10
-basics.run_spinup_utils.train_td3.update_after = 9950
+basics.run_spinup_utils.train_td3.num_test_episodes_per_epoch = 3
+basics.run_spinup_utils.train_td3.update_after = 950

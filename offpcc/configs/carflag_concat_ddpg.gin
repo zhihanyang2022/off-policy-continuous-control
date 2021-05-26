@@ -1,0 +1,41 @@
+import basics.actors_and_critics
+import algorithms.ddpg
+import basics.replay_buffer
+import basics.run_utils
+import basics.run_spinup_utils
+
+
+basics.actors_and_critics.make_MLP.hidden_dimensions = (256, 256)
+
+basics.run_spinup_utils.train_ddpg.hidden_dimensions = (256, 256)
+
+
+algorithms.ddpg.DDPG.gamma = 0.99
+algorithms.ddpg.DDPG.action_noise = 0.1
+algorithms.ddpg.DDPG.lr = 1e-3
+algorithms.ddpg.DDPG.polyak = 0.995
+
+basics.run_spinup_utils.train_ddpg.gamma = 0.99
+basics.run_spinup_utils.train_ddpg.action_noise = 0.1
+basics.run_spinup_utils.train_ddpg.lr = 1e-3
+basics.run_spinup_utils.train_ddpg.polyak = 0.995
+
+
+basics.replay_buffer.ReplayBuffer.capacity = 1_000_000
+basics.replay_buffer.ReplayBuffer.batch_size = 100
+
+basics.run_spinup_utils.train_ddpg.capacity = 1_000_000
+basics.run_spinup_utils.train_ddpg.batch_size = 100
+
+
+basics.run_utils.train.num_epochs = 200
+basics.run_utils.train.num_steps_per_epoch = 1000
+basics.run_utils.train.update_every = 50
+basics.run_utils.train.num_test_episodes_per_epoch = 3
+basics.run_utils.train.update_after = 1000
+
+basics.run_spinup_utils.train_ddpg.num_epochs = 200
+basics.run_spinup_utils.train_ddpg.num_steps_per_epoch = 1000
+basics.run_spinup_utils.train_ddpg.update_every = 50
+basics.run_spinup_utils.train_ddpg.num_test_episodes_per_epoch = 3
+basics.run_spinup_utils.train_ddpg.update_after = 950
