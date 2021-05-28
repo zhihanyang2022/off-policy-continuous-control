@@ -225,7 +225,7 @@ class SAC(OffPolicyRLAlgorithm):
 
         else:
 
-            log_alpha_loss = 0
+            log_alpha_loss = 0  # needed only for logging purposes
 
         # update target networks
 
