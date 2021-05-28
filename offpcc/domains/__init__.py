@@ -66,7 +66,7 @@ register(
 # with non-recurrent agent: baseline (lstm < this)
 register(
     id='cartpole-vam-v0',
-    entry_point='domains.cartpole_continuous_variable_action_multiplier:ContinuousCartPoleVariableMassEnv',
+    entry_point='domains.cartpole_continuous_variable_action_multiplier:ContinuousCartPoleVariableActionMultiplierEnv',
     max_episode_steps=350
 )
 
