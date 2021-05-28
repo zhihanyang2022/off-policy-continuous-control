@@ -95,10 +95,11 @@ class ContinuousCartPoleVariableActionMultiplierEnv(gym.Env):
 
     def step(self, action):
 
-        action = self.action_multiplier * action
-
         assert self.action_space.contains(action), \
             "%r (%s) invalid" % (action, type(action))
+
+        action = self.action_multiplier * action
+
         # Cast action to float to strip np trappings
         force = self.force_mag * float(action)
         self.state = self.stepPhysics(force)
