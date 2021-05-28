@@ -37,7 +37,7 @@ class ContinuousCartPoleVariableActionMultiplierEnv(gym.Env):
         self.max_action = 1.0
 
         self.action_multiplier_min = 1
-        self.action_multiplier_max = 3
+        self.action_multiplier_max = 10
         self.action_multiplier = np.random.uniform(self.action_multiplier_min, self.action_multiplier_max)
 
         # Angle at which to fail the episode
