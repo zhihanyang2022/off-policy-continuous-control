@@ -209,10 +209,10 @@ class SAC(OffPolicyRLAlgorithm):
             #            = self.log_alpha * excess_entropy  (eq used in here)
             #
             # If excess_entropy > 0, then log_alpha needs to be decreased to reduce alpha_loss, which corresponds to
-            # less weighting on sample_entropy in policy loss and hence reduces excess_entropy.
+            # less weighting on sample_entropy in the upcoming policy loss and hence reduces excess_entropy.
             #
             # If excess_entropy < 0, then log_alpha needs to be increased to reduce alpha_loss, which corresponds to
-            # more weighting on sample_entropy in policy loss and hence increases excess_entropy.
+            # more weighting on sample_entropy in the upcoming policy loss and hence increases excess_entropy.
 
             excess_entropy = sample_entropy.detach() - self.target_entropy
             log_alpha_loss = self.log_alpha * excess_entropy
