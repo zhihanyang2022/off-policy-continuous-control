@@ -203,10 +203,10 @@ class SAC(OffPolicyRLAlgorithm):
 
             # derivation to make things more intuitive
             #
-            # alpha_loss = - self.log_alpha * (log_pi_a_given_s.detach() + self.target_entropy)
+            # alpha_loss = - self.log_alpha * (log_pi_a_given_s.detach() + self.target_entropy)  (eq used in SB3)
             #            = self.log_alpha * (- log_pi_a_given_s.detach() - self.target_entropy)
             #            = self.log_alpha * (sample_entropy - self.target_entropy)
-            #            = self.log_alpha * excess_entropy
+            #            = self.log_alpha * excess_entropy  (eq used in here)
             #
             # If excess_entropy > 0, then log_alpha needs to be decreased to reduce alpha_loss, which corresponds to
             # less weighting on sample_entropy in policy loss and hence reduces excess_entropy.
