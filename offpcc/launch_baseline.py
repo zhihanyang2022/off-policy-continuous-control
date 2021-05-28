@@ -19,9 +19,6 @@ args = parser.parse_args()
 
 for seed in args.seed:
 
-    def env_fn():
-        return RescaleAction(gym.make(args.env), -1, 1)
-
     wandb.init(
         project=os.getenv('OFFPCC_WANDB_PROJECT'),
         entity=os.getenv('OFFPCC_WANDB_ENTITY'),
@@ -43,6 +40,9 @@ for seed in args.seed:
         raise NotImplementedError(f'Baseline {args.baseline} is not available.')
 
     gin.parse_config_file(args.config)
+
+    def env_fn():
+        return RescaleAction(gym.make(args.env), -1, 1)
 
     if args.algo == 'ddpg':
         train_ddpg(
