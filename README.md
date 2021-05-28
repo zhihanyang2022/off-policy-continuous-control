@@ -1,3 +1,15 @@
+create a configuration guideline
+as to be <= than num_steps_per_epoch - update_every for spinup to work
+
+Add the entropy tuning OPTION to spinup, but it can't actually run it at this point
+so raise unimplemented error; use SB3 to benchmark that
+
+Cannot run SAC files with spinup yet, since spinup does not support entropy tuning
+
+Both spinup and SB 3 currently only runs on cpu
+
+The othermost env wrapper should always be a timelimit wrapper (mention code reasons)
+
 Requirements: please first install spinup first
 
 Logging to wandb currently only works for pytorch 3 algorithms only in spinup, talk about forked spinup
