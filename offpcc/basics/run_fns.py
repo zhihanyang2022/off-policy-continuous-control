@@ -135,6 +135,8 @@ def train(
             buffer.push(state, action, reward, next_state, done)  # storing cutoff; only used by recurrent agent
         elif isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
             buffer.push(state, action, reward, next_state, done, cutoff)
+        else:
+            raise NotImplementedError
 
         # crucial, crucial preparation for next step
         state = next_state

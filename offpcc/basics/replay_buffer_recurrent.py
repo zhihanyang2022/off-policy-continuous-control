@@ -12,6 +12,8 @@ RecurrentBatch = namedtuple('RecurrentBatch', 'o a r d m')
 @gin.configurable(module=__name__)
 class RecurrentReplayBuffer:
 
+    "Always store the recurrent state, but it's the algorithm's decision to use them or not"
+
     def __init__(
         self,
         o_dim,

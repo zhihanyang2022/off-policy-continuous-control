@@ -69,6 +69,7 @@ class SAC_LSTM(RecurrentOffPolicyRLAlgorithm):
         # miscellaneous
 
         self.hidden_size = hidden_size
+        self.input_dim = input_dim
         self.action_dim = action_dim  # for shape checking
 
         self.h_and_c = None

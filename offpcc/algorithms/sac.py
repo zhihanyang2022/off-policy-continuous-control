@@ -21,13 +21,14 @@ class SAC(OffPolicyRLAlgorithm):
     """Soft actor-critic"""
 
     def __init__(
-        self,
-        input_dim: int,
-        action_dim: int,
-        gamma: float = gin.REQUIRED,
-        alpha: float = gin.REQUIRED,
-        lr: float = gin.REQUIRED,
-        polyak: float = gin.REQUIRED
+            self,
+            input_dim: int,
+            action_dim: int,
+            gamma: float = gin.REQUIRED,
+            alpha: float = gin.REQUIRED,
+            autotune_alpha: bool = gin.REQUIRED,
+            lr: float = gin.REQUIRED,
+            polyak: float = gin.REQUIRED
     ):
 
         # networks
@@ -58,7 +59,9 @@ class SAC(OffPolicyRLAlgorithm):
 
         # miscellaneous
 
+        self.input_dim = input_dim
         self.action_dim = action_dim  # for shape checking
+        self.target_entropy = - self.action_dim
 
     def sample_action_from_distribution(
             self,

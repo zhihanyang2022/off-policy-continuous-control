@@ -9,6 +9,7 @@ from gym.wrappers import RescaleAction
 
 from basics.replay_buffer import ReplayBuffer
 from basics.replay_buffer_recurrent import RecurrentReplayBuffer
+from basics.abstract_algorithm import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from algorithms import *
 
 from basics.run_fns import train, make_log_dir, visualize_trained_policy
@@ -63,16 +64,16 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
             name=f'run_id={run_id}'
         )
 
-        if args.algo.endswith('lstm'):  # TODO(future): change if new algorithms are added
+        # creating buffer based on the need of the algorithm
+        if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):  # TODO(future): change if new algorithms are added
             buffer = RecurrentReplayBuffer(
                 o_dim=example_env.observation_space.shape[0],
                 a_dim=example_env.action_space.shape[0]
             )
-        else:
+        elif isinstance(algorithm, OffPolicyRLAlgorithm):
             buffer = ReplayBuffer()
-
-        # for env.spec and wh max_episode_steps would be in there
-        # see https://github.com/openai/gym/blob/master/gym/wrappers/time_limit.py#L10
+        else:
+            raise NotImplementedError
 
         train(
             env_fn=env_fn,

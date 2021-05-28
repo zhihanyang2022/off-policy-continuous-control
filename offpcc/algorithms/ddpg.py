@@ -51,6 +51,7 @@ class DDPG(OffPolicyRLAlgorithm):
 
         # miscellaneous
 
+        self.input_dim = input_dim
         self.action_dim = action_dim
 
     def act(self, state: np.array, deterministic: bool) -> np.array:

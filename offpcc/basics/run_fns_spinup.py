@@ -104,11 +104,14 @@ def train_sac(
         polyak=gin.REQUIRED,
         lr=gin.REQUIRED,
         alpha=gin.REQUIRED,
+        autotune_alpha=gin.REQUIRED,
         batch_size=gin.REQUIRED,
         update_after=gin.REQUIRED,
         update_every=gin.REQUIRED,
         num_test_episodes_per_epoch=gin.REQUIRED
 ):
+    if autotune_alpha:
+        raise NotImplementedError("This feature has not been implemented in spinup.")
     sac(
         env_fn=env_fn,
         ac_kwargs=dict(hidden_sizes=list(hidden_dimensions), activation=nn.ReLU),

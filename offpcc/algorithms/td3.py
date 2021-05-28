@@ -67,6 +67,7 @@ class TD3(OffPolicyRLAlgorithm):
         # miscellaneous
 
         self.num_Q_updates = 0  # for delaying updates
+        self.input_dim = input_dim
         self.action_dim = action_dim  # for shape checking
 
         # for logging; the actor does not get updated every iteration, so stats is not available every iteration
