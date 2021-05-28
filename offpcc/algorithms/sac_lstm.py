@@ -9,7 +9,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.distributions import Normal, Independent
 
-from basics.abstract_algorithm import OffPolicyRLAlgorithm
+from basics.abstract_algorithm import RecurrentOffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPGaussianActor, MLPCritic
 from basics.replay_buffer_recurrent import RecurrentBatch
 from basics.cuda_utils import get_device
@@ -20,7 +20,7 @@ def rescale_loss(loss: torch.tensor, mask: torch.tensor) -> torch.tensor:
 
 
 @gin.configurable(module=__name__)
-class SAC_LSTM(OffPolicyRLAlgorithm):
+class SAC_LSTM(RecurrentOffPolicyRLAlgorithm):
 
     """Soft actor-critic with LSTM-based recurrent actor and critic."""
 

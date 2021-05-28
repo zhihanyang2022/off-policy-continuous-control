@@ -9,6 +9,7 @@ from copy import deepcopy
 import numpy as np
 from gym.wrappers import Monitor
 
+from basics.abstract_algorithm import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from basics.replay_buffer import ReplayBuffer
 from basics.replay_buffer_recurrent import RecurrentReplayBuffer
 
@@ -50,9 +51,8 @@ def visualize_trained_policy(
 @gin.configurable(module=__name__)
 def train(
         env_fn,
-        algorithm,
+        algorithm: Union[OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm],
         buffer: Union[ReplayBuffer, RecurrentReplayBuffer],
-        max_steps_per_episode,
         num_epochs=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
         num_test_episodes_per_epoch=gin.REQUIRED,
@@ -131,7 +131,10 @@ def train(
             cutoff = False
 
         # store the transition
-        buffer.push(state, action, reward, next_state, done, cutoff)  # storing cutoff; only used by recurrent agent
+        if isinstance(algorithm, OffPolicyRLAlgorithm):
+            buffer.push(state, action, reward, next_state, done)  # storing cutoff; only used by recurrent agent
+        elif isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+            buffer.push(state, action, reward, next_state, done, cutoff)
 
         # crucial, crucial preparation for next step
         state = next_state

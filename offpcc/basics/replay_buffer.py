@@ -17,7 +17,7 @@ class ReplayBuffer:
         self.memory = deque(maxlen=capacity)
         self.batch_size = batch_size
 
-    def push(self, s, a, r, ns, d, cutoff) -> None:
+    def push(self, s, a, r, ns, d) -> None:
         self.memory.appendleft(Transition(s, a, r, ns, d))
 
     def sample(self) -> Batch:
