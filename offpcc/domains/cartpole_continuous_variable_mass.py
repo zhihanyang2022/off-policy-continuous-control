@@ -7,6 +7,7 @@ Continuous version by Ian Danforth
 Changes have been made in __init__, reset, and step by Zhihan
 - masscart and masspole are randomized in __init__ and reset
 - masscart and masspole has been added to state in reset and step
+- observation space has been modified
 """
 
 import math
@@ -49,14 +50,26 @@ class ContinuousCartPoleVariableMassEnv(gym.Env):
             self.x_threshold * 2,
             np.finfo(np.float32).max,
             self.theta_threshold_radians * 2,
-            np.finfo(np.float32).max])
+            np.finfo(np.float32).max,
+            self.masscart_max,
+            self.masspole_max
+        ])
+
+        self.low = np.array([
+            -self.x_threshold * 2,
+            -np.finfo(np.float32).max,
+            -self.theta_threshold_radians * 2,
+            -np.finfo(np.float32).max,
+            self.masscart_min,
+            self.masspole_min
+        ])
 
         self.action_space = spaces.Box(
             low=self.min_action,
             high=self.max_action,
             shape=(1,)
         )
-        self.observation_space = spaces.Box(-self.high, self.high)
+        self.observation_space = spaces.Box(self.low, self.high)
 
         self.seed()
         self.viewer = None
@@ -111,7 +124,7 @@ Any further steps are undefined behavior.
             self.steps_beyond_done += 1
             reward = 0.0
 
-        return np.array([list(self.state) + [self.masscart, self.masspole]]), reward, done, {}
+        return np.array(list(self.state) + [self.masscart, self.masspole]), reward, done, {}
 
     def reset(self):
 
@@ -124,7 +137,7 @@ Any further steps are undefined behavior.
         self.state = self.np_random.uniform(low=-0.05, high=0.05, size=(4,))
         self.steps_beyond_done = None
 
-        return np.array([list(self.state) + [self.masscart, self.masspole]])
+        return np.array(list(self.state) + [self.masscart, self.masspole])
 
     def render(self, mode='human'):
         screen_width = 600
@@ -197,10 +210,6 @@ def pv():
 
 def p():
     return FilterObsByIndex(ContinuousCartPoleVariableMassEnv(), indices_to_keep=[0, 2])
-
-
-def p_concat2():
-    return ConcatObs(p(), 2)
 
 
 def p_concat10():

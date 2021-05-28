@@ -120,7 +120,7 @@ def train_ddpg(
         gradient_steps=update_every,
         action_noise=NormalActionNoise(mean=np.zeros(env.action_space.shape),
                                        sigma=action_noise * np.ones(env.action_space.shape)),
-        policy_kwargs={'net_arch': hidden_dimensions},
+        policy_kwargs={'net_arch': list(hidden_dimensions)},
         verbose=1,
         seed=seed,
         device='cpu',
@@ -172,7 +172,7 @@ def train_td3(
         policy_delay=policy_delay,
         target_policy_noise=target_noise,
         target_noise_clip=noise_clip,
-        policy_kwargs={'net_arch': hidden_dimensions},
+        policy_kwargs={'net_arch': list(hidden_dimensions)},
         verbose=1,
         seed=seed,
         device='cpu',
@@ -219,7 +219,7 @@ def train_sac(
         action_noise=None,
         ent_coef=f'auto_{str(alpha)}' if autotune_alpha else alpha,  # e.g., 'auto_0.1' use 0.1 as init value
         target_entropy="auto",  # this will be the negative of dim of action space; not used if autotune_alpha is False
-        policy_kwargs={'net_arch': hidden_dimensions},
+        policy_kwargs={'net_arch': list(hidden_dimensions)},
         verbose=1,
         seed=seed,
         device='cpu'
