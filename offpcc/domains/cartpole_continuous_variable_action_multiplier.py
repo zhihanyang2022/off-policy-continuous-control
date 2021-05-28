@@ -128,7 +128,7 @@ Any further steps are undefined behavior.
 
     def reset(self):
         self.state = self.np_random.uniform(low=-0.05, high=0.05, size=(4,))
-        self.action_multiplier = np.random.choice([0, 1])
+        self.action_multiplier = np.random.choice([-1, 1])
         self.steps_beyond_done = None
         return np.array(list(self.state) + [self.action_multiplier])
 
