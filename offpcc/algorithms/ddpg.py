@@ -89,7 +89,7 @@ class DDPG(OffPolicyRLAlgorithm):
 
         # compute td error
 
-        Q_loss = torch.mean((predictions - targets.detach()) ** 2)
+        Q_loss = torch.mean((predictions - targets) ** 2)
 
         assert Q_loss.shape == ()
 
