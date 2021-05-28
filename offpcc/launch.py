@@ -23,7 +23,7 @@ algo_name2class = {
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--env', type=str, required=True)
-parser.add_argument('--algo', type=str, required=True, help='Choose among "ddpg", "td3" and "sac"')
+parser.add_argument('--algo', type=str, required=True, help='Choose among ddpg, ddpg-lstm, td3, td3-lstm, sac and sac-lstm')
 parser.add_argument('--run_id', nargs='+', type=int, required=True)
 parser.add_argument('--config', type=str, required=True, help='Task-specific hyperparameters')
 parser.add_argument('--visualize', action='store_true', help='Visualize a trained policy (no training happens)')  # default is false
