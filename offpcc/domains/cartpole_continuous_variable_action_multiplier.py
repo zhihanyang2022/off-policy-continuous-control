@@ -18,7 +18,7 @@ import numpy as np
 from domains.wrappers import ConcatObs, FilterObsByIndex
 
 
-class ContinuousCartPoleVariableMassEnv(gym.Env):
+class ContinuousCartPoleVariableActionMultiplierEnv(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 50
@@ -26,12 +26,8 @@ class ContinuousCartPoleVariableMassEnv(gym.Env):
 
     def __init__(self):
         self.gravity = 9.8
-
-        self.masscart_min, self.masscart_max = 0.7, 1.3
-        self.masspole_min, self.masspole_max = 0.07, 0.13
-
-        self.masscart = np.random.uniform(self.masscart_min, self.masscart_max)  # 1.0
-        self.masspole = np.random.uniform(self.masspole_min, self.masspole_max)  # 0.1
+        self.masscart = 1.0
+        self.masspole = 0.1
         self.total_mass = (self.masspole + self.masscart)
         self.length = 0.5  # actually half the pole's length
         self.polemass_length = (self.masspole * self.length)
@@ -39,6 +35,10 @@ class ContinuousCartPoleVariableMassEnv(gym.Env):
         self.tau = 0.02  # seconds between state updates
         self.min_action = -1.0
         self.max_action = 1.0
+
+        self.action_multiplier_min = 1
+        self.action_multiplier_max = 3
+        self.action_multiplier = np.random.uniform(self.action_multiplier_min, self.action_multiplier_max)
 
         # Angle at which to fail the episode
         self.theta_threshold_radians = 12 * 2 * math.pi / 360
@@ -51,8 +51,7 @@ class ContinuousCartPoleVariableMassEnv(gym.Env):
             np.finfo(np.float32).max,
             self.theta_threshold_radians * 2,
             np.finfo(np.float32).max,
-            self.masscart_max,
-            self.masspole_max
+            self.action_multiplier_max
         ])
 
         self.low = np.array([
@@ -60,8 +59,7 @@ class ContinuousCartPoleVariableMassEnv(gym.Env):
             -np.finfo(np.float32).max,
             -self.theta_threshold_radians * 2,
             -np.finfo(np.float32).max,
-            self.masscart_min,
-            self.masspole_min
+            self.action_multiplier_min
         ])
 
         self.action_space = spaces.Box(
@@ -96,6 +94,9 @@ class ContinuousCartPoleVariableMassEnv(gym.Env):
         return (x, x_dot, theta, theta_dot)
 
     def step(self, action):
+
+        action = self.action_multiplier * action
+
         assert self.action_space.contains(action), \
             "%r (%s) invalid" % (action, type(action))
         # Cast action to float to strip np trappings
@@ -124,20 +125,13 @@ Any further steps are undefined behavior.
             self.steps_beyond_done += 1
             reward = 0.0
 
-        return np.array(list(self.state) + [self.masscart, self.masspole]), reward, done, {}
+        return np.array(list(self.state) + [self.action_multiplier]), reward, done, {}
 
     def reset(self):
-
-        # re-generate random masscart and masspole, and change relevant attributes
-        self.masscart = np.random.uniform(self.masscart_min, self.masscart_max)  # 1.0
-        self.masspole = np.random.uniform(self.masspole_min, self.masspole_max)  # 0.1
-        self.total_mass = (self.masspole + self.masscart)
-        self.polemass_length = (self.masspole * self.length)
-
         self.state = self.np_random.uniform(low=-0.05, high=0.05, size=(4,))
+        self.action_multiplier = np.random.uniform(self.action_multiplier_min, self.action_multiplier_max)
         self.steps_beyond_done = None
-
-        return np.array(list(self.state) + [self.masscart, self.masspole])
+        return np.array(list(self.state) + [self.action_multiplier])
 
     def render(self, mode='human'):
         screen_width = 600
@@ -200,16 +194,15 @@ Code below is added by me.
 # 1: cart velocity
 # 2: pole angle
 # 3: pole velocity at top
-# 4: masscart
-# 5: masspole
+# 4: action scale
 
 
 def pv():
-    return FilterObsByIndex(ContinuousCartPoleVariableMassEnv(), indices_to_keep=[0, 1, 2, 3])
+    return FilterObsByIndex(ContinuousCartPoleVariableActionMultiplierEnv(), indices_to_keep=[0, 1, 2, 3])
 
 
 def p():
-    return FilterObsByIndex(ContinuousCartPoleVariableMassEnv(), indices_to_keep=[0, 2])
+    return FilterObsByIndex(ContinuousCartPoleVariableActionMultiplierEnv(), indices_to_keep=[0, 2])
 
 
 def p_concat10():
