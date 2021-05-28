@@ -36,9 +36,7 @@ class ContinuousCartPoleVariableActionMultiplierEnv(gym.Env):
         self.min_action = -1.0
         self.max_action = 1.0
 
-        self.action_multiplier_min = 1
-        self.action_multiplier_max = 20
-        self.action_multiplier = np.random.uniform(self.action_multiplier_min, self.action_multiplier_max)
+        self.action_multiplier = np.random.choice([-1, 1])
 
         # Angle at which to fail the episode
         self.theta_threshold_radians = 12 * 2 * math.pi / 360
@@ -51,7 +49,7 @@ class ContinuousCartPoleVariableActionMultiplierEnv(gym.Env):
             np.finfo(np.float32).max,
             self.theta_threshold_radians * 2,
             np.finfo(np.float32).max,
-            self.action_multiplier_max
+            1
         ])
 
         self.low = np.array([
@@ -59,7 +57,7 @@ class ContinuousCartPoleVariableActionMultiplierEnv(gym.Env):
             -np.finfo(np.float32).max,
             -self.theta_threshold_radians * 2,
             -np.finfo(np.float32).max,
-            self.action_multiplier_min
+            -1
         ])
 
         self.action_space = spaces.Box(
@@ -130,7 +128,7 @@ Any further steps are undefined behavior.
 
     def reset(self):
         self.state = self.np_random.uniform(low=-0.05, high=0.05, size=(4,))
-        self.action_multiplier = np.random.uniform(self.action_multiplier_min, self.action_multiplier_max)
+        self.action_multiplier = np.random.choice([0, 1])
         self.steps_beyond_done = None
         return np.array(list(self.state) + [self.action_multiplier])
 
