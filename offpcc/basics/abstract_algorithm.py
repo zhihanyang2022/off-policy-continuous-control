@@ -59,6 +59,6 @@ class RecurrentOffPolicyRLAlgorithm(ABC):
         pass
 
     @abstractmethod
-    def restart(self) -> None:
+    def reinitialize_hidden(self) -> None:
         """For recurrent agents only; called at the beginning of each episode to reset hidden states"""
         pass

@@ -73,7 +73,7 @@ class SAC_LSTM(RecurrentOffPolicyRLAlgorithm):
 
         self.h_and_c = None
 
-    def restart(self) -> None:
+    def reinitialize_hidden(self) -> None:
         self.h_and_c = None  # lstm will treat a None hidden state as zeros
 
     def sample_action_from_distribution(

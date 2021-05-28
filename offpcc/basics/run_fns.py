@@ -144,7 +144,8 @@ def train(
             train_episode_lens.append(episode_len)
             train_episode_rets.append(episode_ret)
             state, episode_len, episode_ret = env.reset(), 0, 0  # reset state and stats trackers
-            algorithm.restart()  # crucial, crucial step for recurrent agents
+            if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+                algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
 
         # update handling
         if t >= update_after and (t + 1) % update_every == 0:
@@ -163,7 +164,8 @@ def train(
             algo_specific_stats_over_epoch = {}
 
             if len(algo_specific_stats_tracker) != 0:
-                keys = algo_specific_stats_tracker[0].keys()  # get keys from the first one; all dicts SHOULD share the same keys
+                # get keys from the first one; all dicts SHOULD share the same keys
+                keys = algo_specific_stats_tracker[0].keys()
                 for k in keys:
                     values = []
                     for dictionary in algo_specific_stats_tracker:
