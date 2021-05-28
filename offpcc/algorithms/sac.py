@@ -18,7 +18,12 @@ from basics.cuda_utils import get_device
 @gin.configurable(module=__name__)
 class SAC(OffPolicyRLAlgorithm):
 
-    """Soft actor-critic"""
+    """
+    Soft actor-critic
+
+    The autotuning of the entropy coefficient (alpha) follows almost EXACTLY from SB3's SAC implementation, while
+    other code follows from spinup's implementation.
+    """
 
     def __init__(
             self,
@@ -54,14 +59,20 @@ class SAC(OffPolicyRLAlgorithm):
         # hyper-parameters
 
         self.gamma = gamma
-        self.alpha = alpha
+        self.autotune_alpha = autotune_alpha
         self.polyak = polyak
+
+        if autotune_alpha:
+            self.log_alpha = torch.log(torch.ones(1) * alpha).requires_grad(True).to(get_device())
+            self.log_alpha_optimizer = optim.Adam([self.log_alpha], lr=lr)
+        else:
+            self.alpha = alpha
 
         # miscellaneous
 
         self.input_dim = input_dim
         self.action_dim = action_dim  # for shape checking
-        self.target_entropy = - self.action_dim
+        self.target_entropy = - self.action_dim  # int, but it will get broadcasted over a FloatTensor as a float
 
     def sample_action_from_distribution(
             self,
@@ -103,6 +114,12 @@ class SAC(OffPolicyRLAlgorithm):
             action = self.sample_action_from_distribution(state, deterministic=deterministic, return_log_prob=False)
             return action.view(-1).cpu().numpy()  # view as 1d -> to cpu -> to numpy
 
+    def get_current_alpha(self):
+        if self.autotune_alpha:
+            return np.exp(float(self.log_alpha))
+        else:
+            return self.alpha
+
     def polyak_update(self, target_net: nn.Module, prediction_net: nn.Module) -> None:
         for target_param, prediction_param in zip(target_net.parameters(), prediction_net.parameters()):
             target_param.data.copy_(target_param.data * self.polyak + prediction_param.data * (1 - self.polyak))
@@ -127,9 +144,9 @@ class SAC(OffPolicyRLAlgorithm):
                                                                           return_log_prob=True)
 
             n_min_Q_targ = torch.min(self.Q1_targ(b.ns, na), self.Q2_targ(b.ns, na))
-            n_entropy = - log_pi_na_given_ns
+            n_sample_entropy = - log_pi_na_given_ns
 
-            targets = b.r + self.gamma * (1 - b.d) * (n_min_Q_targ + self.alpha * n_entropy)
+            targets = b.r + self.gamma * (1 - b.d) * (n_min_Q_targ + self.get_current_alpha() * n_sample_entropy)
 
             assert na.shape == (bs, self.action_dim)
             assert log_pi_na_given_ns.shape == (bs, 1)
@@ -162,9 +179,9 @@ class SAC(OffPolicyRLAlgorithm):
         a, log_pi_a_given_s = self.sample_action_from_distribution(b.s, deterministic=False, return_log_prob=True)
 
         min_Q = torch.min(self.Q1(b.s, a), self.Q2(b.s, a))
-        entropy = - log_pi_a_given_s
+        sample_entropy = - log_pi_a_given_s
 
-        policy_loss = - torch.mean(min_Q + self.alpha * entropy)
+        policy_loss = - torch.mean(min_Q + self.get_current_alpha() * sample_entropy)
 
         assert a.shape == (bs, self.action_dim)
         assert log_pi_a_given_s.shape == (bs, 1)
@@ -180,6 +197,36 @@ class SAC(OffPolicyRLAlgorithm):
         set_requires_grad_flag(self.Q1, True)
         set_requires_grad_flag(self.Q2, True)
 
+        if self.autotune_alpha:
+
+            # compute log alpha loss
+
+            # derivation to make things more intuitive
+            #
+            # alpha_loss = - self.log_alpha * (log_pi_a_given_s.detach() + self.target_entropy)
+            #            = self.log_alpha * (- log_pi_a_given_s.detach() - self.target_entropy)
+            #            = self.log_alpha * (sample_entropy - self.target_entropy)
+            #            = self.log_alpha * excess_entropy
+            #
+            # If excess_entropy > 0, then log_alpha needs to be decreased to reduce alpha_loss, which corresponds to
+            # less weighting on sample_entropy in policy loss and hence reduces excess_entropy.
+            #
+            # If excess_entropy < 0, then log_alpha needs to be increased to reduce alpha_loss, which corresponds to
+            # more weighting on sample_entropy in policy loss and hence increases excess_entropy.
+
+            excess_entropy = sample_entropy.detach() - self.target_entropy
+            log_alpha_loss = self.log_alpha * excess_entropy
+
+            # reduce log alpha loss
+
+            self.log_alpha_optimizer.zero_grad()
+            log_alpha_loss.backward()
+            self.log_alpha_optimizer.step()
+
+        else:
+
+            log_alpha_loss = 0
+
         # update target networks
 
         self.polyak_update(target_net=self.Q1_targ, prediction_net=self.Q1)
@@ -193,8 +240,11 @@ class SAC(OffPolicyRLAlgorithm):
             '(qfunc) Q2 loss': float(Q2_loss),
             # for learning the actor
             '(actor) min Q pred': float(min_Q.mean()),
-            '(actor) entropy (sample)': float(entropy.mean()),
-            '(actor) policy loss': float(policy_loss)
+            '(actor) entropy (sample)': float(sample_entropy.mean()),
+            '(actor) policy loss': float(policy_loss),
+            # for learning the entropy coefficient (alpha)
+            '(alpha) alpha': self.get_current_alpha(),
+            '(alpha) log alpha loss': float(log_alpha_loss.mean())
         }
 
     def save_networks(self, save_dir: str) -> None:
