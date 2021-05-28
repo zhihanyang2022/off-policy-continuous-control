@@ -32,26 +32,23 @@ for seed in args.seed:
     # it's weird but wandb.init has to be done before these since these code
     # will invoke wandb.run.dir, which is not None only after init
 
-    from basics.run_spinup_utils import train_ddpg, train_td3, train_sac
+    from basics.run_fns_spinup import train_ddpg, train_td3, train_sac
     gin.parse_config_file(args.config)
 
     if args.algo == 'ddpg':
         train_ddpg(
             env_fn=env_fn,
-            seed=seed,
-            max_steps_per_episode=env_fn().spec.max_episode_steps
+            seed=seed
         )
     elif args.algo == 'td':
         train_td3(
             env_fn=env_fn,
-            seed=seed,
-            max_steps_per_episode=env_fn().spec.max_episode_steps
+            seed=seed
         )
     elif args.algo == 'sac':
         train_sac(
             env_fn=env_fn,
-            seed=seed,
-            max_steps_per_episode=env_fn().spec.max_episode_steps
+            seed=seed
         )
     else:
         raise NotImplementedError(f'{args.algo} is not an available algorithm')

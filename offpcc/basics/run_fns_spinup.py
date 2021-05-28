@@ -10,7 +10,6 @@ from spinup import sac_pytorch as sac
 def train_ddpg(
         env_fn,
         seed,
-        max_steps_per_episode,
         hidden_dimensions=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
         num_epochs=gin.REQUIRED,
@@ -41,7 +40,7 @@ def train_ddpg(
         update_every=update_every,
         act_noise=action_noise,
         num_test_episodes=num_test_episodes_per_epoch,
-        max_ep_len=max_steps_per_episode,
+        max_ep_len=env_fn().spec.max_episode_steps,
         logger_kwargs=dict(),  # automatically uploaded to wandb
         save_freq=50  # we don't actually care about saved models from spinup
     )
@@ -51,7 +50,6 @@ def train_ddpg(
 def train_td3(
         env_fn,
         seed,
-        max_steps_per_episode,
         hidden_dimensions=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
         num_epochs=gin.REQUIRED,
@@ -88,7 +86,7 @@ def train_td3(
         noise_clip=noise_clip,
         policy_delay=policy_delay,
         num_test_episodes=num_test_episodes_per_epoch,
-        max_ep_len=max_steps_per_episode,
+        max_ep_len=env_fn().spec.max_episode_steps,
         logger_kwargs=dict(),
         save_freq=50
     )
@@ -98,7 +96,6 @@ def train_td3(
 def train_sac(
         env_fn,
         seed,
-        max_steps_per_episode,
         hidden_dimensions=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
         num_epochs=gin.REQUIRED,
@@ -128,7 +125,7 @@ def train_sac(
         update_after=update_after,
         update_every=update_every,
         num_test_episodes=num_test_episodes_per_epoch,
-        max_ep_len=max_steps_per_episode,
+        max_ep_len=env_fn().spec.max_episode_steps,
         logger_kwargs=dict(),
         save_freq=50
     )

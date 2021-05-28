@@ -194,7 +194,7 @@ class CarEnv(gym.Env):
         reward = 0
         if (self.heaven_position > self.hell_position):
             if (position >= self.heaven_position):
-                reward = 1.0
+                reward = 1
 
             # if (position <= self.hell_position):
             #     reward = -1.0
@@ -204,7 +204,7 @@ class CarEnv(gym.Env):
             #     reward = -1.0
 
             if (position <= self.heaven_position):
-                reward = 1.0
+                reward = 1
 
         direction = 0.0
         if position >= self.priest_position - self.priest_delta and position <= self.priest_position + self.priest_delta:
@@ -216,7 +216,7 @@ class CarEnv(gym.Env):
                 direction = -1.0
 
         self.state = np.array([position, velocity, direction])
-        self.solved = (reward > 0.0)
+        self.solved = (reward > 0)
 
         if self.show:
             self.render()

@@ -109,7 +109,7 @@ def train(
 
         # carefully decide what "done" should be at max_episode_steps
 
-        if episode_len == max_steps_per_episode:
+        if episode_len == env.spec.max_episode_steps:
 
             # here's how truncated is computed behind the scene
             # - at max_episode_steps & done=True -> truncated=False

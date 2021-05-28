@@ -11,7 +11,7 @@ from basics.replay_buffer import ReplayBuffer
 from basics.replay_buffer_recurrent import RecurrentReplayBuffer
 from algorithms import *
 
-from basics.run_utils import train, make_log_dir, visualize_trained_policy
+from basics.run_fns import train, make_log_dir, visualize_trained_policy
 
 algo_name2class = {
     'ddpg': DDPG,
@@ -77,6 +77,5 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
         train(
             env_fn=env_fn,
             algorithm=algorithm,
-            buffer=buffer,
-            max_steps_per_episode=example_env.spec.max_episode_steps  # for handling bootstrapping correctly
+            buffer=buffer
         )

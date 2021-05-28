@@ -55,3 +55,39 @@ register(
     entry_point='domains.car:car_flag_concat',
     max_episode_steps=160
 )
+
+# ============================================================================================
+# CartPole Variable Mass (Type 1 Task)
+# I'm using 350 timesteps because
+# 1) it is used in RDPG paper
+# 2) it is harder than 200 timesteps (in gym) but easier than 1000 timesteps (in VRM)
+# ============================================================================================
+
+# with non-recurrent agent: baseline (lstm < this)
+register(
+    id='cartpole-variable-mass-v0',
+    entry_point='domains.cartpole_continuous_variable_mass:ContinuousCartPoleVariableMassEnv',
+    max_episode_steps=350
+)
+
+# with non-recurrent agent: baseline (prove that our task is really harder)
+register(
+    id='cartpole-variable-mass-pv-v0',
+    entry_point='domains.cartpole_continuous_variable_mass:pv',
+    max_episode_steps=350
+)
+
+# with non-recurrent agent: baseline (lstm approximately = this)
+register(
+    id='cartpole-variable-mass-p-concat10-v0',
+    entry_point='domains.cartpole_continuous_variable_mass:p_concat10',
+    max_episode_steps=350
+)
+
+# with non-recurrent agent: baseline (lstm > this)
+# with recurrent agent: for lstm
+register(
+    id='cartpole-variable-mass-p-v0',
+    entry_point='domains.cartpole_continuous_variable_mass:p',
+    max_episode_steps=350
+)

@@ -5,9 +5,9 @@ import basics.run_utils
 import basics.run_spinup_utils
 
 
-basics.actors_and_critics.make_MLP.hidden_dimensions = (256, 256)
+basics.actors_and_critics.make_MLP.hidden_dimensions = (256, 256, 256)
 
-basics.run_spinup_utils.train_td3.hidden_dimensions = (256, 256)
+basics.run_spinup_utils.train_td3.hidden_dimensions = (256, 256, 256)
 
 
 algorithms.td3.TD3.gamma = 0.99
