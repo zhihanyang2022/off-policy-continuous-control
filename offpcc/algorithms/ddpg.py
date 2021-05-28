@@ -123,7 +123,13 @@ class DDPG(OffPolicyRLAlgorithm):
         self.polyak_update(old_net=self.actor_targ, new_net=self.actor)
         self.polyak_update(old_net=self.Q_targ, new_net=self.Q)
 
-        return {}
+        return {
+            # for learning the q functions
+            '(qfunc) Q pred': float(predictions.mean()),
+            '(qfunc) Q loss': float(Q_loss),
+            # for learning the actor
+            '(actor) policy loss': float(policy_loss),
+        }
 
     def save_networks(self, save_dir: str) -> None:
         torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))
