@@ -1,7 +1,9 @@
-import gym
-from gym.wrappers import Monitor
+import wandb
 import warnings
 from typing import Any, Dict, Optional, Union
+
+import gym
+import numpy as np
 
 from stable_baselines3.common.callbacks import EventCallback
 from stable_baselines3.common.vec_env import DummyVecEnv, VecEnv, sync_envs_normalization
