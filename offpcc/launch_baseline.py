@@ -1,28 +1,38 @@
+# @@@@@ imports @@@@@
+
 import os
 import argparse
 import gin
 import wandb
 
 import gym
-from domains import *
+from domains import *  # pycharm does not recognize that this is actually required
 from gym.wrappers import RescaleAction
-from basics.run_fns_sb3 import configure_ddpg, configure_td3, configure_sac, train_and_save_model, load_and_visualize_policy, make_log_dir
+from basics.run_fns_sb3 import configure_ddpg, configure_td3, configure_sac, train_and_save_model, \
+    load_and_visualize_policy, make_log_dir
+
+# @@@@@ parse command line arguments @@@@@
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--env', type=str, required=True)
 parser.add_argument('--algo', type=str, required=True, help='Choose among ddpg, td3 and sac')
 parser.add_argument('--seed', nargs='+', type=int, required=True)
 parser.add_argument('--config', type=str, required=True, help='Task-specific hyperparameters')
-parser.add_argument('--visualize', action='store_true', help='Visualize a trained policy (no training happens)')  # default is false
+parser.add_argument('--visualize', action='store_true',
+                    help='Visualize a trained policy (no training happens)')  # default is false
 
 args = parser.parse_args()
 
+# @@@@@ run each seed @@@@@
+
 gin.parse_config_file(args.config)
 
-for seed in args.seed:
 
-    def env_fn():
-        return RescaleAction(gym.make(args.env), -1, 1)
+def env_fn():
+    return RescaleAction(gym.make(args.env), -1, 1)
+
+
+for seed in args.seed:
 
     if args.algo == 'ddpg':
         model = configure_ddpg(env_fn=env_fn, seed=seed)

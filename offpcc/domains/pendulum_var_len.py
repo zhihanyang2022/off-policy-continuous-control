@@ -50,6 +50,7 @@ class PendulumVarLenFullEnv(gym.Env):
 
         # added
         self.last_u = np.zeros(self.action_space.shape)
+        self.should_update_viewer = False  # use this flag to update view upon reset, since self.l might have changed
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -79,6 +80,7 @@ class PendulumVarLenFullEnv(gym.Env):
         self.state = self.np_random.uniform(low=-high, high=high)
         self.last_u = np.zeros(self.action_space.shape)  # modified; originally None
         self.l = self.np_random.choice([LOW, HIGH])
+        self.should_update_viewer = True
         print(f'Called reset with l={self.l}')
         return self._get_obs()
 
@@ -87,11 +89,11 @@ class PendulumVarLenFullEnv(gym.Env):
         return np.array([np.cos(theta), np.sin(theta), thetadot, self.l, float(self.last_u)])
 
     def render(self, mode='human'):
-        if self.viewer is None:
+        if self.viewer is None or self.should_update_viewer:
             from gym.envs.classic_control import rendering
             self.viewer = rendering.Viewer(500, 500)
             self.viewer.set_bounds(-2.2, 2.2, -2.2, 2.2)
-            rod = rendering.make_capsule(1, .2)
+            rod = rendering.make_capsule(self.l, .2)
             rod.set_color(.8, .3, .3)
             self.pole_transform = rendering.Transform()
             rod.add_attr(self.pole_transform)
@@ -103,6 +105,7 @@ class PendulumVarLenFullEnv(gym.Env):
             self.img = rendering.Image(fname, 1., 1.)
             self.imgtrans = rendering.Transform()
             self.img.add_attr(self.imgtrans)
+            self.should_update_viewer = False
 
         self.viewer.add_onetime(self.img)
         self.pole_transform.set_rotation(self.state[0] + np.pi / 2)
