@@ -21,14 +21,16 @@ class PendulumVarLenEnv(gym.Env):
         self.l = np.random.uniform(0.5, 2)  # default is 1.
         self.viewer = None
 
-        high = np.array([1., 1., self.max_speed], dtype=np.float32)
+        high = np.array([1., 1., self.max_speed, 2], dtype=np.float32)
+        low = np.array([-1., -1., -self.max_speed, 0.5], dtype=np.float32)
+
         self.action_space = spaces.Box(
             low=-self.max_torque,
             high=self.max_torque, shape=(1,),
             dtype=np.float32
         )
         self.observation_space = spaces.Box(
-            low=-high,
+            low=low,
             high=high,
             dtype=np.float32
         )
@@ -56,18 +58,18 @@ class PendulumVarLenEnv(gym.Env):
         newthdot = np.clip(newthdot, -self.max_speed, self.max_speed)
 
         self.state = np.array([newth, newthdot])
-        return np.array(list(self._get_obs()) + [self.l]), -costs, False, {}
+        return self._get_obs(), -costs, False, {}
 
     def reset(self):
         high = np.array([np.pi, 1])
         self.state = self.np_random.uniform(low=-high, high=high)
         self.last_u = None
         self.l = np.random.uniform(0.5, 2)  # default is 1.
-        return np.array(list(self._get_obs()) + [self.l])
+        return self._get_obs()
 
     def _get_obs(self):
         theta, thetadot = self.state
-        return np.array([np.cos(theta), np.sin(theta), thetadot])
+        return np.array([np.cos(theta), np.sin(theta), thetadot, self.l])
 
     def render(self, mode='human'):
         if self.viewer is None:
