@@ -24,7 +24,7 @@ num_test_episodes_per_epoch = 3
 update_after = 999
 
 # ====================================================================================
-# applying the parameters above to all three codebases (spinup, sb3 and ours)
+# applying the parameters above to two codebases (sb3 and ours)
 # ====================================================================================
 
 import basics.actors_and_critics
@@ -42,28 +42,19 @@ algorithms.ddpg.DDPG.action_noise = %action_noise
 algorithms.ddpg.DDPG.lr = %lr
 algorithms.ddpg.DDPG.polyak = %polyak
 
-basics.run_fns_spinup.train_ddpg.hidden_dimensions = %hidden_dimensions
-basics.run_fns_spinup.train_ddpg.gamma = %gamma
-basics.run_fns_spinup.train_ddpg.action_noise = %action_noise
-basics.run_fns_spinup.train_ddpg.lr = %lr
-basics.run_fns_spinup.train_ddpg.polyak = %polyak
-
-basics.run_fns_sb3.train_ddpg.hidden_dimensions = %hidden_dimensions
-basics.run_fns_sb3.train_ddpg.gamma = %gamma
-basics.run_fns_sb3.train_ddpg.action_noise = %action_noise
-basics.run_fns_sb3.train_ddpg.lr = %lr
-basics.run_fns_sb3.train_ddpg.polyak = %polyak
+basics.run_fns_sb3.configure_ddpg.hidden_dimensions = %hidden_dimensions
+basics.run_fns_sb3.configure_ddpg.gamma = %gamma
+basics.run_fns_sb3.configure_ddpg.action_noise = %action_noise
+basics.run_fns_sb3.configure_ddpg.lr = %lr
+basics.run_fns_sb3.configure_ddpg.polyak = %polyak
 
 ##### buffer parameters #####
 
 basics.replay_buffer.ReplayBuffer.capacity = %capacity
 basics.replay_buffer.ReplayBuffer.batch_size = %batch_size
 
-basics.run_fns_spinup.train_ddpg.capacity = %capacity
-basics.run_fns_spinup.train_ddpg.batch_size = %batch_size
-
-basics.run_fns_sb3.train_ddpg.capacity = %capacity
-basics.run_fns_sb3.train_ddpg.batch_size = %batch_size
+basics.run_fns_sb3.configure_ddpg.capacity = %capacity
+basics.run_fns_sb3.configure_ddpg.batch_size = %batch_size
 
 ##### training loop parameters #####
 
@@ -73,14 +64,8 @@ basics.run_fns.train.update_every = %update_every
 basics.run_fns.train.num_test_episodes_per_epoch = %num_test_episodes_per_epoch
 basics.run_fns.train.update_after = %update_after
 
-basics.run_fns_spinup.train_ddpg.num_epochs = %num_epochs
-basics.run_fns_spinup.train_ddpg.num_steps_per_epoch = %num_steps_per_epoch
-basics.run_fns_spinup.train_ddpg.update_every = %update_every
-basics.run_fns_spinup.train_ddpg.num_test_episodes_per_epoch = %num_test_episodes_per_epoch
-basics.run_fns_spinup.train_ddpg.update_after = %update_after
-
-basics.run_fns_sb3.train_ddpg.num_epochs = %num_epochs
-basics.run_fns_sb3.train_ddpg.num_steps_per_epoch = %num_steps_per_epoch
-basics.run_fns_sb3.train_ddpg.update_every = %update_every
-basics.run_fns_sb3.train_ddpg.num_test_episodes_per_epoch = %num_test_episodes_per_epoch
-basics.run_fns_sb3.train_ddpg.update_after = %update_after
+basics.run_fns_sb3.train_and_save_model.num_epochs = %num_epochs
+basics.run_fns_sb3.train_and_save_model.num_steps_per_epoch = %num_steps_per_epoch
+basics.run_fns_sb3.train_and_save_model.update_every = %update_every
+basics.run_fns_sb3.train_and_save_model.num_test_episodes_per_epoch = %num_test_episodes_per_epoch
+basics.run_fns_sb3.train_and_save_model.update_after = %update_after
