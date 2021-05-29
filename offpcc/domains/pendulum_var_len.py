@@ -32,8 +32,8 @@ class PendulumVarLenFullEnv(gym.Env):
         self.l = None  # will be set in reset()
         self.viewer = None
 
-        high = np.array([1., 1., self.max_speed, HIGH], dtype=np.float32)
-        low = np.array([-1., -1., -self.max_speed, LOW], dtype=np.float32)
+        high = np.array([1., 1., self.max_speed, HIGH, 1], dtype=np.float32)
+        low = np.array([-1., -1., -self.max_speed, LOW, -1], dtype=np.float32)
 
         self.action_space = spaces.Box(
             low=-self.max_torque,
