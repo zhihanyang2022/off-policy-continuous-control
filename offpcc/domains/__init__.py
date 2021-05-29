@@ -83,8 +83,8 @@ register(
 
 # with non-recurrent agent: baseline (lstm = this)
 register(
-    id='pendulum-var-len-pa-concat10-v0',
-    entry_point='domains.pendulum_var_len:pa-concat10',
+    id='pendulum-var-len-pa-concat5-v0',
+    entry_point='domains.pendulum_var_len:pa-concat5',
     max_episode_steps=200
 )
 

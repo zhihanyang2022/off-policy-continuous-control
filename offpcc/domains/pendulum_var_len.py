@@ -152,5 +152,5 @@ def pa():
     return FilterObsByIndex(PendulumVarLenFullEnv(), indices_to_keep=[0, 1, 4])
 
 
-def pa_concat10():
-    return ConcatObs(pa(), 10)
+def pa_concat5():
+    return ConcatObs(pa(), 5)
