@@ -12,7 +12,7 @@ from basics.replay_buffer_recurrent import RecurrentReplayBuffer
 from basics.abstract_algorithm import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from algorithms import *
 
-from basics.run_fns import train, make_log_dir, visualize_trained_policy
+from basics.run_fns import train, make_log_dir, load_and_visualize_policy
 
 algo_name2class = {
     'ddpg': DDPG,
@@ -47,7 +47,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
 
     if args.visualize:
 
-        visualize_trained_policy(
+        load_and_visualize_policy(
             env_fn=env_fn,
             algorithm=algorithm,
             log_dir=make_log_dir(args.env, args.algo, run_id),  # trained model will be loaded from here

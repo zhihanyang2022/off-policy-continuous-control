@@ -32,7 +32,7 @@ def test_for_one_episode(env, algorithm) -> tuple:
     return episode_len, episode_return
 
 
-def visualize_trained_policy(
+def load_and_visualize_policy(
         env_fn,
         algorithm,
         log_dir,

@@ -1,6 +1,7 @@
 import gin
 import numpy as np
 import gym
+from gym.wrappers import Monitor
 import warnings
 from typing import Any, Dict, Optional, Union
 import wandb
@@ -90,12 +91,10 @@ class MyEvalCallback(EventCallback):
 
 
 @gin.configurable(module=__name__)
-def train_ddpg(
+def configure_ddpg(
         env_fn,
         seed,
         hidden_dimensions=gin.REQUIRED,
-        num_steps_per_epoch=gin.REQUIRED,
-        num_epochs=gin.REQUIRED,
         capacity=gin.REQUIRED,
         gamma=gin.REQUIRED,
         polyak=gin.REQUIRED,
@@ -103,8 +102,7 @@ def train_ddpg(
         batch_size=gin.REQUIRED,
         update_after=gin.REQUIRED,
         update_every=gin.REQUIRED,
-        action_noise=gin.REQUIRED,
-        num_test_episodes_per_epoch=gin.REQUIRED
+        action_noise=gin.REQUIRED
 ):
     env = env_fn()
     model = DDPG(
@@ -125,23 +123,14 @@ def train_ddpg(
         seed=seed,
         device='cpu',
     )
-    my_eval_callback = MyEvalCallback(env_fn(),
-                                      seed=seed,
-                                      eval_freq=num_steps_per_epoch,
-                                      n_eval_episodes=num_test_episodes_per_epoch)
-    model.learn(
-        total_timesteps=num_steps_per_epoch*num_epochs,
-        callback=my_eval_callback
-    )
+    return model
 
 
 @gin.configurable(module=__name__)
-def train_td3(
+def configure_td3(
         env_fn,
         seed,
         hidden_dimensions=gin.REQUIRED,
-        num_steps_per_epoch=gin.REQUIRED,
-        num_epochs=gin.REQUIRED,
         capacity=gin.REQUIRED,
         gamma=gin.REQUIRED,
         polyak=gin.REQUIRED,
@@ -152,8 +141,7 @@ def train_td3(
         action_noise=gin.REQUIRED,
         target_noise=gin.REQUIRED,
         noise_clip=gin.REQUIRED,
-        policy_delay=gin.REQUIRED,
-        num_test_episodes_per_epoch=gin.REQUIRED
+        policy_delay=gin.REQUIRED
 ):
     env = env_fn()
     model = TD3(
@@ -177,23 +165,14 @@ def train_td3(
         seed=seed,
         device='cpu',
     )
-    my_eval_callback = MyEvalCallback(env_fn(),
-                                      seed=seed,
-                                      eval_freq=num_steps_per_epoch,
-                                      n_eval_episodes=num_test_episodes_per_epoch)
-    model.learn(
-        total_timesteps=num_steps_per_epoch * num_epochs,
-        callback=my_eval_callback
-    )
+    return model
 
 
 @gin.configurable(module=__name__)
-def train_sac(
+def configure_sac(
         env_fn,
         seed,
         hidden_dimensions=gin.REQUIRED,
-        num_steps_per_epoch=gin.REQUIRED,
-        num_epochs=gin.REQUIRED,
         capacity=gin.REQUIRED,
         gamma=gin.REQUIRED,
         polyak=gin.REQUIRED,
@@ -202,8 +181,7 @@ def train_sac(
         autotune_alpha=gin.REQUIRED,
         batch_size=gin.REQUIRED,
         update_after=gin.REQUIRED,
-        update_every=gin.REQUIRED,
-        num_test_episodes_per_epoch=gin.REQUIRED
+        update_every=gin.REQUIRED
 ):
     model = SAC(
         policy='MlpPolicy',
@@ -224,11 +202,57 @@ def train_sac(
         seed=seed,
         device='cpu'
     )
+    return model
+
+
+@gin.configurable(module=__name__)
+def train_configured_model(
+        env_fn,
+        model,
+        seed,
+        num_steps_per_epoch=gin.REQUIRED,
+        num_epochs=gin.REQUIRED,
+        num_test_episodes_per_epoch=gin.REQUIRED
+):
     my_eval_callback = MyEvalCallback(env_fn(),
                                       seed=seed,
                                       eval_freq=num_steps_per_epoch,
                                       n_eval_episodes=num_test_episodes_per_epoch)
     model.learn(
-        total_timesteps=num_steps_per_epoch * num_epochs,
+        total_timesteps=num_steps_per_epoch*num_epochs,
         callback=my_eval_callback
     )
+
+
+BASE_LOG_DIR = '../results_sb3'
+
+
+def make_log_dir(env_name, algo_name, seed) -> str:
+    log_dir = f'{BASE_LOG_DIR}/{env_name}/{algo_name}/{seed}'
+    return log_dir
+
+
+def test_for_one_episode(env, model) -> tuple:
+    state, done, episode_return, episode_len = env.reset(), False, 0, 0
+    while not done:
+        action = model.predict(state, deterministic=True)
+        state, reward, done, _ = env.step(action)
+        episode_return += reward
+        episode_len += 1
+    return episode_len, episode_return
+
+
+def load_and_visualize_policy(
+        env_fn,
+        model,
+        log_dir,
+        num_videos
+) -> None:
+    model.load_actor(log_dir)
+    for i in range(num_videos):
+        env = Monitor(
+            env_fn(),
+            directory=f'{log_dir}/videos/{i+1}',
+            force=True
+        )
+        test_for_one_episode(env, model)
