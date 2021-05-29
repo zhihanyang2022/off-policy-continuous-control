@@ -206,7 +206,7 @@ def configure_sac(
 
 
 @gin.configurable(module=__name__)
-def train_configured_model_then_save_to_cloud(
+def train_and_save_model(
         env_fn,
         model,
         seed,

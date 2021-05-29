@@ -6,7 +6,7 @@ import wandb
 import gym
 from domains import *
 from gym.wrappers import RescaleAction
-from basics.run_fns_sb3 import configure_ddpg, configure_td3, configure_sac, train_configured_model_then_save_to_cloud, load_and_visualize_policy, make_log_dir
+from basics.run_fns_sb3 import configure_ddpg, configure_td3, configure_sac, train_and_save_model, load_and_visualize_policy, make_log_dir
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--env', type=str, required=True)
@@ -52,4 +52,4 @@ for seed in args.seed:
             name=f'seed={seed}'
         )
 
-        train_configured_model_then_save_to_cloud(env_fn, model, seed)
+        train_and_save_model(env_fn, model, seed)
