@@ -10,7 +10,7 @@ from stable_baselines3 import DDPG, TD3, SAC
 from stable_baselines3.common.noise import NormalActionNoise
 from stable_baselines3.common.evaluation import evaluate_policy
 
-from basics.callbacks_sb3 import MyEvalCallback
+from basics_sb3.callbacks import MyEvalCallback
 
 # @@@@@ wrapper functions for gin to configure models from SB3 @@@@@
 
