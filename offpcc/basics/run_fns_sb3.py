@@ -206,7 +206,7 @@ def configure_sac(
 
 
 @gin.configurable(module=__name__)
-def train_configured_model(
+def train_configured_model_then_save_to_cloud(
         env_fn,
         model,
         seed,
@@ -222,6 +222,7 @@ def train_configured_model(
         total_timesteps=num_steps_per_epoch*num_epochs,
         callback=my_eval_callback
     )
+    model.save(wandb.run.dir)
 
 
 BASE_LOG_DIR = '../results_sb3'
