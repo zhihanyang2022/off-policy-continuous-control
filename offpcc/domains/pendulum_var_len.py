@@ -6,6 +6,9 @@ from os import path
 from domains.wrappers import ConcatObs, FilterObsByIndex
 
 
+LOW, HIGH = 0.5, 5
+
+
 class PendulumVarLenEnv(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
@@ -21,8 +24,8 @@ class PendulumVarLenEnv(gym.Env):
         self.l = None  # will be set in reset()
         self.viewer = None
 
-        high = np.array([1., 1., self.max_speed, 2], dtype=np.float32)
-        low = np.array([-1., -1., -self.max_speed, 0.5], dtype=np.float32)
+        high = np.array([1., 1., self.max_speed, HIGH], dtype=np.float32)
+        low = np.array([-1., -1., -self.max_speed, LOW], dtype=np.float32)
 
         self.action_space = spaces.Box(
             low=-self.max_torque,
@@ -64,7 +67,8 @@ class PendulumVarLenEnv(gym.Env):
         high = np.array([np.pi, 1])
         self.state = self.np_random.uniform(low=-high, high=high)
         self.last_u = None
-        self.l = self.np_random.uniform(low=0.5, high=2)
+        self.l = self.np_random.choice([LOW, HIGH])
+        print(f'Called reset with l={self.l}')
         return self._get_obs()
 
     def _get_obs(self):
