@@ -6,7 +6,7 @@ from os import path
 from domains.wrappers import ConcatObs, FilterObsByIndex
 
 
-LOW, HIGH = 0.05, 3
+LOW, HIGH = 0.1, 1
 
 
 class PendulumVarLenEnv(gym.Env):

@@ -47,7 +47,7 @@ for seed in args.seed:
         wandb.init(
             project=os.getenv('OFFPCC_WANDB_PROJECT'),
             entity=os.getenv('OFFPCC_WANDB_ENTITY'),
-            group=f"{args.env} {args.algo} {args.config.split('/')[-1]} ({args.baseline})",
+            group=f"{args.env} {args.algo} {args.config.split('/')[-1]} (sb3)",
             settings=wandb.Settings(_disable_stats=True),
             name=f'seed={seed}'
         )
