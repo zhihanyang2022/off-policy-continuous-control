@@ -151,6 +151,8 @@ def train_and_save_model(
     )
     model.save(os.path.join(wandb.run.dir, 'networks.zip'))
 
+# @@@@@ function for loading and visualizing trained model (plz download from wandb) @@@@@
+
 
 BASE_LOG_DIR = '../results_sb3'
 
