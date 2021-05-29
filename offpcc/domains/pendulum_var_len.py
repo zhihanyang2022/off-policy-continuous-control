@@ -69,7 +69,7 @@ class PendulumVarLenEnv(gym.Env):
 
     def _get_obs(self):
         theta, thetadot = self.state
-        return np.array([np.cos(theta), np.sin(theta), thetadot, self.l])
+        return np.array([np.cos(theta), np.sin(theta), thetadot])
 
     def render(self, mode='human'):
         if self.viewer is None:
