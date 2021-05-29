@@ -54,4 +54,4 @@ for seed in args.seed:
 
         train_and_save_model(env_fn, model, seed)
 
-        run.finish()
+        run.finish()  # if I don't include this, then the next run is tracked by the current run
