@@ -39,7 +39,6 @@ for seed in args.seed:
             env_fn=env_fn,
             model=model,
             log_dir=make_log_dir(args.env, args.algo, seed),
-            num_videos=4
         )
 
     else:

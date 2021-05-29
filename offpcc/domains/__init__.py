@@ -62,23 +62,37 @@ register(
 
 # with non-recurrent agent: baseline (lstm < this)
 register(
-    id='pendulum-var-len-v0',
-    entry_point='domains.pendulum_var_len:PendulumVarLenEnv',
+    id='pendulum-var-len-pvl-v0',
+    entry_point='domains.pendulum_var_len:pvl',
     max_episode_steps=200
 )
 
-# with non-recurrent agent: baseline (prove that our task is really harder)
+# with non-recurrent agent: baseline (ablation)
 register(
     id='pendulum-var-len-pv-v0',
     entry_point='domains.pendulum_var_len:pv',
     max_episode_steps=200
 )
 
+# with non-recurrent agent: baseline (ablation)
+register(
+    id='pendulum-var-len-pl-v0',
+    entry_point='domains.pendulum_var_len:pl',
+    max_episode_steps=200
+)
+
+# with non-recurrent agent: baseline (lstm = this)
+register(
+    id='pendulum-var-len-pa-concat10-v0',
+    entry_point='domains.pendulum_var_len:pa-concat10',
+    max_episode_steps=200
+)
+
 # with non-recurrent agent: baseline (lstm > this)
 # with recurrent agent: for lstm
 register(
-    id='pendulum-var-len-p-v0',
-    entry_point='domains.pendulum_var_len:p',
+    id='pendulum-var-len-pa-v0',
+    entry_point='domains.pendulum_var_len:pa',
     max_episode_steps=200
 )
 

@@ -6,10 +6,18 @@ from os import path
 from domains.wrappers import ConcatObs, FilterObsByIndex
 
 
-LOW, HIGH = 0.1, 1
+LOW, HIGH = 1/5, 1
 
 
-class PendulumVarLenEnv(gym.Env):
+class PendulumVarLenFullEnv(gym.Env):
+
+    """
+    Full-fledged pendulum swing-up task.
+
+    By full-fledged, I mean it tracks past action and pole length and output them through
+    observations.
+    """
+
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 30
@@ -40,6 +48,9 @@ class PendulumVarLenEnv(gym.Env):
 
         self.seed()
 
+        # added
+        self.last_u = np.zeros(self.action_space.shape)
+
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
@@ -66,14 +77,14 @@ class PendulumVarLenEnv(gym.Env):
     def reset(self):
         high = np.array([np.pi, 1])
         self.state = self.np_random.uniform(low=-high, high=high)
-        self.last_u = None
+        self.last_u = np.zeros(self.action_space.shape)  # modified; originally None
         self.l = self.np_random.choice([LOW, HIGH])
         print(f'Called reset with l={self.l}')
         return self._get_obs()
 
     def _get_obs(self):
         theta, thetadot = self.state
-        return np.array([np.cos(theta), np.sin(theta), thetadot, self.l])
+        return np.array([np.cos(theta), np.sin(theta), thetadot, self.l, self.last_u])
 
     def render(self, mode='human'):
         if self.viewer is None:
@@ -115,15 +126,31 @@ def angle_normalize(x):
 # 1: sin(theta)
 # 2: theta_dot
 # 3: pole length
+# 4: last action
+
+
+# notation
+# p: position
+# v: velocity
+# l: pole length
+# a: action
+
+
+def pvl():
+    return FilterObsByIndex(PendulumVarLenFullEnv(), indices_to_keep=[0, 1, 2, 3])
 
 
 def pv():
-    return FilterObsByIndex(PendulumVarLenEnv(), indices_to_keep=[0, 1, 2])
+    return FilterObsByIndex(PendulumVarLenFullEnv(), indices_to_keep=[0, 1, 2])
 
 
-def p():
-    return FilterObsByIndex(PendulumVarLenEnv(), indices_to_keep=[0, 1])
+def pl():
+    return FilterObsByIndex(PendulumVarLenFullEnv(), indices_to_keep=[0, 1, 3])
 
 
-def p_concat10():
-    return ConcatObs(p(), 10)
+def pa():
+    return FilterObsByIndex(PendulumVarLenFullEnv(), indices_to_keep=[0, 1, 4])
+
+
+def pa_concat10():
+    return ConcatObs(pa(), 10)

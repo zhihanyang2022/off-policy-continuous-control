@@ -5,6 +5,7 @@ from gym.wrappers import Monitor
 import warnings
 from typing import Any, Dict, Optional, Union
 import wandb
+import os
 
 from stable_baselines3 import DDPG, TD3, SAC
 from stable_baselines3.common.noise import NormalActionNoise
@@ -222,7 +223,7 @@ def train_and_save_model(
         total_timesteps=num_steps_per_epoch*num_epochs,
         callback=my_eval_callback
     )
-    model.save(wandb.run.dir)
+    model.save(os.path.join(wandb.run.dir, 'networks.zip'))
 
 
 BASE_LOG_DIR = '../results_sb3'
@@ -233,27 +234,18 @@ def make_log_dir(env_name, algo_name, seed) -> str:
     return log_dir
 
 
-def test_for_one_episode(env, model) -> tuple:
-    state, done, episode_return, episode_len = env.reset(), False, 0, 0
-    while not done:
-        action = model.predict(state, deterministic=True)
-        state, reward, done, _ = env.step(action)
-        episode_return += reward
-        episode_len += 1
-    return episode_len, episode_return
-
-
 def load_and_visualize_policy(
         env_fn,
         model,
         log_dir,
-        num_videos
 ) -> None:
-    model.load_actor(log_dir)
-    for i in range(num_videos):
-        env = Monitor(
-            env_fn(),
-            directory=f'{log_dir}/videos/{i+1}',
-            force=True
-        )
-        test_for_one_episode(env, model)
+    model = model.load(os.path.join(log_dir, 'networks.zip'))
+    episode_rewards, episode_lengths = evaluate_policy(
+        model,
+        env_fn(),
+        n_eval_episodes=5,
+        render=True,
+        deterministic=True,
+        return_episode_rewards=True,
+    )
+    print(episode_rewards, episode_lengths)
