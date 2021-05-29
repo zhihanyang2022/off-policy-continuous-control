@@ -88,6 +88,13 @@ register(
     max_episode_steps=200
 )
 
+# with non-recurrent agent: baseline (lstm = this)
+register(
+    id='pendulum-var-len-pa-concat10-v0',
+    entry_point='domains.pendulum_var_len:pa_concat10',
+    max_episode_steps=200
+)
+
 # with non-recurrent agent: baseline (lstm > this)
 # with recurrent agent: for lstm
 register(
