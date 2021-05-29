@@ -18,7 +18,7 @@ class PendulumVarLenEnv(gym.Env):
         self.dt = .05
         self.g = g
         self.m = 1.
-        self.l = np.random.uniform(0.5, 2)  # default is 1.
+        self.l = None  # will be set in reset()
         self.viewer = None
 
         high = np.array([1., 1., self.max_speed, 2], dtype=np.float32)
@@ -64,12 +64,12 @@ class PendulumVarLenEnv(gym.Env):
         high = np.array([np.pi, 1])
         self.state = self.np_random.uniform(low=-high, high=high)
         self.last_u = None
-        self.l = np.random.uniform(0.5, 2)  # default is 1.
+        self.l = self.np_random.uniform(low=0.5, high=2)
         return self._get_obs()
 
     def _get_obs(self):
         theta, thetadot = self.state
-        return np.array([np.cos(theta), np.sin(theta), thetadot])
+        return np.array([np.cos(theta), np.sin(theta), thetadot, self.l])
 
     def render(self, mode='human'):
         if self.viewer is None:
