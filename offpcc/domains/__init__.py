@@ -57,6 +57,24 @@ register(
 )
 
 # ============================================================================================
+# Pendulum Swing-up Variable Length (Type 1 Task)
+# ============================================================================================
+
+# with non-recurrent agent: baseline (lstm < this)
+register(
+    id='pendulum-var-len-v0',
+    entry_point='domains.pendulum_var_len:PendulumVarLenEnv',
+    max_episode_steps=200
+)
+
+# with non-recurrent agent: baseline (prove that our task is really harder)
+register(
+    id='pendulum-var-len-pv-v0',
+    entry_point='domains.pendulum_var_len:pv',
+    max_episode_steps=200
+)
+
+# ============================================================================================
 # CartPole Variable Action Multiplier (Type 1 Task)
 # I'm using 350 timesteps because
 # 1) it is used in RDPG paper
