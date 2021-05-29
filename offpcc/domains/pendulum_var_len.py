@@ -89,7 +89,8 @@ class PendulumVarLenFullEnv(gym.Env):
         return np.array([np.cos(theta), np.sin(theta), thetadot, self.l, float(self.last_u)])
 
     def render(self, mode='human'):
-        if self.viewer is None or self.should_update_viewer:
+
+        if self.viewer is None:
             from gym.envs.classic_control import rendering
             self.viewer = rendering.Viewer(500, 500)
             self.viewer.set_bounds(-2.2, 2.2, -2.2, 2.2)
@@ -106,6 +107,13 @@ class PendulumVarLenFullEnv(gym.Env):
             self.imgtrans = rendering.Transform()
             self.img.add_attr(self.imgtrans)
             self.should_update_viewer = False
+
+        if self.should_update_viewer:
+            rod = rendering.make_capsule(self.l, .2)
+            rod.set_color(.8, .3, .3)
+            self.pole_transform = rendering.Transform()
+            rod.add_attr(self.pole_transform)
+            self.viwer.geoms[0] = rod
 
         self.viewer.add_onetime(self.img)
         self.pole_transform.set_rotation(self.state[0] + np.pi / 2)
