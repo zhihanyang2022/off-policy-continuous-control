@@ -43,12 +43,15 @@ for seed in args.seed:
 
     else:
 
-        wandb.init(
+        run = wandb.init(
             project=os.getenv('OFFPCC_WANDB_PROJECT'),
             entity=os.getenv('OFFPCC_WANDB_ENTITY'),
             group=f"{args.env} {args.algo} {args.config.split('/')[-1]} (sb3)",
             settings=wandb.Settings(_disable_stats=True),
-            name=f'seed={seed}'
+            name=f'seed={seed}',
+            reinit=True  # allows to re-init multiple runs
         )
 
         train_and_save_model(env_fn, model, seed)
+
+        run.finish()
