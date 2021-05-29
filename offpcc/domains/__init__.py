@@ -74,6 +74,14 @@ register(
     max_episode_steps=200
 )
 
+# with non-recurrent agent: baseline (lstm > this)
+# with recurrent agent: for lstm
+register(
+    id='pendulum-var-len-p-v0',
+    entry_point='domains.pendulum_var_len:p',
+    max_episode_steps=200
+)
+
 # ============================================================================================
 # CartPole Variable Action Multiplier (Type 1 Task)
 # I'm using 350 timesteps because
