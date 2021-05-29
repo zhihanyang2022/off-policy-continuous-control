@@ -6,6 +6,7 @@ import gin
 import wandb
 
 import gym
+from domains import *
 from gym.wrappers import RescaleAction
 from basics_sb3.run_fns import configure_ddpg, configure_td3, configure_sac, train_and_save_model, \
     load_and_visualize_policy, make_log_dir

@@ -109,11 +109,12 @@ class PendulumVarLenFullEnv(gym.Env):
             self.should_update_viewer = False
 
         if self.should_update_viewer:
+            from gym.envs.classic_control import rendering
             rod = rendering.make_capsule(self.l, .2)
             rod.set_color(.8, .3, .3)
             self.pole_transform = rendering.Transform()
             rod.add_attr(self.pole_transform)
-            self.viwer.geoms[0] = rod
+            self.viewer.geoms[0] = rod
 
         self.viewer.add_onetime(self.img)
         self.pole_transform.set_rotation(self.state[0] + np.pi / 2)
