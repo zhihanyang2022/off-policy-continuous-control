@@ -57,7 +57,7 @@ register(
 )
 
 # ============================================================================================
-# Pendulum Swing-up Variable Length (Type 1 Task)
+# Pendulum Swing-up Variable Length (Type 1 Task: Sensor Integration + System Identification)
 # ============================================================================================
 
 # with non-recurrent agent: baseline (lstm < this)
@@ -97,7 +97,7 @@ register(
 )
 
 # ============================================================================================
-# CartPole Swing-up Variable Length (Type 1 Task)
+# CartPole Swing-up Variable Length (Type 1 Task: Sensor Integration + System Identification)
 # I'm using 350 timesteps because
 # 1) it is used in RDPG paper
 # 2) it is harder than 200 timesteps (in gym) but easier than 1000 timesteps (in VRM)
