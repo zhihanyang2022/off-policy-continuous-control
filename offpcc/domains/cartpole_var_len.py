@@ -38,7 +38,7 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env, ABC):
         self.total_m = (self.m_p + self.m_c)
 
         self.l = None  # will be set in reset(); originally 0.6
-        # self.m_p_l = (self.m_p * self.l)  will be set in rest()
+        self.m_p_l = None  # will be set in rest(); originally self.m_p_l = (self.m_p * self.l)
 
         self.force_mag = 10.0
         self.dt = 0.01  # seconds between state updates
@@ -80,8 +80,8 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env, ABC):
         self.state = None
 
         # added
-        self.should_update_viewer = False
-        self.last_action = np.zeros(self.action_space.shape)
+        self.should_update_viewer = None  # will be set in reset
+        self.last_action = None  # will be set in reset
 
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -128,7 +128,7 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env, ABC):
 
         reward = reward_theta * reward_x
 
-        obs = np.array([x, x_dot, np.cos(theta), np.sin(theta), theta_dot, self.l, *self.last_action])
+        obs = np.array([x, x_dot, np.cos(theta), np.sin(theta), theta_dot, self.l, float(self.last_action)])
 
         return obs, reward, done, {}
 
@@ -145,7 +145,7 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env, ABC):
         self.should_update_viewer = True
         self.last_action = np.zeros(self.action_space.shape)
 
-        obs = np.array([x, x_dot, np.cos(theta), np.sin(theta), theta_dot, self.l, *self.last_action])
+        obs = np.array([x, x_dot, np.cos(theta), np.sin(theta), theta_dot, self.l, float(self.last_action)])
         return obs
 
     def _render(self, mode='human', close=False):
