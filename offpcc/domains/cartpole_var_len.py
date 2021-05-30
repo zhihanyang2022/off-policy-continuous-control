@@ -127,7 +127,8 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
 
         # problem: reward is too "soft", i.e., rewards a wide range of behavior;
         # therefore imprecise policies also get rewarded a lot, making it hard
-        # to differentate a precise and an imprecise policy
+        # to differentate a precise and an imprecise policy; try plotting reward_theta
+        # and reward_x in a standard grapher and you will understand why
 
         # reward_theta = (np.cos(theta) + 1.0) / 2.0
         # reward_x = np.cos((x / self.x_threshold) * (np.pi / 2.0))
