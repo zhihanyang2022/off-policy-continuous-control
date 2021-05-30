@@ -132,13 +132,12 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
 
         # @@@@@ my code @@@@@
 
-        # (cos(theta) + 1.0) / 2.0 = 0.96
-        # cos(theta) = 0.97 * 2 - 1
-        # theta = acos(0.97 * 2 - 1)
-        #       = 0.3482  (approx; in rad)
-        #       = 19.95   (approx; in deg)
+        # (cos(theta) + 1.0) / 2.0 = 0.999
+        # cos(theta) = 0.999 * 2 - 1
+        # theta = acos(0.999 * 2 - 1)
+        #       = 3.624   (approx; in deg)
 
-        reward_theta = 1.0 if (np.cos(theta) + 1.0) / 2.0 >= 0.97 else 0.0
+        reward_theta = 1.0 if (np.cos(theta) + 1.0) / 2.0 >= 0.999 else 0.0
         reward_x = 0  # why punish? if out of bound then the agent can't collect reward_theta -> enough for it to learn
         reward = reward_theta + reward_x
 
