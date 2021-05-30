@@ -172,7 +172,7 @@ def load_and_visualize_policy(
     episode_rewards, episode_lengths = evaluate_policy(
         model,
         env_fn(),
-        n_eval_episodes=5,
+        n_eval_episodes=10,
         render=True,
         deterministic=True,
         return_episode_rewards=True,

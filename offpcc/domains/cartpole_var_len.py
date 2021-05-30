@@ -123,10 +123,24 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
         if self.t >= self.t_limit:
             done = True
 
-        reward_theta = (np.cos(theta) + 1.0) / 2.0
-        reward_x = np.cos((x / self.x_threshold) * (np.pi / 2.0))
+        # @@@@@ previous code @@@@@
 
-        reward = reward_theta * reward_x
+        # reward_theta = (np.cos(theta) + 1.0) / 2.0
+        # reward_x = np.cos((x / self.x_threshold) * (np.pi / 2.0))
+        #
+        # reward = reward_theta * reward_x
+
+        # @@@@@ my code @@@@@
+
+        # (cos(theta) + 1.0) / 2.0 = 0.96
+        # cos(theta) = 0.97 * 2 - 1
+        # theta = acos(0.97 * 2 - 1)
+        #       = 0.3482  (approx; in rad)
+        #       = 19.95   (approx; in deg)
+
+        reward_theta = 1.0 if (np.cos(theta) + 1.0) / 2.0 >= 0.97 else 0.0
+        reward_x = 0  # why punish? if out of bound then the agent can't collect reward_theta -> enough for it to learn
+        reward = reward_theta + reward_x
 
         obs = np.array([x, x_dot, np.cos(theta), np.sin(theta), theta_dot, self.l, float(self.last_action)])
 
