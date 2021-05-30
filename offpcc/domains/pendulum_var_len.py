@@ -166,7 +166,3 @@ def pa():
 
 def pa_concat5():
     return ConcatObs(pa(), 5)
-
-
-def pa_concat10():
-    return ConcatObs(pa(), 10)
