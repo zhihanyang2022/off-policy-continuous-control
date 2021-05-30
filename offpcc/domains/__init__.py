@@ -131,3 +131,9 @@ register(
     entry_point='domains.cartpole_continuous_variable_action_multiplier:p',
     max_episode_steps=350
 )
+
+register(
+    id='water-maze-v0',
+    entry_point='domains.water_maze:WaterMazeEnv',
+    max_episode_steps=200,
+)
