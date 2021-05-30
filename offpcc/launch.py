@@ -56,12 +56,13 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
 
     else:
 
-        wandb.init(
+        run = wandb.init(
             project=os.getenv('OFFPCC_WANDB_PROJECT'),
             entity=os.getenv('OFFPCC_WANDB_ENTITY'),
-            group=f"{args.env} {args.algo} {args.config.split('configs/')[-1]}",
+            group=f"{args.env} {args.algo} {args.config.split('configs/')[-1]} (ours)",
             settings=wandb.Settings(_disable_stats=True),
-            name=f'run_id={run_id}'
+            name=f'run_id={run_id}',
+            reinit=True
         )
 
         # creating buffer based on the need of the algorithm
@@ -80,3 +81,5 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
             algorithm=algorithm,
             buffer=buffer
         )
+
+        run.finish()
