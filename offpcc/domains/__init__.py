@@ -98,9 +98,7 @@ register(
 
 # ============================================================================================
 # CartPole Swing-up Variable Length (Type 1 Task: Sensor Integration + System Identification)
-# I'm using 350 timesteps because
-# 1) it is used in RDPG paper
-# 2) it is harder than 200 timesteps (in gym) but easier than 1000 timesteps (in VRM)
+# I'm using 350 timesteps because it is used in RDPG paper.
 # ============================================================================================
 
 # with non-recurrent agent: baseline (lstm <= this)
@@ -132,5 +130,38 @@ register(
     max_episode_steps=350
 )
 
+# ============================================================================================
+# CartPole Swing-up Flip Action (Type 1 Task: Sensor Integration + System Identification)
+# I'm using 350 timesteps because it is used in RDPG paper.
+# ============================================================================================
+
+# with non-recurrent agent: baseline (lstm <= this)
+register(
+    id='cartpole-flip-action-pvf-v0',
+    entry_point='domains.cartpole_flip_action:pvf',
+    max_episode_steps=350
+)
+
+# with non-recurrent agent: baseline (ablation)
+register(
+    id='cartpole-flip-action-pv-v0',
+    entry_point='domains.cartpole_flip_action:pv',
+    max_episode_steps=350
+)
+
+# with non-recurrent agent: baseline (lstm = this)
+register(
+    id='cartpole-flip-action-pa-concat5-v0',
+    entry_point='domains.cartpole_flip_action:pa_concat5',
+    max_episode_steps=350
+)
+
+# with non-recurrent agent: baseline (lstm > this)
+# with recurrent agent: for lstm
+register(
+    id='cartpole-flip-action-pa-v0',
+    entry_point='domains.cartpole_flip_action:pa',
+    max_episode_steps=350
+)
 
 

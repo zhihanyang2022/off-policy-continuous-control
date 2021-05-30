@@ -21,10 +21,7 @@ from domains.wrappers import ConcatObs, FilterObsByIndex
 logger = logging.getLogger(__name__)
 
 
-MIN, MAX = 1/5, 1
-
-
-class CartPoleSwingUpVarLenFullEnv(gym.Env):
+class CartPoleSwingUpFlipActionFullEnv(gym.Env):
 
     metadata = {
         'render.modes': ['human', 'rgb_array'],
@@ -37,8 +34,8 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
         self.m_p = 0.5  # pendulum mass
         self.total_m = (self.m_p + self.m_c)
 
-        self.l = None  # will be set in reset(); originally 0.6
-        self.m_p_l = None  # will be set in rest(); originally self.m_p_l = (self.m_p * self.l)
+        self.l = 0.6
+        self.m_p_l = (self.m_p * self.l)
 
         self.force_mag = 10.0
         self.dt = 0.01  # seconds between state updates
@@ -57,8 +54,8 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
             np.finfo(np.float32).max,
             np.finfo(np.float32).max,
             np.finfo(np.float32).max,
-            MAX,
-            1.0
+            1.0,  # action flip
+            1.0   # last action
         ])
 
         # added
@@ -68,7 +65,7 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
             np.finfo(np.float32).min,
             np.finfo(np.float32).min,
             np.finfo(np.float32).min,
-            MIN,
+            -1.0,
             -1.0
         ])
 
@@ -80,8 +77,8 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
         self.state = None
 
         # added
-        self.should_update_viewer = None  # will be set in reset
-        self.last_action = None  # will be set in reset
+        self.last_action = None  # will be initialized in reset
+        self.action_flip = None  # will be set in reset
 
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -90,9 +87,10 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
     def step(self, action):
 
         # added
-        self.last_action = action
+        self.last_action = action  # keep track of original, unflipped action
 
         # Valid action
+        action = self.action_flip * action
         action = np.clip(action, -1.0, 1.0)[0]
         action *= self.force_mag
 
@@ -128,7 +126,7 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
 
         reward = reward_theta * reward_x
 
-        obs = np.array([x, x_dot, np.cos(theta), np.sin(theta), theta_dot, self.l, float(self.last_action)])
+        obs = np.array([x, x_dot, np.cos(theta), np.sin(theta), theta_dot, self.action_flip, float(self.last_action)])
 
         return obs, reward, done, {}
 
@@ -139,13 +137,12 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
         self.t = 0  # timestep
         x, x_dot, theta, theta_dot = self.state
 
-        self.l = np.random.choice([MIN, MAX])
-        self.m_p_l = (self.m_p * self.l)
-
-        self.should_update_viewer = True
+        # added
+        self.action_flip = np.random.choice([-1, 1])
+        print(f'Resetted with action_flip={self.action_flip}')
         self.last_action = np.zeros(self.action_space.shape)
 
-        obs = np.array([x, x_dot, np.cos(theta), np.sin(theta), theta_dot, self.l, float(self.last_action)])
+        obs = np.array([x, x_dot, np.cos(theta), np.sin(theta), theta_dot, self.action_flip, float(self.last_action)])
         return obs
 
     def render(self, mode='human', close=False):
@@ -166,7 +163,7 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
         cartwidth = 40.0
         cartheight = 20.0
 
-        if self.viewer is None or self.should_update_viewer:
+        if self.viewer is None:
 
             self.should_update_viewer = False
 
@@ -240,23 +237,23 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
 # 2: np.cos(theta)
 # 3: np.sin(theta)
 # 4: theta_dot
-# 5: pole length
+# 5: action flip
 # 6: last action
 
 
-def pvl():
-    """positions + velocities + pole length"""
-    return FilterObsByIndex(CartPoleSwingUpVarLenFullEnv(), indices_to_keep=[0, 1, 2, 3, 4, 5])
+def pvf():
+    """positions + velocities + action flip"""
+    return FilterObsByIndex(CartPoleSwingUpFlipActionFullEnv(), indices_to_keep=[0, 1, 2, 3, 4, 5])
 
 
 def pv():
     """positions + velocities"""
-    return FilterObsByIndex(CartPoleSwingUpVarLenFullEnv(), indices_to_keep=[0, 1, 2, 3, 4])
+    return FilterObsByIndex(CartPoleSwingUpFlipActionFullEnv(), indices_to_keep=[0, 1, 2, 3, 4])
 
 
 def pa():
     """positions + actions"""
-    return FilterObsByIndex(CartPoleSwingUpVarLenFullEnv(), indices_to_keep=[0, 2, 3, 6])
+    return FilterObsByIndex(CartPoleSwingUpFlipActionFullEnv(), indices_to_keep=[0, 2, 3, 6])
 
 
 def pa_concat5():

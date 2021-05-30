@@ -12,8 +12,6 @@ RecurrentBatch = namedtuple('RecurrentBatch', 'o a r d m')
 @gin.configurable(module=__name__)
 class RecurrentReplayBuffer:
 
-    "Always store the recurrent state, but it's the algorithm's decision to use them or not"
-
     def __init__(
         self,
         o_dim,
@@ -26,18 +24,20 @@ class RecurrentReplayBuffer:
 
         # placeholders
 
-        self.o = np.zeros((capacity, max_episode_len+1+(num_bptt-1), o_dim))
-        self.a = np.zeros((capacity, max_episode_len+(num_bptt-1), a_dim))
-        self.r = np.zeros((capacity, max_episode_len+(num_bptt-1), 1))
-        self.d = np.zeros((capacity, max_episode_len+(num_bptt-1), 1))
-        self.m = np.zeros((capacity, max_episode_len+(num_bptt-1), 1))  # mask, in case episode_len < num_bptt
-        self.ep_len = np.zeros((capacity,))
+        self.pad_len = num_bptt - 1
+
+        self.o = np.zeros((capacity, self.pad_len+max_episode_len+self.pad_len, o_dim))
+        self.a = np.zeros((capacity, self.pad_len+max_episode_len+self.pad_len, a_dim))
+        self.r = np.zeros((capacity, self.pad_len+max_episode_len+self.pad_len, 1))
+        self.d = np.zeros((capacity, self.pad_len+max_episode_len+self.pad_len, 1))
+        self.m = np.zeros((capacity, self.pad_len+max_episode_len+self.pad_len, 1))  # mask, in case episode_len < num_bptt
+        self.ep_len = np.ones((capacity,)) * self.pad_len
         self.ready_for_sampling = np.zeros((capacity,))
 
         # pointers
 
         self.episode_ptr = 0
-        self.time_ptr = 0
+        self.time_ptr = self.pad_len  # start filling at pad_len
 
         # trackers
 
@@ -62,7 +62,7 @@ class RecurrentReplayBuffer:
             self.r[self.episode_ptr] = 0
             self.d[self.episode_ptr] = 0
             self.m[self.episode_ptr] = 0
-            self.ep_len[self.episode_ptr] = 0
+            self.ep_len[self.episode_ptr] = self.pad_len
             self.ready_for_sampling[self.episode_ptr] = 0
 
             self.starting_new_episode = False
@@ -81,13 +81,13 @@ class RecurrentReplayBuffer:
             # fill placeholders
 
             self.o[self.episode_ptr, self.time_ptr+1] = no
-            self.ep_len[self.episode_ptr] += self.num_bptt - 1
+            self.ep_len[self.episode_ptr] += self.num_bptt - 1  # for RHS padding
             self.ready_for_sampling[self.episode_ptr] = 1
 
             # reset pointers
 
             self.episode_ptr = (self.episode_ptr + 1) % self.capacity
-            self.time_ptr = 0
+            self.time_ptr = self.pad_len
 
             # update trackers
 
