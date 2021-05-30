@@ -21,7 +21,7 @@ from domains.wrappers import ConcatObs, FilterObsByIndex
 logger = logging.getLogger(__name__)
 
 
-MIN, MAX = 1/5, 1
+MIN, MAX = 0.1, 0.6
 
 
 class CartPoleSwingUpVarLenFullEnv(gym.Env):

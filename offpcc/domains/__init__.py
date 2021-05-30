@@ -98,28 +98,27 @@ register(
 
 # ============================================================================================
 # CartPole Swing-up Variable Length (Type 1 Task: Sensor Integration + System Identification)
-# I'm using 350 timesteps because it is used in RDPG paper.
 # ============================================================================================
 
 # with non-recurrent agent: baseline (lstm <= this)
 register(
     id='cartpole-var-len-pvl-v0',
     entry_point='domains.cartpole_var_len:pvl',
-    max_episode_steps=350
+    max_episode_steps=500
 )
 
 # with non-recurrent agent: baseline (ablation)
 register(
     id='cartpole-var-len-pv-v0',
     entry_point='domains.cartpole_var_len:pv',
-    max_episode_steps=350
+    max_episode_steps=500
 )
 
 # with non-recurrent agent: baseline (lstm = this)
 register(
     id='cartpole-var-len-pa-concat5-v0',
     entry_point='domains.cartpole_var_len:pa_concat5',
-    max_episode_steps=350
+    max_episode_steps=500
 )
 
 # with non-recurrent agent: baseline (lstm > this)
@@ -127,7 +126,7 @@ register(
 register(
     id='cartpole-var-len-pa-v0',
     entry_point='domains.cartpole_var_len:pa',
-    max_episode_steps=350
+    max_episode_steps=500
 )
 
 # ============================================================================================
