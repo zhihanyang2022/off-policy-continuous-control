@@ -133,7 +133,7 @@ def angle_normalize(x):
     return (((x+np.pi) % (2*np.pi)) - np.pi)
 
 
-# positions and interpretations
+# indices and interpretations
 # 0: cos(theta)
 # 1: sin(theta)
 # 2: theta_dot

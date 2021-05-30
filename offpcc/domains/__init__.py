@@ -60,7 +60,7 @@ register(
 # Pendulum Swing-up Variable Length (Type 1 Task: Sensor Integration + System Identification)
 # ============================================================================================
 
-# with non-recurrent agent: baseline (lstm < this)
+# with non-recurrent agent: baseline (lstm <= this)
 register(
     id='pendulum-var-len-pvl-v0',
     entry_point='domains.pendulum_var_len:pvl',
@@ -103,4 +103,34 @@ register(
 # 2) it is harder than 200 timesteps (in gym) but easier than 1000 timesteps (in VRM)
 # ============================================================================================
 
-# TODO
+# with non-recurrent agent: baseline (lstm <= this)
+register(
+    id='cartpole-var-len-pvl-v0',
+    entry_point='domains.cartpole_var_len:pvl',
+    max_episode_steps=350
+)
+
+# with non-recurrent agent: baseline (ablation)
+register(
+    id='cartpole-var-len-pv-v0',
+    entry_point='domains.cartpole_var_len:pv',
+    max_episode_steps=350
+)
+
+# with non-recurrent agent: baseline (lstm = this)
+register(
+    id='cartpole-var-len-pa-concat5-v0',
+    entry_point='domains.cartpole_var_len:pa_concat5',
+    max_episode_steps=350
+)
+
+# with non-recurrent agent: baseline (lstm > this)
+# with recurrent agent: for lstm
+register(
+    id='cartpole-var-len-pa-v0',
+    entry_point='domains.cartpole_var_len:pa',
+    max_episode_steps=350
+)
+
+
+
