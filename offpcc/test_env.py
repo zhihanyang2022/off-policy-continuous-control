@@ -8,6 +8,7 @@ args = parser.parse_args()
 
 env = gym.make(args.env)
 print('=> Env:', env)
+print('=> Timeout:', env.spec.max_episode_steps)
 print('=> Observation space:', env.observation_space)
 print('=> Observation space low:', env.observation_space.low)
 print('=> Observation space high:', env.observation_space.high)
