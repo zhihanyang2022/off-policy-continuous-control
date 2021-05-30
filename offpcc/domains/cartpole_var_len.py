@@ -124,6 +124,9 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
             done = True
 
         # @@@@@ previous code @@@@@
+        # problem: reward is too "soft", i.e., rewards a wide range of behavior;
+        # therefore imprecise policies also get rewarded a lot, making it hard
+        # to differentate a precise and an imprecise policy
 
         # reward_theta = (np.cos(theta) + 1.0) / 2.0
         # reward_x = np.cos((x / self.x_threshold) * (np.pi / 2.0))
@@ -131,6 +134,7 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
         # reward = reward_theta * reward_x
 
         # @@@@@ my code @@@@@
+        # solution: being very harsh on the angle requirements
 
         # (cos(theta) + 1.0) / 2.0 = 0.999
         # cos(theta) = 0.999 * 2 - 1
