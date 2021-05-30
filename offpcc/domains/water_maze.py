@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
@@ -8,7 +7,6 @@ from gym import spaces
 from gym.utils import seeding
 from gym.envs.classic_control import rendering as visualize
 
-import time
 
 class WaterMazeEnv(gym.Env):
 
@@ -16,10 +14,9 @@ class WaterMazeEnv(gym.Env):
 
         self.max_action_value = max_action_value
 
-
         self.action_space = spaces.Box(low=-max_action_value,
-                                high=max_action_value,
-                                shape=(2,))
+                                       high=max_action_value,
+                                       shape=(2,))
 
         self.observation_space = spaces.Box(-1., 1., shape=(2,))
 
@@ -33,9 +30,9 @@ class WaterMazeEnv(gym.Env):
 
         self.setup_view = False
 
-        self.scale = self.screen_width/self.world_radius     
+        self.scale = self.screen_width / self.world_radius
 
-        self.step_in_platform = 0   
+        self.step_in_platform = 0
 
         self.inside_platform = 0.0
 
@@ -49,7 +46,7 @@ class WaterMazeEnv(gym.Env):
     # such that the agent is not within the platform
     def reset(self):
         self.inside_platform = 0.0
-        self.step_in_platform = 0  
+        self.step_in_platform = 0
 
         while (True):
             theta_agent = 2 * np.pi * self.np_random.rand()
@@ -58,10 +55,13 @@ class WaterMazeEnv(gym.Env):
 
             theta_platform = 2 * np.pi * self.np_random.rand()
             radius_platform = self.np_random.rand()
-            self.platform_center = np.array([radius_platform * np.cos(theta_platform), radius_platform * np.sin(theta_platform)])
+            self.platform_center = np.array(
+                [radius_platform * np.cos(theta_platform), radius_platform * np.sin(theta_platform)])
 
-            is_platform_within_world = self._is_circle_within_circle(np.array([0, 0]), self.world_radius, self.platform_center, self.platform_radius)
-            is_agent_not_in_platform = not self._is_within_circle(self.agent_pos, self.platform_center, self.platform_radius)
+            is_platform_within_world = self._is_circle_within_circle(np.array([0, 0]), self.world_radius,
+                                                                     self.platform_center, self.platform_radius)
+            is_agent_not_in_platform = not self._is_within_circle(self.agent_pos, self.platform_center,
+                                                                  self.platform_radius)
 
             if is_agent_not_in_platform and is_platform_within_world:
                 break
@@ -69,12 +69,12 @@ class WaterMazeEnv(gym.Env):
         return self._get_obs()
 
     def _randomize_agent(self):
-        while(True):
+        while (True):
             theta_agent = 2 * np.pi * self.np_random.rand()
             radius_agent = self.np_random.rand()
-            agent_pos = np.array([radius_agent * np.cos(theta_agent), radius_agent * np.sin(theta_agent)])     
+            agent_pos = np.array([radius_agent * np.cos(theta_agent), radius_agent * np.sin(theta_agent)])
 
-            is_agent_not_in_platform = not self._is_within_circle(agent_pos, self.platform_center, self.platform_radius)   
+            is_agent_not_in_platform = not self._is_within_circle(agent_pos, self.platform_center, self.platform_radius)
 
             if is_agent_not_in_platform:
                 return agent_pos
@@ -118,13 +118,13 @@ class WaterMazeEnv(gym.Env):
 
         # Update agent
         new_transform = self.agent_pos * self.scale + np.array([300, 300])
-        self.agent_transform.set_translation(new_transform[0], new_transform[1])        
+        self.agent_transform.set_translation(new_transform[0], new_transform[1])
 
         self.viewer.render(return_rgb_array=mode == 'rgb_array')
 
     def _setup_view(self):
         screen_width = 600
-        screen_height = 600        
+        screen_height = 600
         if not self.setup_view:
             self.viewer = visualize.Viewer(screen_width, screen_height)
 
@@ -134,19 +134,19 @@ class WaterMazeEnv(gym.Env):
             self.viewer.add_geom(world)
 
             # Platform
-            self.platform = visualize.make_circle(self.platform_radius*self.scale, filled=False)
+            self.platform = visualize.make_circle(self.platform_radius * self.scale, filled=False)
             self.platform_transform = visualize.Transform()
             self.platform.add_attr(self.platform_transform)
             self.platform.set_color(0.0, 1.0, .0)
-            self.viewer.add_geom(self.platform)   
-            self.setup_view = True 
-            
+            self.viewer.add_geom(self.platform)
+            self.setup_view = True
+
             # Agent
             self.agent = visualize.make_circle(10)
             self.agent_transform = visualize.Transform()
             self.agent.add_attr(self.agent_transform)
             self.agent.set_color(0.0, 0.0, 0.0)
-            self.viewer.add_geom(self.agent)          
+            self.viewer.add_geom(self.agent)
 
     def is_agent_inside_world(self):
         return self._is_within_circle(self.agent_pos, np.array([0.0, 0.0]), self.world_radius)
@@ -157,9 +157,9 @@ class WaterMazeEnv(gym.Env):
 
     def _is_circle_within_circle(self, c_big, r_big, c_small, r_small):
         d = np.linalg.norm(c_big - c_small)
-        return (r_big > d + r_small)
+        return r_big > d + r_small
 
     def close(self):
         if self.viewer:
             self.viewer.close()
-            self.viewer = None        
+            self.viewer = None
