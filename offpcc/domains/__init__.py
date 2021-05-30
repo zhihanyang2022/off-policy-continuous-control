@@ -97,43 +97,10 @@ register(
 )
 
 # ============================================================================================
-# CartPole Variable Action Multiplier (Type 1 Task)
+# CartPole Swing-up Variable Length (Type 1 Task)
 # I'm using 350 timesteps because
 # 1) it is used in RDPG paper
 # 2) it is harder than 200 timesteps (in gym) but easier than 1000 timesteps (in VRM)
 # ============================================================================================
 
-# with non-recurrent agent: baseline (lstm < this)
-register(
-    id='cartpole-vam-v0',
-    entry_point='domains.cartpole_continuous_variable_action_multiplier:ContinuousCartPoleVariableActionMultiplierEnv',
-    max_episode_steps=350
-)
-
-# with non-recurrent agent: baseline (prove that our task is really harder)
-register(
-    id='cartpole-vam-pv-v0',
-    entry_point='domains.cartpole_continuous_variable_action_multiplier:pv',
-    max_episode_steps=350
-)
-
-# with non-recurrent agent: baseline (lstm approximately = this)
-register(
-    id='cartpole-vam-p-concat10-v0',
-    entry_point='domains.cartpole_continuous_variable_action_multiplier:p_concat10',
-    max_episode_steps=350
-)
-
-# with non-recurrent agent: baseline (lstm > this)
-# with recurrent agent: for lstm
-register(
-    id='cartpole-vam-p-v0',
-    entry_point='domains.cartpole_continuous_variable_action_multiplier:p',
-    max_episode_steps=350
-)
-
-register(
-    id='water-maze-v0',
-    entry_point='domains.water_maze:WaterMazeEnv',
-    max_episode_steps=200,
-)
+# TODO
