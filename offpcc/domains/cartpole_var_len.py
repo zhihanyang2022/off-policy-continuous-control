@@ -10,7 +10,6 @@ Modified by David Ha
 
 import logging
 import math
-from abc import ABC
 
 import gym
 from gym import spaces
@@ -25,7 +24,8 @@ logger = logging.getLogger(__name__)
 MIN, MAX = 1 / 5, 1
 
 
-class CartPoleSwingUpVarLenFullEnv(gym.Env, ABC):
+class CartPoleSwingUpVarLenFullEnv(gym.Env):
+
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 50
@@ -87,7 +87,7 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env, ABC):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-    def _step(self, action):
+    def step(self, action):
 
         # added
         self.last_action = action
@@ -132,7 +132,7 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env, ABC):
 
         return obs, reward, done, {}
 
-    def _reset(self):
+    def reset(self):
 
         self.state = np.random.normal(loc=np.array([0.0, 0.0, np.pi, 0.0]), scale=np.array([0.2, 0.2, 0.2, 0.2]))
         self.steps_beyond_done = None
@@ -148,7 +148,7 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env, ABC):
         obs = np.array([x, x_dot, np.cos(theta), np.sin(theta), theta_dot, self.l, float(self.last_action)])
         return obs
 
-    def _render(self, mode='human', close=False):
+    def render(self, mode='human', close=False):
         if close:
             if self.viewer is not None:
                 self.viewer.close()
