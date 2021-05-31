@@ -1,9 +1,9 @@
 import torch.nn as nn
 import gin
 
-from spinup import ddpg_pytorch as ddpg
-from spinup import td3_pytorch as td3
-from spinup import sac_pytorch as sac
+from temp.spinup import ddpg_pytorch as ddpg
+from temp.spinup import td3_pytorch as td3
+from temp.spinup import sac_pytorch as sac
 
 
 @gin.configurable(module=__name__)

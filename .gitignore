@@ -131,4 +131,5 @@ dmypy.json
 # Custom
 .idea/
 /offpcc/wandb/
-/results/.ipynb_checkpoints
+/results/
+/results_sb3/
