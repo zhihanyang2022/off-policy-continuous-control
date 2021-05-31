@@ -190,12 +190,17 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
         cartwidth = 40.0
         cartheight = 20.0
 
-        if self.viewer is None or self.should_update_viewer:
-
-            self.should_update_viewer = False
+        if self.viewer is None:
 
             from gym.envs.classic_control import rendering
             self.viewer = rendering.Viewer(screen_width, screen_height)
+
+        if self.should_update_viewer:
+
+            self.should_update_viewer = False
+            self.viewer.geoms = []
+
+            from gym.envs.classic_control import rendering
 
             l, r, t, b = -cartwidth / 2, cartwidth / 2, cartheight / 2, -cartheight / 2
 

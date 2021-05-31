@@ -27,15 +27,19 @@ parser.add_argument('--env', type=str, required=True)
 parser.add_argument('--algo', type=str, required=True, help='Choose among ddpg, ddpg-lstm, td3, td3-lstm, sac and sac-lstm')
 parser.add_argument('--run_id', nargs='+', type=int, required=True)
 parser.add_argument('--config', type=str, required=True, help='Task-specific hyperparameters')
-parser.add_argument('--visualize', action='store_true', help='Visualize a trained policy (no training happens)')  # default is false
+parser.add_argument('--render', action='store_true', help='Visualize a trained policy (no training happens)')
+parser.add_argument('--record', action='store_true', help='Record a trained policy (no training happens)')
 
 args = parser.parse_args()
+assert not (args.render and args.record), "You should only set one of these two flags."
 
 gin.parse_config_file(args.config)
+
 
 def env_fn():
     """Any wrapper by default copies the observation and action space of its wrappee."""
     return RescaleAction(gym.make(args.env), -1, 1)
+
 
 example_env = env_fn()
 
@@ -46,13 +50,24 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
         action_dim=example_env.action_space.shape[0],
     )
 
-    if args.visualize:
+    if args.render:
 
         load_and_visualize_policy(
             env_fn=env_fn,
             algorithm=algorithm,
             log_dir=make_log_dir(args.env, args.algo, run_id),  # trained model will be loaded from here
-            num_videos=1  # number of episodes to record
+            num_videos=10,
+            save_videos=False
+        )
+
+    elif args.record:
+
+        load_and_visualize_policy(
+            env_fn=env_fn,
+            algorithm=algorithm,
+            log_dir=make_log_dir(args.env, args.algo, run_id),  # trained model will be loaded from here
+            num_videos=10,
+            save_videos=True
         )
 
     else:

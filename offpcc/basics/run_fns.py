@@ -21,13 +21,15 @@ def make_log_dir(env_name, algo_name, run_id) -> str:
     return log_dir
 
 
-def test_for_one_episode(env, algorithm) -> tuple:
+def test_for_one_episode(env, algorithm, render=False) -> tuple:
     state, done, episode_return, episode_len = env.reset(), False, 0, 0
     if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
         algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
     while not done:
         action = algorithm.act(state, deterministic=True)
         state, reward, done, _ = env.step(action)
+        if render:
+            env.render()
         episode_return += reward
         episode_len += 1
     return episode_len, episode_return
@@ -37,16 +39,21 @@ def load_and_visualize_policy(
         env_fn,
         algorithm,
         log_dir,
-        num_videos
+        num_videos,
+        save_videos
 ) -> None:
     algorithm.load_actor(log_dir)
+    env = env_fn()
     for i in range(num_videos):
-        env = Monitor(
-            env_fn(),
-            directory=f'{log_dir}/videos/{i+1}',
-            force=True
-        )
-        test_for_one_episode(env, algorithm)
+        if save_videos:
+            env = Monitor(
+                env_fn(),
+                directory=f'{log_dir}/videos/{i+1}',
+                force=True
+            )
+            test_for_one_episode(env, algorithm, render=False)
+        else:
+            test_for_one_episode(env, algorithm, render=True)
 
 
 @gin.configurable(module=__name__)
