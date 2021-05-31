@@ -109,6 +109,7 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
         theta = theta + theta_dot * self.dt
         x_dot = x_dot + xdot_update * self.dt
         theta_dot = theta_dot + thetadot_update * self.dt
+        theta_dot = np.clip(theta_dot, -8, 8)
 
         self.state = (x, x_dot, theta, theta_dot)
 
