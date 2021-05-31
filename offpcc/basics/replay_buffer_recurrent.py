@@ -18,8 +18,8 @@ class RecurrentReplayBuffer:
         self,
         o_dim,
         a_dim,
+        max_episode_len,
         capacity=gin.REQUIRED,
-        max_episode_len=gin.REQUIRED,
         num_bptt=gin.REQUIRED,
         batch_size=gin.REQUIRED
     ):
@@ -28,7 +28,7 @@ class RecurrentReplayBuffer:
 
         self.pad_len = num_bptt - 1
 
-        self.o = np.zeros((capacity, self.pad_len+max_episode_len+self.pad_len, o_dim))
+        self.o = np.zeros((capacity, self.pad_len+max_episode_len+self.pad_len+1, o_dim))
         self.a = np.zeros((capacity, self.pad_len+max_episode_len+self.pad_len, a_dim))
         self.r = np.zeros((capacity, self.pad_len+max_episode_len+self.pad_len, 1))
         self.d = np.zeros((capacity, self.pad_len+max_episode_len+self.pad_len, 1))

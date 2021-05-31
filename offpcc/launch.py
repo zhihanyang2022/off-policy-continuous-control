@@ -70,7 +70,8 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
         if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):  # TODO(future): change if new algorithms are added
             buffer = RecurrentReplayBuffer(
                 o_dim=example_env.observation_space.shape[0],
-                a_dim=example_env.action_space.shape[0]
+                a_dim=example_env.action_space.shape[0],
+                max_episode_len=example_env.spec.max_episode_steps
             )
         elif isinstance(algorithm, OffPolicyRLAlgorithm):
             buffer = ReplayBuffer()

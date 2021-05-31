@@ -6,6 +6,7 @@
 
 hidden_dimensions = (256, 256)
 
+num_bptt = 10
 hidden_size = 256
 num_lstm_layers = 2
 use_target_for_lstm = False
@@ -34,7 +35,7 @@ update_after = 999
 
 import basics.actors_and_critics
 import algorithms.ddpg_lstm
-import basics.replay_buffer
+import basics.replay_buffer_recurrent
 import basics.run_fns
 import basics_sb3.run_fns
 
@@ -53,8 +54,9 @@ algorithms.ddpg_lstm.DDPG_LSTM.polyak = %polyak
 
 ##### buffer parameters #####
 
-basics.replay_buffer.ReplayBuffer.capacity = %capacity
-basics.replay_buffer.ReplayBuffer.batch_size = %batch_size
+basics.replay_buffer_recurrent.RecurrentReplayBuffer.num_bptt = %num_bptt
+basics.replay_buffer_recurrent.RecurrentReplayBuffer.capacity = %capacity
+basics.replay_buffer_recurrent.RecurrentReplayBuffer.batch_size = %batch_size
 
 ##### training loop parameters #####
 

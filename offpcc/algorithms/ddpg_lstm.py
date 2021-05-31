@@ -71,7 +71,7 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
         self.actor_targ.load_state_dict(self.actor.state_dict())
 
         self.Q = MLPCritic(hidden_size, action_dim).to(get_device())
-        self.Q_targ = deepcopy(self.actor)
+        self.Q_targ = deepcopy(self.Q)
         set_requires_grad_flag(self.Q_targ, False)
         self.Q_targ.load_state_dict(self.Q.state_dict())
 
@@ -100,7 +100,7 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
 
     def act(self, observation: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
-            observation = torch.tensor(observation).unsqueeze(0).float().to(get_device())
+            observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
             self.actor_lstm.flatten_parameters()
             h, self.h_and_c = self.actor_lstm(observation, self.h_and_c)
             greedy_action = self.actor(h).view(-1).cpu().numpy()  # view as 1d -> to cpu -> to numpy

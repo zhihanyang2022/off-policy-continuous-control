@@ -21,10 +21,19 @@ def make_MLP(num_in, num_out, final_activation, hidden_dimensions=gin.REQUIRED):
     layers = []
     input_dimensions, output_dimensions = tensor_dimensions[:-1], tensor_dimensions[1:]
     for i, (input_dimension, output_dimension) in enumerate(zip(input_dimensions, output_dimensions)):
-        layers.extend([
-            nn.Linear(input_dimension, output_dimension),
-            final_activation if i == num_layers - 1 else nn.ReLU(),
-        ])
+        if i == num_layers - 1:
+            if final_activation is None:
+                layers.append(nn.Linear(input_dimension, output_dimension))
+            else:
+                layers.extend([
+                    nn.Linear(input_dimension, output_dimension),
+                    final_activation,
+                ])
+        else:
+            layers.extend([
+                nn.Linear(input_dimension, output_dimension),
+                nn.ReLU(),
+            ])
     net = nn.Sequential(*layers)
 
     if num_out is None:
@@ -68,7 +77,7 @@ class MLPCritic(nn.Module):
 
     def __init__(self, input_dim, action_dim):
         super().__init__()
-        self.net = make_MLP(num_in=input_dim + action_dim, num_out=1, final_activation=lambda x : x)
+        self.net = make_MLP(num_in=input_dim + action_dim, num_out=1, final_activation=None)
 
     def forward(self, states: torch.tensor, actions: torch.tensor):
         return self.net(torch.cat([states, actions], dim=-1))

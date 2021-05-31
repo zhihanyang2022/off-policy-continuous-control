@@ -23,7 +23,8 @@ def make_log_dir(env_name, algo_name, run_id) -> str:
 
 def test_for_one_episode(env, algorithm) -> tuple:
     state, done, episode_return, episode_len = env.reset(), False, 0, 0
-    algorithm.restart()  # crucial, crucial step for recurrent agents
+    if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+        algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
     while not done:
         action = algorithm.act(state, deterministic=True)
         state, reward, done, _ = env.step(action)
