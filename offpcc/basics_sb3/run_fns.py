@@ -5,6 +5,7 @@ import numpy as np
 
 import wandb
 import os
+import gym
 
 from stable_baselines3 import DDPG, TD3, SAC
 from stable_baselines3.common.noise import NormalActionNoise
@@ -169,15 +170,20 @@ def load_and_visualize_policy(
         log_dir,
 ) -> None:
     model = model.load(os.path.join(log_dir, 'networks.zip'))
-    episode_rewards, episode_lengths = evaluate_policy(
-        model,
-        env_fn(),
-        n_eval_episodes=10,
-        render=True,
-        deterministic=True,
-        return_episode_rewards=True,
-    )
-    print(
-        'Rewards:', episode_rewards,
-        'Lengths:', episode_lengths
-    )
+    for i in range(10):
+        episode_rewards, episode_lengths = evaluate_policy(
+            model,
+            env=gym.wrappers.Monitor(
+                env_fn(),
+                directory=os.path.join(log_dir, str(i+1)),
+                force=True
+            ),
+            n_eval_episodes=10,
+            render=True,
+            deterministic=True,
+            return_episode_rewards=True,
+        )
+        print(
+            'Rewards:', episode_rewards,
+            'Lengths:', episode_lengths
+        )
