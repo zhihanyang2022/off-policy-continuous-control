@@ -110,10 +110,11 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
         x_dot = x_dot + xdot_update * self.dt
         theta_dot = theta_dot + thetadot_update * self.dt
 
-        self.state = (x, x_dot, theta, theta_dot)
-
         if x < -self.x_threshold or x > self.x_threshold:
             x = last_x
+            x_dot = -x_dot  # simulate Newton's third law
+
+        self.state = (x, x_dot, theta, theta_dot)
 
         # @@@@@ previous code @@@@@
 
@@ -144,12 +145,12 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
 
         # modified from pendulum swingup
 
-        # relative magnitudes (without weighting)
+        # relative magnitudes (with weighting)
         # min of first term: 0; max of first term 10
-        # min of second term: 0; max of second term 24 ** 2 = 500+
+        # min of second term: 0; max of second term 24 ** 2 = 500+ -> * 0.01 -> 0.05
         # min of third term: 0; max of third term 2.4 ** 2 = 5.76
 
-        costs = angle_normalize(theta) ** 2 + .01 * theta_dot ** 2 + x ** 2
+        costs = 0.1 * (angle_normalize(theta) ** 2 + .01 * theta_dot ** 2 + x ** 2)
 
         obs = np.array([x, x_dot, np.cos(theta), np.sin(theta), theta_dot, self.l, float(self.last_action)])
 
