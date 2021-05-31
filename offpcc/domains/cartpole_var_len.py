@@ -44,9 +44,6 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
         self.dt = 0.01  # seconds between state updates
         self.b = 0.1  # friction coefficient
 
-        self.t = 0  # timestep
-        self.t_limit = 1000
-
         # Angle at which to fail the episode
         self.theta_threshold_radians = 12 * 2 * math.pi / 360
         self.x_threshold = 2.4
@@ -98,6 +95,7 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
 
         state = self.state
         x, x_dot, theta, theta_dot = state
+        last_x = x
 
         s = math.sin(theta)
         c = math.cos(theta)
@@ -114,14 +112,8 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
 
         self.state = (x, x_dot, theta, theta_dot)
 
-        done = False
         if x < -self.x_threshold or x > self.x_threshold:
-            done = True
-
-        self.t += 1
-
-        if self.t >= self.t_limit:
-            done = True
+            x = last_x
 
         # @@@@@ previous code @@@@@
 
@@ -161,7 +153,7 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
 
         obs = np.array([x, x_dot, np.cos(theta), np.sin(theta), theta_dot, self.l, float(self.last_action)])
 
-        return obs, -costs, done, {}
+        return obs, -costs, False, {}
 
     def reset(self):
 
