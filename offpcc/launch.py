@@ -18,6 +18,7 @@ algo_name2class = {
     'ddpg': DDPG,
     'td3': TD3,
     'sac': SAC,
+    'ddpg_lstm': DDPG_LSTM,
     'sac_lstm': SAC_LSTM
 }
 
@@ -32,13 +33,13 @@ args = parser.parse_args()
 
 gin.parse_config_file(args.config)
 
+def env_fn():
+    """Any wrapper by default copies the observation and action space of its wrappee."""
+    return RescaleAction(gym.make(args.env), -1, 1)
+
+example_env = env_fn()
+
 for run_id in args.run_id:  # args.run_id is a list of ints; could contain more than one run_ids
-
-    def env_fn():
-        """Any wrapper by default copies the observation and action space of its wrappee."""
-        return RescaleAction(gym.make(args.env), -1, 1)
-
-    example_env = env_fn()
 
     algorithm = algo_name2class[args.algo](
         input_dim=example_env.observation_space.shape[0],

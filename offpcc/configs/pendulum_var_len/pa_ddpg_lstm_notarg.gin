@@ -33,7 +33,7 @@ update_after = 999
 # ====================================================================================
 
 import basics.actors_and_critics
-import algorithms.ddpg
+import algorithms.ddpg_lstm
 import basics.replay_buffer
 import basics.run_fns
 import basics_sb3.run_fns
@@ -41,24 +41,20 @@ import basics_sb3.run_fns
 ##### algorithm parameters #####
 
 basics.actors_and_critics.make_MLP.hidden_dimensions = %hidden_dimensions
-algorithms.ddpg.DDPG.gamma = %gamma
-algorithms.ddpg.DDPG.action_noise = %action_noise
-algorithms.ddpg.DDPG.lr = %lr
-algorithms.ddpg.DDPG.polyak = %polyak
 
-basics_sb3.run_fns.configure_ddpg.hidden_dimensions = %hidden_dimensions
-basics_sb3.run_fns.configure_ddpg.gamma = %gamma
-basics_sb3.run_fns.configure_ddpg.action_noise = %action_noise
-basics_sb3.run_fns.configure_ddpg.lr = %lr
-basics_sb3.run_fns.configure_ddpg.polyak = %polyak
+algorithms.ddpg_lstm.DDPG_LSTM.hidden_size = %hidden_size
+algorithms.ddpg_lstm.DDPG_LSTM.num_lstm_layers = %num_lstm_layers
+algorithms.ddpg_lstm.DDPG_LSTM.use_target_for_lstm = %use_target_for_lstm
+
+algorithms.ddpg_lstm.DDPG_LSTM.gamma = %gamma
+algorithms.ddpg_lstm.DDPG_LSTM.action_noise = %action_noise
+algorithms.ddpg_lstm.DDPG_LSTM.lr = %lr
+algorithms.ddpg_lstm.DDPG_LSTM.polyak = %polyak
 
 ##### buffer parameters #####
 
 basics.replay_buffer.ReplayBuffer.capacity = %capacity
 basics.replay_buffer.ReplayBuffer.batch_size = %batch_size
-
-basics_sb3.run_fns.configure_ddpg.capacity = %capacity
-basics_sb3.run_fns.configure_ddpg.batch_size = %batch_size
 
 ##### training loop parameters #####
 
@@ -67,9 +63,3 @@ basics.run_fns.train.num_steps_per_epoch = %num_steps_per_epoch
 basics.run_fns.train.update_every = %update_every
 basics.run_fns.train.num_test_episodes_per_epoch = %num_test_episodes_per_epoch
 basics.run_fns.train.update_after = %update_after
-
-basics_sb3.run_fns.train_and_save_model.num_epochs = %num_epochs
-basics_sb3.run_fns.train_and_save_model.num_steps_per_epoch = %num_steps_per_epoch
-basics_sb3.run_fns.configure_ddpg.update_every = %update_every
-basics_sb3.run_fns.configure_ddpg.update_after = %update_after
-basics_sb3.run_fns.train_and_save_model.num_test_episodes_per_epoch = %num_test_episodes_per_epoch
