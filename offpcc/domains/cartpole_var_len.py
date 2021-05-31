@@ -151,9 +151,13 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
         # @@@@@ my code v2 @@@@@
 
         # modified from pendulum swingup
-        # min of first term: 0; max of first term 10
 
-        costs = angle_normalize(theta) ** 2 + .03 * theta_dot ** 2 + np.abs(x)
+        # relative magnitudes (without weighting)
+        # min of first term: 0; max of first term 10
+        # min of second term: 0; max of second term 24 ** 2 = 500+
+        # min of third term: 0; max of third term 2.4 ** 2 = 5.76
+
+        costs = angle_normalize(theta) ** 2 + .01 * theta_dot ** 2 + x ** 2
 
         obs = np.array([x, x_dot, np.cos(theta), np.sin(theta), theta_dot, self.l, float(self.last_action)])
 
