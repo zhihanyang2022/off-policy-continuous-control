@@ -17,9 +17,13 @@ print('=> Random trajectory:')
 state = env.reset()
 print(state)
 
+ret = 0
 while True:
     state, reward, done, info = env.step(env.action_space.sample())
+    ret += reward
     env.render()
     print(state)
     if done:
         break
+
+print(ret)
