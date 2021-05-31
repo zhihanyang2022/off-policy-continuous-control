@@ -145,8 +145,8 @@ class CartPoleSwingUpVarLenFullEnv(gym.Env):
         #       = 3.624   (approx; in deg)
 
         reward_theta = 1.0 if (np.cos(theta) + 1.0) / 2.0 >= 0.999 else 0.0
-        reward_x = 0  # why punish? if out of bound then the agent can't collect reward_theta -> enough for it to learn
-        reward = reward_theta + reward_x
+        reward_x = np.cos((x / self.x_threshold) * (np.pi / 2.0))
+        reward = reward_theta * reward_x
 
         obs = np.array([x, x_dot, np.cos(theta), np.sin(theta), theta_dot, self.l, float(self.last_action)])
 
