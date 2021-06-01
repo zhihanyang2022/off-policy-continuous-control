@@ -206,7 +206,7 @@ def load_and_visualize_policy(
         ep_rets, ep_lens = evaluate_policy(
             model,
             env=env,
-            n_eval_episodes=1,
+            n_eval_episodes=num_episodes,
             render=True,
             deterministic=True,
             return_episode_rewards=True,

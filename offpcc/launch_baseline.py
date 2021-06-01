@@ -18,8 +18,8 @@ parser.add_argument('--env', type=str, required=True)
 parser.add_argument('--algo', type=str, required=True, help='Choose among ddpg, td3 and sac')
 parser.add_argument('--seed', nargs='+', type=int, required=True)
 parser.add_argument('--config', type=str, required=True, help='Task-specific hyperparameters')
-parser.add_argument('--visualize', action='store_true',
-                    help='Visualize a trained policy (no training happens)')  # default is false
+parser.add_argument('--render', action='store_true', help='Visualize a trained policy (no training happens)')
+parser.add_argument('--record', action='store_true', help='Record a trained policy (no training happens)')
 
 args = parser.parse_args()
 
@@ -43,12 +43,24 @@ for seed in args.seed:
     else:
         raise NotImplementedError(f'Algorithm {args.algo} is not available from stable-baselines3.')
 
-    if args.visualize:
+    if args.render:
 
         load_and_visualize_policy(
             env_fn=env_fn,
             model=model,
             log_dir=make_log_dir(args.env, args.algo, seed),
+            num_episodes=10,
+            save_videos=False
+        )
+
+    elif args.record:
+
+        load_and_visualize_policy(
+            env_fn=env_fn,
+            model=model,
+            log_dir=make_log_dir(args.env, args.algo, seed),
+            num_episodes=10,
+            save_videos=True
         )
 
     else:
