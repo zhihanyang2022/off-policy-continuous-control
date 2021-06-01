@@ -15,6 +15,8 @@ import gym.spaces as spaces
 from gym.envs.mujoco import mujoco_env
 from copy import deepcopy
 
+from domains.wrappers import FilterObsByIndex
+
 
 class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
@@ -128,5 +130,9 @@ def mdp():
     return ReacherEnv(yopo=False)
 
 
-def pomdp():
+def pomdp_v0():
     return ReacherEnv(yopo=True)
+
+
+def pomdp_v1():
+    return FilterObsByIndex(pomdp_v0(), indices_to_keep=[0, 1, 2, 3, 4, 5, 8, 9, 10])

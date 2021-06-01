@@ -141,6 +141,12 @@ register(
 
 register(
     id='reacher-pomdp-v0',
-    entry_point='domains.reacher:pomdp',
+    entry_point='domains.reacher:pomdp_v0',
+    max_episode_steps=50
+)
+
+register(
+    id='reacher-pomdp-v1',
+    entry_point='domains.reacher:pomdp_v1',
     max_episode_steps=50
 )
