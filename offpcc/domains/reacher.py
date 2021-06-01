@@ -43,7 +43,7 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         if self.yopo:  # modification
 
             self.last_action = None  # set in reset() method
-            self.returning_first_obs = None  # set in reset() method
+            self.returning_first_obs = None  # set in reset() method; only true for the first step of each episode
 
             low = self.observation_space.low
             high = self.observation_space.high
