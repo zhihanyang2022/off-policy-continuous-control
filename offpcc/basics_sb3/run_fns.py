@@ -170,20 +170,24 @@ def load_and_visualize_policy(
         log_dir,
 ) -> None:
     model = model.load(os.path.join(log_dir, 'networks.zip'))
-    for i in range(10):
-        episode_rewards, episode_lengths = evaluate_policy(
-            model,
-            env=gym.wrappers.Monitor(
+    """
+    gym.wrappers.Monitor(
                 env_fn(),
                 directory=os.path.join(log_dir, str(i+1)),
                 force=True
-            ),
-            n_eval_episodes=10,
+            )
+    """
+    env = env_fn()
+    for i in range(10):
+        episode_rewards, episode_lengths = evaluate_policy(
+            model,
+            env=env,
+            n_eval_episodes=1,
             render=True,
             deterministic=True,
             return_episode_rewards=True,
         )
         print(
-            'Rewards:', episode_rewards,
-            'Lengths:', episode_lengths
+            'Return:', round(episode_rewards[0], 2),
+            'Length:', episode_lengths[0]
         )
