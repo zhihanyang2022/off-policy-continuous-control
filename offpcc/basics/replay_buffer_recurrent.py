@@ -1,3 +1,13 @@
+"""
+This file contains two classes for recurrent replay buffer:
+- RecurrentReplayBufferGlobal (use this when num_bptt == max_episode_len; learn "global" time dependencies)
+- RecurrentReplayBufferLocal (use this when num_bptt << max_episode_len; learn "local" time dependencies)
+
+If num_bptt < max_episode_len but num_bptt is still kind of large, please use RecurrentReplayBufferGlobal for
+better efficiency, because RecurrentReplayBufferLocal will be sampling a lot of zeros (although they are masked out
+properly). An example would be num_bptt = 20 but max_episode_len is only 30.
+"""
+
 import gin
 
 from collections import namedtuple
@@ -9,8 +19,124 @@ from basics.cuda_utils import get_device
 RecurrentBatch = namedtuple('RecurrentBatch', 'o a r d m')
 
 
+def as_probas(positive_values: np.array) -> np.array:
+    return positive_values / np.sum(positive_values)
+
+
+def as_tensor_on_device(np_array: np.array):
+    return torch.tensor(np_array).float().to(get_device())
+
+
 @gin.configurable(module=__name__)
-class RecurrentReplayBufferV2:
+class RecurrentReplayBufferGlobal:
+
+    """Use this version when num_bptt == max_episode_len"""
+
+    def __init__(
+        self,
+        o_dim,
+        a_dim,
+        max_episode_len,  # this will also serve as num_bptt
+        capacity=gin.REQUIRED,
+        batch_size=gin.REQUIRED,
+    ):
+
+        # placeholders
+
+        self.o = np.zeros((capacity, max_episode_len + 1, o_dim))
+        self.a = np.zeros((capacity, max_episode_len, a_dim))
+        self.r = np.zeros((capacity, max_episode_len, 1))
+        self.d = np.zeros((capacity, max_episode_len, 1))
+        self.m = np.zeros((capacity, max_episode_len, 1))
+        self.ep_len = np.zeros((capacity,))
+        self.ready_for_sampling = np.zeros((capacity,))
+
+        # pointers
+
+        self.episode_ptr = 0
+        self.time_ptr = 0
+
+        # trackers
+
+        self.starting_new_episode = True
+
+        # hyper-parameters
+
+        self.capacity = capacity
+        self.o_dim = o_dim
+        self.a_dim = a_dim
+        self.batch_size = batch_size
+
+        self.max_episode_len = max_episode_len
+
+    def push(self, o, a, r, no, d, cutoff):
+
+        # zero-out current slot at the beginning of an episode
+
+        if self.starting_new_episode:
+
+            self.o[self.episode_ptr] = 0
+            self.a[self.episode_ptr] = 0
+            self.r[self.episode_ptr] = 0
+            self.d[self.episode_ptr] = 0
+            self.m[self.episode_ptr] = 0
+            self.ep_len[self.episode_ptr] = 0
+            self.ready_for_sampling[self.episode_ptr] = 0
+
+            self.starting_new_episode = False
+
+        # fill placeholders
+
+        self.o[self.episode_ptr, self.time_ptr] = o
+        self.a[self.episode_ptr, self.time_ptr] = a
+        self.r[self.episode_ptr, self.time_ptr] = r
+        self.d[self.episode_ptr, self.time_ptr] = d
+        self.m[self.episode_ptr, self.time_ptr] = 1
+        self.ep_len[self.episode_ptr] += 1
+
+        if d or cutoff:
+
+            # fill placeholders
+
+            self.o[self.episode_ptr, self.time_ptr+1] = no
+            self.ready_for_sampling[self.episode_ptr] = 1
+
+            # reset pointers
+
+            self.episode_ptr = (self.episode_ptr + 1) % self.capacity
+            self.time_ptr = 0
+
+            # update trackers
+
+            self.starting_new_episode = True
+
+        else:
+
+            # update pointers
+
+            self.time_ptr += 1
+
+    def sample(self):
+
+        # sample episode indices
+
+        options = np.where(self.ready_for_sampling == 1)[0]
+        probas = as_probas(self.ep_len[options])
+        ep_idxs = np.random.choice(options, p=probas, size=self.batch_size)
+
+        # grab the corresponding episodes
+
+        o = as_tensor_on_device(self.o[ep_idxs]).view(self.batch_size, self.max_episode_len+1, self.o_dim)
+        a = as_tensor_on_device(self.a[ep_idxs]).view(self.batch_size, self.max_episode_len, self.o_dim)
+        r = as_tensor_on_device(self.r[ep_idxs]).view(self.batch_size, self.max_episode_len, self.o_dim)
+        d = as_tensor_on_device(self.d[ep_idxs]).view(self.batch_size, self.max_episode_len, self.o_dim)
+        m = as_tensor_on_device(self.m[ep_idxs]).view(self.batch_size, self.max_episode_len, self.o_dim)
+
+        return RecurrentBatch(o, a, r, d, m)
+
+
+@gin.configurable(module=__name__)
+class RecurrentReplayBufferLocal:
 
     """Use this version when num_bptt << max_episode_len"""
 
@@ -103,14 +229,6 @@ class RecurrentReplayBufferV2:
 
             self.time_ptr += 1
 
-    @staticmethod
-    def _as_probas(positive_values: np.array) -> np.array:
-        return positive_values / np.sum(positive_values)
-
-    @staticmethod
-    def _prepare(np_array: np.array):
-        return torch.tensor(np_array).float().to(get_device())
-
     def sample(self):
 
         # sample could take place in the middle of an episode
@@ -123,7 +241,7 @@ class RecurrentReplayBufferV2:
         # assign higher probability to longer episodes
 
         options = np.where(self.ready_for_sampling == 1)[0]
-        probas = self._as_probas(self.ep_len[options] - 2 * self.pad_len)
+        probas = as_probas(self.ep_len[options] - 2 * self.pad_len)
         ep_idxs = np.random.choice(options, p=probas, size=self.batch_size)
 
         # for selected episodes, get their length
@@ -168,10 +286,10 @@ class RecurrentReplayBufferV2:
 
         # numpy advanced indexing
 
-        o = self._prepare(self.o[row_idxs_for_o, col_idxs_for_o]).view(self.batch_size, self.num_bptt+1, self.o_dim)
-        a = self._prepare(self.a[row_idxs_for_others, col_idxs_for_others]).view(self.batch_size, self.num_bptt, self.a_dim)
-        r = self._prepare(self.r[row_idxs_for_others, col_idxs_for_others]).view(self.batch_size, self.num_bptt, 1)
-        d = self._prepare(self.d[row_idxs_for_others, col_idxs_for_others]).view(self.batch_size, self.num_bptt, 1)
-        m = self._prepare(self.m[row_idxs_for_others, col_idxs_for_others]).view(self.batch_size, self.num_bptt, 1)
+        o = as_tensor_on_device(self.o[row_idxs_for_o, col_idxs_for_o]).view(self.batch_size, self.num_bptt+1, self.o_dim)
+        a = as_tensor_on_device(self.a[row_idxs_for_others, col_idxs_for_others]).view(self.batch_size, self.num_bptt, self.a_dim)
+        r = as_tensor_on_device(self.r[row_idxs_for_others, col_idxs_for_others]).view(self.batch_size, self.num_bptt, 1)
+        d = as_tensor_on_device(self.d[row_idxs_for_others, col_idxs_for_others]).view(self.batch_size, self.num_bptt, 1)
+        m = as_tensor_on_device(self.m[row_idxs_for_others, col_idxs_for_others]).view(self.batch_size, self.num_bptt, 1)
 
         return RecurrentBatch(o, a, r, d, m)
