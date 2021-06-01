@@ -33,7 +33,7 @@ def instantiate_recurrent_replay_buffer(
     elif num_bptt < max_episode_len:
         return RecurrentReplayBufferLocal(o_dim, a_dim, max_episode_len, capacity, num_bptt, batch_size)
     else:
-        raise NotImplementedError("Why do you want num_bptt > max_episode_len?")
+        raise NotImplementedError(f"Why do you want num_bptt ({num_bptt}) > max_episode_len ({max_episode_len}) ?")
 
 
 RecurrentBatch = namedtuple('RecurrentBatch', 'o a r d m')
