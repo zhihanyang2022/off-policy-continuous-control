@@ -2,11 +2,9 @@
 Adapted from the original code here
 https://github.com/openai/gym/blob/master/gym/envs/mujoco/reacher.py
 
-Now the position of the goal is only shown once at the beginning of the episode (upon reset).
+If yopo=True, then the position of the goal is only shown once at the beginning of the episode (upon reset).
 
-This is why I called it the Reacher-YOPO-Env, where YOPO stands for You-Only-Peek-Once
-
-Changes has been made in method the step method only, with the help of a new method called zero_out_goal_info.
+yopo stands for You Only Peek Once.
 """
 
 import numpy as np
