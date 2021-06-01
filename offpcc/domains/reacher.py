@@ -5,6 +5,8 @@ https://github.com/openai/gym/blob/master/gym/envs/mujoco/reacher.py
 If yopo=True, then the position of the goal is only shown once at the beginning of the episode (upon reset).
 
 yopo stands for You Only Peek Once.
+
+If yopo=True, the last action is also tracked and appended to observation.
 """
 
 import numpy as np
