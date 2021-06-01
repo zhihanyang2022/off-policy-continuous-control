@@ -10,7 +10,7 @@ RecurrentBatch = namedtuple('RecurrentBatch', 'o a r d m')
 
 
 @gin.configurable(module=__name__)
-class RecurrentReplayBuffer:
+class RecurrentReplayBufferV2:
 
     """Use this version when num_bptt << max_episode_len"""
 
@@ -23,6 +23,8 @@ class RecurrentReplayBuffer:
         num_bptt=gin.REQUIRED,
         batch_size=gin.REQUIRED
     ):
+
+        assert num_bptt < max_episode_len, "If num_bptt == max_episode_len, then use RecurrentReplayBufferV1."
 
         # placeholders
 
@@ -151,10 +153,7 @@ class RecurrentReplayBuffer:
             # first +1 is to correct for over subtraction
             # second +1 is to correct for the fact that np.random.randint does not include upper bound
 
-            if ep_len > self.num_bptt:
-                start_index = np.random.randint((final_index - self.num_bptt + 1) + 1)
-            elif ep_len <= self.num_bptt:  # this is the case for which mask is actually useful
-                start_index = 0
+            start_index = np.random.randint((final_index - self.num_bptt + 1) + 1)
 
             end_index = start_index + (self.num_bptt - 1)  # correct for over addition
 
