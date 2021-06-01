@@ -1,13 +1,18 @@
 """
-This file contains two classes for recurrent replay buffer:
+(*) This file contains two classes for recurrent replay buffer:
 - RecurrentReplayBufferGlobal (use this when num_bptt == max_episode_len to learn "global" time dependencies)
 - RecurrentReplayBufferLocal (use this when num_bptt << max_episode_len to learn "local" time dependencies)
 
-If num_bptt < max_episode_len but num_bptt is still kind of large, please use RecurrentReplayBufferGlobal for
+(*) If num_bptt < max_episode_len but num_bptt is still kind of large, please use RecurrentReplayBufferGlobal for
 better efficiency, because RecurrentReplayBufferLocal will be sampling a lot of zeros (they are masked out
 properly so this is still technically correct). An example would be num_bptt = 20 but max_episode_len is only 30.
 
-Don't worry about all this, since the function instantiate_recurrent_replay_buffer takes care of this for you.
+Don't worry about above, since the function instantiate_recurrent_replay_buffer takes care of this for you.
+
+(*) If you want to use num_bptt == max_episode_len, there are two things to keep in mind:
+- If you don't use gpu, then bptt through so many timesteps is VERY VERY slow.
+- Don't set batch size to be too large (e.g., 100) (slow), but also don't set it to be too small (e.g., 5) (unstable).
+  Transitions within the same episode are highly correlated, so too few episodes MIGHT cause stability problems.
 """
 
 import gin
