@@ -49,7 +49,8 @@ def load_and_visualize_policy(
             env = Monitor(
                 env_fn(),
                 directory=f'{log_dir}/videos/{i+1}',
-                force=True
+                force=True,
+                uid='video'
             )
             test_for_one_episode(env, algorithm, render=False)
         else:
