@@ -57,7 +57,7 @@ register(
 )
 
 # ============================================================================================
-# Pendulum Swing-up Variable Length (Type 1 Task: Sensor Integration + System Identification)
+# Pendulum Swing-up Variable Length (Sensor Integration + System Identification)
 # ============================================================================================
 
 # with non-recurrent agent: baseline (lstm <= this)
@@ -97,7 +97,7 @@ register(
 )
 
 # ============================================================================================
-# CartPole Swing-up Variable Length (Type 1 Task: Sensor Integration + System Identification)
+# CartPole Swing-up Variable Length (Sensor Integration + System Identification)
 # ============================================================================================
 
 # with non-recurrent agent: baseline (lstm <= this)
@@ -127,4 +127,20 @@ register(
     id='cartpole-var-len-pa-v0',
     entry_point='domains.cartpole_var_len:pa',
     max_episode_steps=500
+)
+
+# ============================================================================================
+# Reacher (Long-term dependency)
+# ============================================================================================
+
+register(
+    id='reacher-mdp-v0',
+    entry_point='domains.reacher:mdp',
+    max_episode_steps=50
+)
+
+register(
+    id='reacher-pomdp-v0',
+    entry_point='domains.reacher:pomdp',
+    max_episode_steps=50
 )

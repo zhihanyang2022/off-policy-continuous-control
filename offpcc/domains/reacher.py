@@ -21,15 +21,29 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self, yopo):
         """Modified"""
 
+        print('called')
+
+        self.yopo = yopo  # modification
+
+        # ==============================================================================================================
+
+        # during mujoco_env.MujocoEnv.__init__, the step method will be called
+        # since I would like the original step to be called (without my modifications), I used this flag to disable
+        # all modifications inside the step method and the _get_obs method
+
+        self.mujoco_doing_init = True
+
         utils.EzPickle.__init__(self)
         mujoco_env.MujocoEnv.__init__(self, 'reacher.xml', 2)
 
-        self.yopo = yopo  # modification
-        self.returning_first_obs = None  # set in reset() method
+        self.mujoco_doing_init = False
+
+        # ==============================================================================================================
 
         if self.yopo:  # modification
 
             self.last_action = None  # set in reset() method
+            self.returning_first_obs = None  # set in reset() method
 
             low = self.observation_space.low
             high = self.observation_space.high
@@ -42,7 +56,10 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def step(self, a):
         """Modified"""
 
-        self.last_action = a  # modification
+        # modification
+        if self.mujoco_doing_init is False:
+            if self.yopo:
+                self.last_action = a
 
         vec = self.get_body_com("fingertip") - self.get_body_com("target")
         reward_dist = - np.linalg.norm(vec)
@@ -60,8 +77,9 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         """Modified"""
 
         # modification
-        self.last_action = np.zeros(self.action_space.shape)
-        self.returning_first_obs = True
+        if self.yopo:
+            self.last_action = np.zeros(self.action_space.shape)
+            self.returning_first_obs = True
 
         qpos = self.np_random.uniform(low=-0.1, high=0.1, size=self.model.nq) + self.init_qpos
         while True:
@@ -83,7 +101,7 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         ref: https://github.com/openai/gym/wiki/Reacher-v2
         """
         obs = deepcopy(obs)  # prevent overriding the input for sanity
-        obs[4, 5, 8, 9, 10] = 0
+        obs[[4, 5, 8, 9, 10]] = 0
         return obs
 
     def _get_obs(self):
@@ -96,10 +114,19 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             self.sim.data.qvel.flat[:2],
             self.get_body_com("fingertip") - self.get_body_com("target")
         ])
-        if self.yopo:
-            if self.returning_first_obs:
-                self.returning_first_obs = False  # only show the goal info if returning the first obs
-            else:
-                ob = self.zero_out_goal_info(ob)
-            ob = np.concatenate([ob, self.last_action])  # a is the last action
+        if self.mujoco_doing_init is False:
+            if self.yopo:
+                if self.returning_first_obs:
+                    self.returning_first_obs = False  # only show the goal info if returning the first obs
+                else:
+                    ob = self.zero_out_goal_info(ob)
+                ob = np.concatenate([ob, self.last_action])  # a is the last action
         return ob
+
+
+def mdp():
+    return ReacherEnv(yopo=False)
+
+
+def pomdp():
+    return ReacherEnv(yopo=True)
