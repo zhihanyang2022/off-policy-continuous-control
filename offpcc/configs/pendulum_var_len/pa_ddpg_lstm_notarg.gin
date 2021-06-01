@@ -54,9 +54,9 @@ algorithms.ddpg_lstm.DDPG_LSTM.polyak = %polyak
 
 ##### buffer parameters #####
 
-basics.replay_buffer_recurrent.RecurrentReplayBuffer.num_bptt = %num_bptt
-basics.replay_buffer_recurrent.RecurrentReplayBuffer.capacity = %capacity
-basics.replay_buffer_recurrent.RecurrentReplayBuffer.batch_size = %batch_size
+basics.replay_buffer_recurrent.instantiate_recurrent_replay_buffer.num_bptt = %num_bptt
+basics.replay_buffer_recurrent.instantiate_recurrent_replay_buffer.capacity = %capacity
+basics.replay_buffer_recurrent.instantiate_recurrent_replay_buffer.batch_size = %batch_size
 
 ##### training loop parameters #####
 
