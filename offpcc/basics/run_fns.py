@@ -32,8 +32,6 @@ def test_for_one_episode(env, algorithm, render=False) -> tuple:
             env.render()
         episode_return += reward
         episode_len += 1
-    print(episode_return)
-    print(state)
     return episode_len, episode_return
 
 

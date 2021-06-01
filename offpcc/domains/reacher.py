@@ -23,8 +23,6 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self, yopo):
         """Modified"""
 
-        print('called')
-
         self.yopo = yopo  # modification
 
         # ==============================================================================================================
