@@ -148,10 +148,10 @@ class RecurrentReplayBufferGlobal:
         # grab the corresponding episodes
 
         o = as_tensor_on_device(self.o[ep_idxs]).view(self.batch_size, self.max_episode_len+1, self.o_dim)
-        a = as_tensor_on_device(self.a[ep_idxs]).view(self.batch_size, self.max_episode_len, self.o_dim)
-        r = as_tensor_on_device(self.r[ep_idxs]).view(self.batch_size, self.max_episode_len, self.o_dim)
-        d = as_tensor_on_device(self.d[ep_idxs]).view(self.batch_size, self.max_episode_len, self.o_dim)
-        m = as_tensor_on_device(self.m[ep_idxs]).view(self.batch_size, self.max_episode_len, self.o_dim)
+        a = as_tensor_on_device(self.a[ep_idxs]).view(self.batch_size, self.max_episode_len, self.a_dim)
+        r = as_tensor_on_device(self.r[ep_idxs]).view(self.batch_size, self.max_episode_len, 1)
+        d = as_tensor_on_device(self.d[ep_idxs]).view(self.batch_size, self.max_episode_len, 1)
+        m = as_tensor_on_device(self.m[ep_idxs]).view(self.batch_size, self.max_episode_len, 1)
 
         return RecurrentBatch(o, a, r, d, m)
 
