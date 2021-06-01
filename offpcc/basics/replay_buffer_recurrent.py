@@ -29,8 +29,10 @@ def instantiate_recurrent_replay_buffer(
     batch_size=gin.REQUIRED
 ):
     if num_bptt == max_episode_len:
+        print('Using recurrent replay buffer (global) ...')
         return RecurrentReplayBufferGlobal(o_dim, a_dim, max_episode_len, capacity, batch_size)
     elif num_bptt < max_episode_len:
+        print('Using recurrent replay buffer (local) ...')
         return RecurrentReplayBufferLocal(o_dim, a_dim, max_episode_len, capacity, num_bptt, batch_size)
     else:
         raise NotImplementedError(f"Why do you want num_bptt ({num_bptt}) > max_episode_len ({max_episode_len}) ?")
