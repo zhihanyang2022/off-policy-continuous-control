@@ -222,15 +222,29 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
         }
 
     def save_networks(self, save_dir: str) -> None:
+
+        torch.save(self.actor_lstm.state_dict(), os.path.join(save_dir, 'actor_lstm.pth'))
+        torch.save(self.critic_lstm.state_dict(), os.path.join(save_dir, 'critic_lstm.pth'))
+
         torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))
         torch.save(self.Q.state_dict(), os.path.join(save_dir, 'Q.pth'))
         torch.save(self.Q_targ.state_dict(), os.path.join(save_dir, 'Q_targ.pth'))
 
     def load_actor(self, save_dir: str) -> None:
+
+        self.actor_lstm.load_state_dict(
+            torch.load(os.path.join(save_dir, 'actor_lstm.pth'), map_location=torch.device(get_device())))
+
         self.actor.load_state_dict(
             torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
 
     def load_networks(self, save_dir: str) -> None:
+
+        self.actor_lstm.load_state_dict(
+            torch.load(os.path.join(save_dir, 'actor_lstm.pth'), map_location=torch.device(get_device())))
+        self.critic_lstm.load_state_dict(
+            torch.load(os.path.join(save_dir, 'critic_lstm.pth'), map_location=torch.device(get_device())))
+
         self.actor.load_state_dict(
             torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
         self.Q1.load_state_dict(

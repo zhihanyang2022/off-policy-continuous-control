@@ -41,7 +41,7 @@ for seed in args.seed:
     elif args.algo == 'sac':
         model = configure_sac(env_fn=env_fn, seed=seed)
     else:
-        raise NotImplementedError(f'Algorithm {args.algo} is not available.')
+        raise NotImplementedError(f'Algorithm {args.algo} is not available from stable-baselines3.')
 
     if args.visualize:
 
