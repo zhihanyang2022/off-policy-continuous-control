@@ -6,6 +6,8 @@ This file contains two classes for recurrent replay buffer:
 If num_bptt < max_episode_len but num_bptt is still kind of large, please use RecurrentReplayBufferGlobal for
 better efficiency, because RecurrentReplayBufferLocal will be sampling a lot of zeros (although they are masked out
 properly). An example would be num_bptt = 20 but max_episode_len is only 30.
+
+Don't worry about all this, since the function instantiate_recurrent_replay_buffer takes care of this for you.
 """
 
 import gin
@@ -15,6 +17,24 @@ import numpy as np
 import torch
 
 from basics.cuda_utils import get_device
+
+
+@gin.configurable(module=__name__)
+def instantiate_recurrent_replay_buffer(
+    o_dim,
+    a_dim,
+    max_episode_len,
+    capacity=gin.REQUIRED,
+    num_bptt=gin.REQUIRED,
+    batch_size=gin.REQUIRED
+):
+    if num_bptt == max_episode_len:
+        return RecurrentReplayBufferGlobal(o_dim, a_dim, max_episode_len, capacity, batch_size)
+    elif num_bptt < max_episode_len:
+        return RecurrentReplayBufferLocal
+    else:
+        raise NotImplementedError("Why do you want num_bptt > max_episode_len?")
+
 
 RecurrentBatch = namedtuple('RecurrentBatch', 'o a r d m')
 
@@ -27,7 +47,6 @@ def as_tensor_on_device(np_array: np.array):
     return torch.tensor(np_array).float().to(get_device())
 
 
-@gin.configurable(module=__name__)
 class RecurrentReplayBufferGlobal:
 
     """Use this version when num_bptt == max_episode_len"""
@@ -37,8 +56,8 @@ class RecurrentReplayBufferGlobal:
         o_dim,
         a_dim,
         max_episode_len,  # this will also serve as num_bptt
-        capacity=gin.REQUIRED,
-        batch_size=gin.REQUIRED,
+        capacity,
+        batch_size,
     ):
 
         # placeholders
@@ -135,7 +154,6 @@ class RecurrentReplayBufferGlobal:
         return RecurrentBatch(o, a, r, d, m)
 
 
-@gin.configurable(module=__name__)
 class RecurrentReplayBufferLocal:
 
     """Use this version when num_bptt << max_episode_len"""
@@ -145,9 +163,9 @@ class RecurrentReplayBufferLocal:
         o_dim,
         a_dim,
         max_episode_len,
-        capacity=gin.REQUIRED,
-        num_bptt=gin.REQUIRED,
-        batch_size=gin.REQUIRED
+        capacity,
+        num_bptt,
+        batch_size
     ):
 
         assert num_bptt < max_episode_len, "If num_bptt == max_episode_len, then use RecurrentReplayBufferV1."
