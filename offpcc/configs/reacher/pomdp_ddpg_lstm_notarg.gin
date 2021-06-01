@@ -27,7 +27,7 @@ num_epochs = 100
 num_steps_per_epoch = 1000
 update_every = 1
 num_test_episodes_per_epoch = 3
-update_after = 999
+update_after = 1000
 
 # ====================================================================================
 # applying the parameters above to two codebases (sb3 and ours)
