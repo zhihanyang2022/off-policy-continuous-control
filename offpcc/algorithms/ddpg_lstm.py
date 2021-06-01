@@ -232,8 +232,8 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
 
     def load_actor(self, save_dir: str) -> None:
 
-        # self.actor_lstm.load_state_dict(
-        #     torch.load(os.path.join(save_dir, 'actor_lstm.pth'), map_location=torch.device(get_device())))
+        self.actor_lstm.load_state_dict(
+            torch.load(os.path.join(save_dir, 'actor_lstm.pth'), map_location=torch.device(get_device())))
 
         self.actor.load_state_dict(
             torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
