@@ -19,7 +19,7 @@ polyak = 0.995
 ##### buffer parameters #####
 
 capacity = 1_000_000
-batch_size = 100
+batch_size = 20
 
 ##### training loop parameters #####
 
