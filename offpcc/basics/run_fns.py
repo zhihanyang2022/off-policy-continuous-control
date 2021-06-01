@@ -11,7 +11,7 @@ from gym.wrappers import Monitor
 
 from basics.abstract_algorithm import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from basics.replay_buffer import ReplayBuffer
-from basics.replay_buffer_recurrent import RecurrentReplayBuffer
+from basics.replay_buffer_recurrent import instantiate_recurrent_replay_buffer
 
 BASE_LOG_DIR = '../results'
 
