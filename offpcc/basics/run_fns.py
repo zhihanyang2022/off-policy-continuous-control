@@ -3,6 +3,8 @@ import time
 import datetime
 import wandb
 import csv
+import os
+import time
 
 from typing import Union
 from copy import deepcopy
@@ -35,6 +37,12 @@ def test_for_one_episode(env, algorithm, render=False) -> tuple:
     return episode_len, episode_return
 
 
+def remove_jsons_from_dir(dir):
+    for fname in os.listdir(dir):
+        if fname.endswith('.json'):
+            os.remove(os.path.join(dir, fname))
+
+
 def load_and_visualize_policy(
         env_fn,
         algorithm,
@@ -42,18 +50,28 @@ def load_and_visualize_policy(
         num_videos,
         save_videos
 ) -> None:
+
     algorithm.load_actor(log_dir)
-    env = env_fn()
-    for i in range(num_videos):
-        if save_videos:
-            env = Monitor(
-                env_fn(),
-                directory=f'{log_dir}/videos/{i+1}',
-                force=True,
-                uid='video'
-            )
+
+    if save_videos:  # no rendering in this case for speed
+
+        env = Monitor(
+            env_fn(),
+            directory=f'{log_dir}/videos/',
+            video_callable=lambda episode_id: True,  # record every single episode
+            force=True
+        )
+
+        for i in range(num_videos):
             test_for_one_episode(env, algorithm, render=False)
-        else:
+
+        remove_jsons_from_dir(f'{log_dir}/videos/')
+
+    else:
+
+        env = env_fn()
+
+        for i in range(num_videos):
             test_for_one_episode(env, algorithm, render=True)
 
 
