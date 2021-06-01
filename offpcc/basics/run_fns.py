@@ -37,17 +37,17 @@ def test_for_one_episode(env, algorithm, render=False) -> tuple:
     return episode_len, episode_return
 
 
-def remove_jsons_from_dir(dir):
-    for fname in os.listdir(dir):
+def remove_jsons_from_dir(directory):
+    for fname in os.listdir(directory):
         if fname.endswith('.json'):
-            os.remove(os.path.join(dir, fname))
+            os.remove(os.path.join(directory, fname))
 
 
 def load_and_visualize_policy(
         env_fn,
         algorithm,
         log_dir,
-        num_videos,
+        num_episodes,
         save_videos
 ) -> None:
 
@@ -62,7 +62,7 @@ def load_and_visualize_policy(
             force=True
         )
 
-        for i in range(num_videos):
+        for i in range(num_episodes):
             test_for_one_episode(env, algorithm, render=False)
 
         remove_jsons_from_dir(f'{log_dir}/videos/')
@@ -71,8 +71,15 @@ def load_and_visualize_policy(
 
         env = env_fn()
 
-        for i in range(num_videos):
-            test_for_one_episode(env, algorithm, render=True)
+        ep_lens, ep_rets = [], []
+        for i in range(num_episodes):
+            ep_len, ep_ret = test_for_one_episode(env, algorithm, render=True)
+            ep_lens.append(ep_len)
+            ep_rets.append(ep_ret)
+
+        print('===== Stats for sanity check =====')
+        print('Episode returns:', [round(ret, 2) for ret in ep_rets])
+        print('Episode lengths:', ep_lens)
 
 
 @gin.configurable(module=__name__)

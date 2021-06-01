@@ -5,7 +5,7 @@ import numpy as np
 
 import wandb
 import os
-import gym
+from gym.wrappers import Monitor
 
 from stable_baselines3 import DDPG, TD3, SAC
 from stable_baselines3.common.noise import NormalActionNoise
@@ -164,22 +164,46 @@ def make_log_dir(env_name, algo_name, seed) -> str:
     return log_dir
 
 
+def remove_jsons_from_dir(dir):
+    for fname in os.listdir(dir):
+        if fname.endswith('.json'):
+            os.remove(os.path.join(dir, fname))
+
+
 def load_and_visualize_policy(
         env_fn,
         model,
         log_dir,
+        num_episodes,
+        save_videos,
 ) -> None:
+
     model = model.load(os.path.join(log_dir, 'networks.zip'))
-    """
-    gym.wrappers.Monitor(
-                env_fn(),
-                directory=os.path.join(log_dir, str(i+1)),
-                force=True
-            )
-    """
-    env = env_fn()
-    for i in range(10):
-        episode_rewards, episode_lengths = evaluate_policy(
+
+    if save_videos:  # no rending in this case for speed
+
+        env = Monitor(
+            env_fn(),
+            directory=f'{log_dir}/videos/',
+            video_callable=lambda episode_id: True,  # record every single episode
+            force=True
+        )
+
+        evaluate_policy(
+            model,
+            env=env,
+            n_eval_episodes=num_episodes,
+            render=False,
+            deterministic=True
+        )
+
+        remove_jsons_from_dir(f'{log_dir}/videos/')
+
+    else:
+
+        env = env_fn()
+
+        ep_rets, ep_lens = evaluate_policy(
             model,
             env=env,
             n_eval_episodes=1,
@@ -187,7 +211,7 @@ def load_and_visualize_policy(
             deterministic=True,
             return_episode_rewards=True,
         )
-        print(
-            'Return:', round(episode_rewards[0], 2),
-            'Length:', episode_lengths[0]
-        )
+
+        print('===== Stats for sanity check =====')
+        print('Episode returns:', [round(ret, 2) for ret in ep_rets])
+        print('Episode lengths:', ep_lens)

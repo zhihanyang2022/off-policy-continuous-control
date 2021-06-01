@@ -56,7 +56,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
             env_fn=env_fn,
             algorithm=algorithm,
             log_dir=make_log_dir(args.env, args.algo, run_id),  # trained model will be loaded from here
-            num_videos=10,
+            num_episodes=10,
             save_videos=False
         )
 
@@ -66,7 +66,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
             env_fn=env_fn,
             algorithm=algorithm,
             log_dir=make_log_dir(args.env, args.algo, run_id),  # trained model will be loaded from here
-            num_videos=10,
+            num_episodes=10,
             save_videos=True
         )
 
