@@ -11,7 +11,7 @@ from gym.wrappers import Monitor
 
 from basics.abstract_algorithm import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from basics.replay_buffer import ReplayBuffer
-from basics.replay_buffer_recurrent import instantiate_recurrent_replay_buffer
+from basics.replay_buffer_recurrent import RecurrentReplayBufferGlobal, RecurrentReplayBufferLocal
 
 BASE_LOG_DIR = '../results'
 
@@ -61,7 +61,7 @@ def load_and_visualize_policy(
 def train(
         env_fn,
         algorithm: Union[OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm],
-        buffer: Union[ReplayBuffer, RecurrentReplayBuffer],
+        buffer: Union[ReplayBuffer, RecurrentReplayBufferGlobal, RecurrentReplayBufferLocal],
         num_epochs=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
         num_test_episodes_per_epoch=gin.REQUIRED,
