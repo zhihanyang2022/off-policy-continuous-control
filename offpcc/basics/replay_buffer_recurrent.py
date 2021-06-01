@@ -4,8 +4,8 @@ This file contains two classes for recurrent replay buffer:
 - RecurrentReplayBufferLocal (use this when num_bptt << max_episode_len to learn "local" time dependencies)
 
 If num_bptt < max_episode_len but num_bptt is still kind of large, please use RecurrentReplayBufferGlobal for
-better efficiency, because RecurrentReplayBufferLocal will be sampling a lot of zeros (although they are masked out
-properly). An example would be num_bptt = 20 but max_episode_len is only 30.
+better efficiency, because RecurrentReplayBufferLocal will be sampling a lot of zeros (they are masked out
+properly so this is still technically correct). An example would be num_bptt = 20 but max_episode_len is only 30.
 
 Don't worry about all this, since the function instantiate_recurrent_replay_buffer takes care of this for you.
 """
