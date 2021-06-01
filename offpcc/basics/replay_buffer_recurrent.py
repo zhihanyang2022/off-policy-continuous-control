@@ -1,7 +1,7 @@
 """
 This file contains two classes for recurrent replay buffer:
-- RecurrentReplayBufferGlobal (use this when num_bptt == max_episode_len; learn "global" time dependencies)
-- RecurrentReplayBufferLocal (use this when num_bptt << max_episode_len; learn "local" time dependencies)
+- RecurrentReplayBufferGlobal (use this when num_bptt == max_episode_len to learn "global" time dependencies)
+- RecurrentReplayBufferLocal (use this when num_bptt << max_episode_len to learn "local" time dependencies)
 
 If num_bptt < max_episode_len but num_bptt is still kind of large, please use RecurrentReplayBufferGlobal for
 better efficiency, because RecurrentReplayBufferLocal will be sampling a lot of zeros (although they are masked out
