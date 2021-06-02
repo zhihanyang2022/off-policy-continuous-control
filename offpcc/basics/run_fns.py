@@ -140,10 +140,12 @@ def train(
 
     for t in range(total_steps):
 
-        if t >= update_after:  # exploration is done
-            action = algorithm.act(state, deterministic=False)
-        else:
-            action = env.action_space.sample()
+        action = algorithm.act(state, deterministic=False)
+
+        # if t >= update_after:  # exploration is done
+        #     action = algorithm.act(state, deterministic=False)
+        # else:
+        #     action = env.action_space.sample()
 
         next_state, reward, done, info = env.step(action)
         episode_len += 1
