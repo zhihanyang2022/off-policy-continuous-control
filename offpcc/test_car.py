@@ -52,5 +52,8 @@ for i in tqdm(range(100)):  # 1000 trials
     num_lefts_s.append(num_lefts)
     num_right_s.append(num_rights)
 
-plt.scatter(num_lefts_s, num_right_s)
-plt.show()
+plt.scatter(num_lefts_s, num_right_s, alpha=0.1)
+plt.title('Out of 10 exploration episodes (100 trials)')
+plt.xlabel('Num of hells reached')
+plt.ylabel('Num of heavens reached')
+plt.savefig('blabla')
