@@ -59,21 +59,17 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
 
             self.actor_lstm_targ = deepcopy(self.actor_lstm)
             set_requires_grad_flag(self.actor_lstm_targ, False)
-            self.actor_lstm_targ.load_state_dict(self.actor_lstm.state_dict())
 
             self.critic_lstm_targ = deepcopy(self.critic_lstm)
             set_requires_grad_flag(self.critic_lstm_targ, False)
-            self.critic_lstm_targ.load_state_dict(self.critic_lstm.state_dict())
 
         self.actor = MLPTanhActor(hidden_size, action_dim).to(get_device())
         self.actor_targ = deepcopy(self.actor)
         set_requires_grad_flag(self.actor_targ, False)
-        self.actor_targ.load_state_dict(self.actor.state_dict())
 
         self.Q = MLPCritic(hidden_size, action_dim).to(get_device())
         self.Q_targ = deepcopy(self.Q)
         set_requires_grad_flag(self.Q_targ, False)
-        self.Q_targ.load_state_dict(self.Q.state_dict())
 
         # optimizers
 

@@ -130,6 +130,14 @@ def train(
 
     # training loop
 
+    if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+        algorithm_clone = deepcopy(algorithm)  # algorithm is for action; algorithm_clone is for updates
+
+        # Since algorithm is a recurrent policy, it (ideally) shouldn't be updated during an episode since this would
+        # affect its ability to interpret past hidden states. Therefore, during an episode, algorithm_clone is updated
+        # while algorithm is not. Once an episode has finished, we do algorithm = deepcopy(algorithm_clone) to carry
+        # over the changes.
+
     for t in range(total_steps):
 
         if t >= update_after:  # exploration is done
@@ -169,25 +177,36 @@ def train(
             buffer.push(state, action, reward, next_state, done)  # storing cutoff; only used by recurrent agent
         elif isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
             buffer.push(state, action, reward, next_state, done, cutoff)
-        else:
-            raise NotImplementedError
 
         # crucial, crucial preparation for next step
         state = next_state
 
         # end of trajectory handling
         if done or cutoff:
+
             train_episode_lens.append(episode_len)
             train_episode_rets.append(episode_ret)
             state, episode_len, episode_ret = env.reset(), 0, 0  # reset state and stats trackers
+
             if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+
+                algorithm = deepcopy(algorithm_clone)
                 algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
+
+                # reinitialize_hidden is no longer needed here because algorithm_clone's h_and_c is always None
+                # we keep it here for convenience
 
         # update handling
         if t >= update_after and (t + 1) % update_every == 0:
             for j in range(update_every):
+
                 batch = buffer.sample()
-                algo_specific_stats = algorithm.update_networks(batch)
+
+                if isinstance(algorithm, OffPolicyRLAlgorithm):
+                    algo_specific_stats = algorithm.update_networks(batch)
+                elif isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+                    algo_specific_stats = algorithm_clone.update_networks(batch)
+
                 algo_specific_stats_tracker.append(algo_specific_stats)
 
         # end of epoch handling
@@ -222,7 +241,7 @@ def train(
             test_episode_lens, test_episode_returns = [], []
 
             for j in range(num_test_episodes_per_epoch):
-                test_algorithm = deepcopy(algorithm)  # crucial, crucial step for recurrent agents
+                test_algorithm = deepcopy(algorithm_clone)  # crucial, crucial step for recurrent agents
                 test_episode_len, test_episode_return = test_for_one_episode(test_env, test_algorithm)
                 test_episode_lens.append(test_episode_len)
                 test_episode_returns.append(test_episode_return)
