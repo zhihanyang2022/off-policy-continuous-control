@@ -243,7 +243,10 @@ def train(
             test_episode_lens, test_episode_returns = [], []
 
             for j in range(num_test_episodes_per_epoch):
-                test_algorithm = deepcopy(algorithm_clone)  # crucial, crucial step for recurrent agents
+                if isinstance(algorithm, OffPolicyRLAlgorithm):
+                    test_algorithm = deepcopy(algorithm)
+                elif isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+                    test_algorithm = deepcopy(algorithm_clone)  # crucial, crucial step for recurrent agents
                 test_episode_len, test_episode_return = test_for_one_episode(test_env, test_algorithm)
                 test_episode_lens.append(test_episode_len)
                 test_episode_returns.append(test_episode_return)
