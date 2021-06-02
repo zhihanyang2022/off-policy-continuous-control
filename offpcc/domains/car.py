@@ -1,35 +1,30 @@
 # -*- coding: utf-8 -*-
 """
 @author: Olivier Sigaud
-
 A merge between two sources:
-
 * Adaptation of the MountainCar Environment from the "FAReinforcement" library
 of Jose Antonio Martin H. (version 1.0), adapted by  'Tom Schaul, tom@idsia.ch'
 and then modified by Arnaud de Broissia
-
 * the OpenAI/gym MountainCar environment
 itself from
 http://incompleteideas.net/sutton/MountainCar/MountainCar1.cp
 permalink: https://perma.cc/6Z2N-PFWC
 """
 
-import math
-
 import numpy as np
-import time
 
 import gym
 from gym import spaces
 from gym.utils import seeding
-from domains.wrappers import ConcatObs
-# import socket
-# if socket.gethostname() != 'theseus':
-#     from gym.envs.classic_control import rendering as visualize
+import socket
+if socket.gethostname() not in ['theseus', 'SXC-Wichita']:
+    from gym.envs.classic_control import rendering as visualize
 
-# from hac_pomdp.utils import check_validity
+from domains.wrappers import ConcatObs
+
 
 class CarEnv(gym.Env):
+
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 30
@@ -61,7 +56,7 @@ class CarEnv(gym.Env):
         self.end_goal_dim = len(self.goal_space_test)
         self.end_goal_thresholds = np.array([0.01])
 
-        self.subgoal_bounds = np.array([[-2.4, 2.4],[-0.07, 0.07]])
+        self.subgoal_bounds = np.array([[-2.4, 2.4], [-0.07, 0.07]])
         self.subgoal_dim = len(self.subgoal_bounds)
 
         # functions to project state to goal
@@ -71,17 +66,17 @@ class CarEnv(gym.Env):
         self.subgoal_bounds_offset = np.zeros((len(self.subgoal_bounds)))
 
         for i in range(len(self.subgoal_bounds)):
-            self.subgoal_bounds_symmetric[i] = (self.subgoal_bounds[i][1] - self.subgoal_bounds[i][0])/2
+            self.subgoal_bounds_symmetric[i] = (self.subgoal_bounds[i][1] - self.subgoal_bounds[i][0]) / 2
             self.subgoal_bounds_offset[i] = self.subgoal_bounds[i][1] - self.subgoal_bounds_symmetric[i]
 
         self.subgoal_thresholds = np.array([0.01, 0.02])
         self.endgoal_thresholds = np.array([0.01, 0.02])
 
         self.state_dim = 3
-        self.name = "Car"
+        self.name = "Car-Flag"
         self.max_actions = max_actions
 
-        self.initial_state_space = np.array([[-0.6, -0.4],[0.0, 0.0]])
+        self.initial_state_space = np.array([[-0.6, -0.4], [0.0, 0.0]])
 
         # Configs for agent
         agent_params = {}
@@ -92,7 +87,7 @@ class CarEnv(gym.Env):
 
         if args is not None:
             agent_params["subgoal_penalty"] = -args.time_scale
-        
+
         agent_params["atomic_noise"] = [0.1]
         agent_params["subgoal_noise"] = [0.02, 0.01]
 
@@ -103,10 +98,6 @@ class CarEnv(gym.Env):
         self.sim = None
         #################### END CONFIGS #######################
 
-        #check_validity(self.name + ".xml", self.goal_space_train, self.goal_space_test,
-        #self.end_goal_thresholds, self.initial_state_space,
-        #self.subgoal_bounds, self.subgoal_thresholds, max_actions, num_frames_skip)
-
         self.setup_view = False
 
         self.min_action = -1.0
@@ -114,8 +105,8 @@ class CarEnv(gym.Env):
         self.min_position = -2.4
         self.max_position = 2.4
         self.max_speed = 0.2
-        self.heaven_position = 1.0 # was 0.5 in gym, 0.45 in Arnaud de Broissia's version
-        self.hell_position = -1.0 # was 0.5 in gym, 0.45 in Arnaud de Broissia's version
+        self.heaven_position = 1.0  # was 0.5 in gym, 0.45 in Arnaud de Broissia's version
+        self.hell_position = -1.0  # was 0.5 in gym, 0.45 in Arnaud de Broissia's version
         self.priest_position = 0.5
         self.power = 0.0015
 
@@ -140,7 +131,7 @@ class CarEnv(gym.Env):
         )
 
         world_width = self.max_position - self.min_position
-        self.scale = self.screen_width/world_width
+        self.scale = self.screen_width / world_width
 
         self.action_space = spaces.Box(
             low=self.min_action,
@@ -179,7 +170,7 @@ class CarEnv(gym.Env):
         position += velocity
         if (position > self.max_position): position = self.max_position
         if (position < self.min_position): position = self.min_position
-        if (position==self.min_position and velocity<0): velocity = 0
+        if (position == self.min_position and velocity < 0): velocity = 0
 
         # Convert a possible numpy bool to a Python bool.
         max_position = max(self.heaven_position, self.hell_position)
@@ -194,7 +185,7 @@ class CarEnv(gym.Env):
         reward = 0
         if (self.heaven_position > self.hell_position):
             if (position >= self.heaven_position):
-                reward = 1
+                reward = 1.0
 
             # if (position <= self.hell_position):
             #     reward = -1.0
@@ -204,7 +195,7 @@ class CarEnv(gym.Env):
             #     reward = -1.0
 
             if (position <= self.heaven_position):
-                reward = 1
+                reward = 1.0
 
         direction = 0.0
         if position >= self.priest_position - self.priest_delta and position <= self.priest_position + self.priest_delta:
@@ -216,7 +207,7 @@ class CarEnv(gym.Env):
                 direction = -1.0
 
         self.state = np.array([position, velocity, direction])
-        self.solved = (reward > 0)
+        self.solved = (reward > 0.0)
 
         if self.show:
             self.render()
@@ -228,7 +219,7 @@ class CarEnv(gym.Env):
 
         pos = self.state[0]
         self.cartrans.set_translation(
-            (pos-self.min_position) * self.scale, self._height(pos) * self.scale
+            (pos - self.min_position) * self.scale, self._height(pos) * self.scale
         )
 
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')
@@ -257,23 +248,23 @@ class CarEnv(gym.Env):
         return .55 * np.ones_like(xs)
 
     def _draw_boundary(self):
-        flagx = (self.priest_position-self.priest_delta-self.min_position)*self.scale
-        flagy1 = self._height(self.priest_position)*self.scale
+        flagx = (self.priest_position - self.priest_delta - self.min_position) * self.scale
+        flagy1 = self._height(self.priest_position) * self.scale
         flagy2 = flagy1 + 50
         flagpole = visualize.Line((flagx, flagy1), (flagx, flagy2))
-        self.viewer.add_geom(flagpole)            
+        self.viewer.add_geom(flagpole)
 
-        flagx = (self.priest_position+self.priest_delta-self.min_position)*self.scale
-        flagy1 = self._height(self.priest_position)*self.scale
+        flagx = (self.priest_position + self.priest_delta - self.min_position) * self.scale
+        flagy1 = self._height(self.priest_position) * self.scale
         flagy2 = flagy1 + 50
         flagpole = visualize.Line((flagx, flagy1), (flagx, flagy2))
-        self.viewer.add_geom(flagpole)         
+        self.viewer.add_geom(flagpole)
 
     def _draw_flags(self):
         scale = self.scale
         # Flag Heaven
-        flagx = (abs(self.heaven_position)-self.min_position)*scale
-        flagy1 = self._height(self.heaven_position)*scale
+        flagx = (abs(self.heaven_position) - self.min_position) * scale
+        flagy1 = self._height(self.heaven_position) * scale
         flagy2 = flagy1 + 50
         flagpole = visualize.Line((flagx, flagy1), (flagx, flagy2))
         self.viewer.add_geom(flagpole)
@@ -290,8 +281,8 @@ class CarEnv(gym.Env):
         self.viewer.add_geom(flag)
 
         # Flag Hell
-        flagx = (-abs(self.heaven_position)-self.min_position)*scale
-        flagy1 = self._height(self.hell_position)*scale
+        flagx = (-abs(self.heaven_position) - self.min_position) * scale
+        flagy1 = self._height(self.hell_position) * scale
         flagy2 = flagy1 + 50
         flagpole = visualize.Line((flagx, flagy1), (flagx, flagy2))
         self.viewer.add_geom(flagpole)
@@ -308,8 +299,8 @@ class CarEnv(gym.Env):
         self.viewer.add_geom(flag)
 
         # BLUE for priest
-        flagx = (self.priest_position-self.min_position)*scale
-        flagy1 = self._height(self.priest_position)*scale
+        flagx = (self.priest_position - self.min_position) * scale
+        flagy1 = self._height(self.priest_position) * scale
         flagy2 = flagy1 + 50
         flagpole = visualize.Line((flagx, flagy1), (flagx, flagy2))
         self.viewer.add_geom(flagpole)
@@ -320,12 +311,12 @@ class CarEnv(gym.Env):
         self.viewer.add_geom(flag)
 
     def _setup_view(self):
-        if  not self.setup_view:
+        if not self.setup_view:
             self.viewer = visualize.Viewer(self.screen_width, self.screen_height)
             scale = self.scale
             xs = np.linspace(self.min_position, self.max_position, 100)
             ys = self._height(xs)
-            xys = list(zip((xs-self.min_position)*scale, ys*scale))
+            xys = list(zip((xs - self.min_position) * scale, ys * scale))
 
             self.track = visualize.make_polyline(xys)
             self.track.set_linewidth(4)
@@ -361,9 +352,8 @@ class CarEnv(gym.Env):
 
             if self.args is not None:
                 if self.n_layers in [2, 3]:
-                
                     ################ Goal ################
-                    car1 = visualize.FilledPolygon([(l,b), (l,t), (r,t), (r,b)])
+                    car1 = visualize.FilledPolygon([(l, b), (l, t), (r, t), (r, b)])
                     car1.set_color(1, 0.0, 0.0)
                     car1.add_attr(visualize.Transform(translation=(0, clearance)))
                     self.cartrans1 = visualize.Transform()
@@ -372,9 +362,8 @@ class CarEnv(gym.Env):
                     ######################################
 
                 if self.n_layers in [3]:
-
                     ############### Goal 2 ###############
-                    car2 = visualize.FilledPolygon([(l,b), (l,t), (r,t), (r,b)])
+                    car2 = visualize.FilledPolygon([(l, b), (l, t), (r, t), (r, b)])
                     car2.set_color(0.0, 1, 0.0)
                     car2.add_attr(visualize.Transform(translation=(0, clearance)))
                     self.cartrans2 = visualize.Transform()
@@ -382,14 +371,14 @@ class CarEnv(gym.Env):
                     self.viewer.add_geom(car2)
                     ######################################
 
-            self.setup_view = True        
+            self.setup_view = True
 
     def display_end_goal(self, end_goal, mode="human"):
 
         self._setup_view()
 
         if self.show:
-            return self.viewer.render(return_rgb_array = mode=='rgb_array')
+            return self.viewer.render(return_rgb_array=mode == 'rgb_array')
         else:
             return
 
@@ -399,17 +388,17 @@ class CarEnv(gym.Env):
 
         if self.show:
             pos = self.state[0]
-            self.cartrans.set_translation((pos-self.min_position)*self.scale, self._height(pos)*self.scale)
-            
+            self.cartrans.set_translation((pos - self.min_position) * self.scale, self._height(pos) * self.scale)
+
             if self.n_layers in [2, 3]:
                 pos1 = subgoals[0][0]
-                self.cartrans1.set_translation((pos1-self.min_position)*self.scale, self._height(pos1)*self.scale)
+                self.cartrans1.set_translation((pos1 - self.min_position) * self.scale, self._height(pos1) * self.scale)
 
             if self.n_layers in [3]:
                 pos2 = subgoals[1][0]
-                self.cartrans2.set_translation((pos2-self.min_position)*self.scale, self._height(pos2)*self.scale)
+                self.cartrans2.set_translation((pos2 - self.min_position) * self.scale, self._height(pos2) * self.scale)
 
-            return self.viewer.render(return_rgb_array = mode=='rgb_array')        
+            return self.viewer.render(return_rgb_array=mode == 'rgb_array')
         else:
             return
 
@@ -419,5 +408,5 @@ class CarEnv(gym.Env):
             self.viewer = None
 
 
-def car_flag_concat():
+def concat20():
     return ConcatObs(CarEnv(), 20)
