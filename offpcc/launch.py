@@ -50,14 +50,6 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
         action_dim=example_env.action_space.shape[0],
     )
 
-    import time
-    from copy import deepcopy
-    start = time.perf_counter()
-    algorithm = deepcopy(algorithm)
-    end = time.perf_counter()
-    print(end - start)
-    exit()
-
     if args.render:
 
         load_and_visualize_policy(
