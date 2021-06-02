@@ -164,10 +164,10 @@ def make_log_dir(env_name, algo_name, seed) -> str:
     return log_dir
 
 
-def remove_jsons_from_dir(dir):
-    for fname in os.listdir(dir):
+def remove_jsons_from_dir(directory):
+    for fname in os.listdir(directory):
         if fname.endswith('.json'):
-            os.remove(os.path.join(dir, fname))
+            os.remove(os.path.join(directory, fname))
 
 
 def load_and_visualize_policy(
