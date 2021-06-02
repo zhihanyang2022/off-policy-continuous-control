@@ -131,7 +131,7 @@ def train(
     # training loop
 
     if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
-        algorithm_clone = deepcopy(algorithm)  # algorithm is for action; algorithm_clone is for updates
+        algorithm_clone = deepcopy(algorithm)  # algorithm is for action; algorithm_clone is for updates and testing
 
         # Since algorithm is a recurrent policy, it (ideally) shouldn't be updated during an episode since this would
         # affect its ability to interpret past hidden states. Therefore, during an episode, algorithm_clone is updated
