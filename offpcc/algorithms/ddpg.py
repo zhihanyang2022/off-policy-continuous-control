@@ -64,8 +64,9 @@ class DDPG(OffPolicyRLAlgorithm):
                 return greedy_action
 
     def polyak_update(self, old_net, new_net) -> None:
-        for old_param, new_param in zip(old_net.parameters(), new_net.parameters()):
-            old_param.data.copy_(old_param.data * self.polyak + new_param.data * (1 - self.polyak))
+        with torch.no_grad():
+            for old_param, new_param in zip(old_net.parameters(), new_net.parameters()):
+                old_param.data.copy_(old_param.data * self.polyak + new_param.data * (1 - self.polyak))
 
     def update_networks(self, b: Batch):
 
