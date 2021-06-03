@@ -102,7 +102,7 @@ class DDPG(OffPolicyRLAlgorithm):
 
         # compute policy loss
 
-        set_requires_grad_flag(self.Q, False)
+        # set_requires_grad_flag(self.Q, False)
 
         a = self.actor(b.s)
         Q_values = self.Q(b.s, a)
@@ -117,7 +117,7 @@ class DDPG(OffPolicyRLAlgorithm):
         policy_loss.backward()
         self.actor_optimizer.step()
 
-        set_requires_grad_flag(self.Q, True)
+        # set_requires_grad_flag(self.Q, True)
 
         # update target networks
 
