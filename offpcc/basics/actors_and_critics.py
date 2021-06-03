@@ -48,6 +48,7 @@ class MLPTanhActor(nn.Module):
     def __init__(self, input_dim, action_dim):
         super().__init__()
         self.net = make_MLP(num_in=input_dim, num_out=action_dim, final_activation=nn.Tanh())
+        print(self.net)
 
     def forward(self, states: torch.tensor):
         return self.net(states)

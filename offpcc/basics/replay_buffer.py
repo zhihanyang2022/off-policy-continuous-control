@@ -22,7 +22,7 @@ class ReplayBuffer:
 
     def sample(self) -> Batch:
         assert len(self.memory) >= self.batch_size, "Please increase update_after to be >= batch_size"
-        transitions = random.sample(self.memory, self.batch_size)
+        transitions = random.choices(self.memory, k=self.batch_size)  # sampling WITH replacement
         batch_raw = Batch(*zip(*transitions))
         s = torch.tensor(batch_raw.s, dtype=torch.float).view(self.batch_size, -1)
         a = torch.tensor(batch_raw.a, dtype=torch.float).view(self.batch_size, -1)
