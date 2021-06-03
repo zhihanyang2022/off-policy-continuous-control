@@ -49,6 +49,15 @@ class ConcatObs(gym.ObservationWrapper):
         for i in range(window_size - 1):
             self.window.append(np.zeros((old_obs_space_dim, )))  # append some dummy observations first
 
+        self.window_size = window_size
+        self.old_obs_space_dim = old_obs_space_dim
+
     def observation(self, obs: np.array) -> np.array:
         self.window.append(obs)
         return np.concatenate(self.window)
+
+    def reset(self):
+        for i in range(self.window_size - 1):
+            self.window.append(np.zeros((self.old_obs_space_dim, )))  # append some dummy observations first
+        observation = self.env.reset()
+        return self.observation(observation)

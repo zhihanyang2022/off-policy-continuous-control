@@ -58,13 +58,13 @@ class DDPG(OffPolicyRLAlgorithm):
         with torch.no_grad():
             state = torch.tensor(state).unsqueeze(0).float().to(get_device())
             greedy_action = self.actor(state).view(-1).cpu().numpy()  # view as 1d -> to cpu -> to numpy
-            if not deterministic:
-                return np.clip(greedy_action + self.action_noise * np.random.randn(len(greedy_action)), -1.0, 1.0)
-            else:
+            if deterministic:
                 return greedy_action
+            else:
+                return np.clip(greedy_action + self.action_noise * np.random.randn(len(greedy_action)), -1.0, 1.0)
 
     def polyak_update(self, old_net, new_net) -> None:
-        with torch.no_grad():
+        with torch.no_grad():  # no grad is not actually required here; only for sanity check
             for old_param, new_param in zip(old_net.parameters(), new_net.parameters()):
                 old_param.data.copy_(old_param.data * self.polyak + new_param.data * (1 - self.polyak))
 
