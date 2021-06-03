@@ -176,7 +176,7 @@ def train(
 
         # store the transition
         if isinstance(algorithm, OffPolicyRLAlgorithm):
-            buffer.push(state, action, reward, next_state, done)  # storing cutoff; only used by recurrent agent
+            buffer.push(state, action, reward, next_state, done)
         elif isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
             buffer.push(state, action, reward, next_state, done, cutoff)
 
