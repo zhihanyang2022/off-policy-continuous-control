@@ -25,10 +25,14 @@ class OffPolicyRLAlgorithm(ABC):
         self.actor = None
         self.networks_to_save_dict = {}
 
+    # methods for collecting rollouts
+
     @abstractmethod
     def act(self, state: np.array, deterministic: bool) -> np.array:
         """Only called during online rollout"""
         pass
+
+    # methods for updating networks using batches
 
     def polyak_update(self, targ_net: nn.Module, pred_net: nn.Module) -> None:
         with torch.no_grad():  # no grad is not actually required here; only for sanity check
@@ -39,6 +43,8 @@ class OffPolicyRLAlgorithm(ABC):
     def update_networks(self, b: Batch) -> dict:  # return a dictonary of stats that you want to track; could be empty
         """Only called during learning"""
         pass
+
+    # methods for saving networks
 
     def save_networks(self, save_dir: str) -> None:
         """Save all the networks"""
@@ -72,9 +78,13 @@ class RecurrentOffPolicyRLAlgorithm(OffPolicyRLAlgorithm):
         self.h_and_c = None
         self.actor_lstm = None
 
+    # methods for collecting rollouts
+
     def reinitialize_hidden(self) -> None:
         """For recurrent agents only; called at the beginning of each episode to reset hidden states"""
         self.h_and_c = None
+
+    # methods for updating networks using batches
 
     @staticmethod
     def rescale_loss(loss: torch.tensor, mask: torch.tensor) -> torch.tensor:
@@ -91,6 +101,8 @@ class RecurrentOffPolicyRLAlgorithm(OffPolicyRLAlgorithm):
     def update_networks(self, b: RecurrentBatch) -> dict:
         """Only called during learning"""
         pass
+
+    # methods for saving networks
 
     def load_actor(self, save_dir: str) -> None:
         """Load the actor network only"""
