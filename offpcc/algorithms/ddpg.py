@@ -1,7 +1,8 @@
 import os
 import gin
-import numpy as np
 
+from copy import deepcopy
+import numpy as np
 import torch
 import torch.optim as optim
 
@@ -26,33 +27,39 @@ class DDPG(OffPolicyRLAlgorithm):
         polyak=gin.REQUIRED,
     ):
 
+        # hyper-parameters
+
+        super().__init__(
+            input_dim=input_dim,
+            action_dim=action_dim,
+            gamma=gamma,
+            lr=lr,
+            polyak=polyak
+        )
+
+        self.action_noise = action_noise
+
         # networks
 
         self.actor = MLPTanhActor(input_dim, action_dim).to(get_device())
-        self.actor_targ = MLPTanhActor(input_dim, action_dim).to(get_device())
+        self.actor_targ = deepcopy(self.actor)
         set_requires_grad_flag(self.actor_targ, False)
-        self.actor_targ.load_state_dict(self.actor.state_dict())
 
         self.Q = MLPCritic(input_dim, action_dim).to(get_device())
-        self.Q_targ = MLPCritic(input_dim, action_dim).to(get_device())
+        self.Q_targ = deepcopy(self.Q)
         set_requires_grad_flag(self.Q_targ, False)
-        self.Q_targ.load_state_dict(self.Q.state_dict())
+
+        self.networks_dict.update({
+            "actor": self.actor,
+            "actor_targ": self.actor_targ,
+            "Q": self.Q,
+            "Q_targ": self.Q_targ
+        })  # these networks will be saved as KEY.pth upon calls to super().save_networks
 
         # optimizers
 
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
         self.Q_optimizer = optim.Adam(self.Q.parameters(), lr=lr)
-
-        # hyper-parameters
-
-        self.gamma = gamma
-        self.action_noise = action_noise
-        self.polyak = polyak
-
-        # miscellaneous
-
-        self.input_dim = input_dim
-        self.action_dim = action_dim
 
     def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
@@ -62,11 +69,6 @@ class DDPG(OffPolicyRLAlgorithm):
                 return greedy_action
             else:
                 return np.clip(greedy_action + self.action_noise * np.random.randn(len(greedy_action)), -1.0, 1.0)
-
-    def polyak_update(self, old_net, new_net) -> None:
-        with torch.no_grad():  # no grad is not actually required here; only for sanity check
-            for old_param, new_param in zip(old_net.parameters(), new_net.parameters()):
-                old_param.data.copy_(old_param.data * self.polyak + new_param.data * (1 - self.polyak))
 
     def update_networks(self, b: Batch):
 
@@ -102,8 +104,6 @@ class DDPG(OffPolicyRLAlgorithm):
 
         # compute policy loss
 
-        # set_requires_grad_flag(self.Q, False)
-
         a = self.actor(b.s)
         Q_values = self.Q(b.s, a)
         policy_loss = - torch.mean(Q_values)
@@ -117,12 +117,10 @@ class DDPG(OffPolicyRLAlgorithm):
         policy_loss.backward()
         self.actor_optimizer.step()
 
-        # set_requires_grad_flag(self.Q, True)
-
         # update target networks
 
-        self.polyak_update(old_net=self.actor_targ, new_net=self.actor)
-        self.polyak_update(old_net=self.Q_targ, new_net=self.Q)
+        self.polyak_update(targ_net=self.actor_targ, pred_net=self.actor)
+        self.polyak_update(targ_net=self.Q_targ, pred_net=self.Q)
 
         return {
             # for learning the q functions
@@ -131,20 +129,3 @@ class DDPG(OffPolicyRLAlgorithm):
             # for learning the actor
             '(actor) policy loss': float(policy_loss),
         }
-
-    def save_networks(self, save_dir: str) -> None:
-        torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))
-        torch.save(self.Q.state_dict(), os.path.join(save_dir, 'Q.pth'))
-        torch.save(self.Q_targ.state_dict(), os.path.join(save_dir, 'Q_targ.pth'))
-
-    def load_actor(self, save_dir: str) -> None:
-        self.actor.load_state_dict(
-            torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
-
-    def load_networks(self, save_dir: str) -> None:
-        self.actor.load_state_dict(
-            torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
-        self.Q1.load_state_dict(
-            torch.load(os.path.join(save_dir, 'Q1.pth'), map_location=torch.device(get_device())))
-        self.Q1_target.load_state_dict(
-            torch.load(os.path.join(save_dir, 'Q1_targ.pth'), map_location=torch.device(get_device())))
