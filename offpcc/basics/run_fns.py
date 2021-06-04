@@ -175,10 +175,10 @@ def train(
             cutoff = False
 
         # store the transition
-        if isinstance(algorithm, OffPolicyRLAlgorithm):
-            buffer.push(state, action, reward, next_state, done)
-        elif isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+        if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
             buffer.push(state, action, reward, next_state, done, cutoff)
+        elif isinstance(algorithm, OffPolicyRLAlgorithm):
+            buffer.push(state, action, reward, next_state, done)
 
         # crucial, crucial preparation for next step
         state = next_state
@@ -206,10 +206,10 @@ def train(
 
                 batch = buffer.sample()
 
-                if isinstance(algorithm, OffPolicyRLAlgorithm):
-                    algo_specific_stats = algorithm.update_networks(batch)
-                elif isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+                if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
                     algo_specific_stats = algorithm_clone.update_networks(batch)
+                elif isinstance(algorithm, OffPolicyRLAlgorithm):
+                    algo_specific_stats = algorithm.update_networks(batch)
 
                 algo_specific_stats_tracker.append(algo_specific_stats)
 
@@ -245,10 +245,12 @@ def train(
             test_episode_lens, test_episode_returns = [], []
 
             for j in range(num_test_episodes_per_epoch):
-                if isinstance(algorithm, OffPolicyRLAlgorithm):
+
+                if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+                    test_algorithm = deepcopy(algorithm_clone)
+                elif isinstance(algorithm, OffPolicyRLAlgorithm):
                     test_algorithm = deepcopy(algorithm)
-                elif isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
-                    test_algorithm = deepcopy(algorithm_clone)  # crucial, crucial step for recurrent agents
+
                 test_episode_len, test_episode_return = test_for_one_episode(test_env, test_algorithm)
                 test_episode_lens.append(test_episode_len)
                 test_episode_returns.append(test_episode_return)
