@@ -23,7 +23,7 @@ class OffPolicyRLAlgorithm(ABC):
         self.polyak = polyak
 
         self.actor = None
-        self.networks_dict = {}
+        self.networks_to_save_dict = {}
 
     @abstractmethod
     def act(self, state: np.array, deterministic: bool) -> np.array:
@@ -42,7 +42,7 @@ class OffPolicyRLAlgorithm(ABC):
 
     def save_networks(self, save_dir: str) -> None:
         """Save all the networks"""
-        for network_name, network in self.networks_dict.items():
+        for network_name, network in self.networks_to_save_dict.items():
             torch.save(network.state_dict(), os.path.join(save_dir, f'{network_name}.pth'))
 
     def load_actor(self, save_dir: str) -> None:
@@ -56,7 +56,7 @@ class OffPolicyRLAlgorithm(ABC):
 
     def load_networks(self, save_dir: str) -> None:
         """Load all the networks"""
-        for network_name, network in self.networks_dict.items():
+        for network_name, network in self.networks_to_save_dict.items():
             network.load_state_dict(
                 torch.load(
                     os.path.join(save_dir, f'{network_name}.pth'),
@@ -65,7 +65,7 @@ class OffPolicyRLAlgorithm(ABC):
             )
 
 
-class RecurrentOffPolicyRLAlgorithm(ABC, OffPolicyRLAlgorithm):
+class RecurrentOffPolicyRLAlgorithm(OffPolicyRLAlgorithm):
 
     def __init__(self, input_dim, action_dim, gamma, lr, polyak):
         super().__init__(input_dim, action_dim, gamma, lr, polyak)
@@ -75,6 +75,22 @@ class RecurrentOffPolicyRLAlgorithm(ABC, OffPolicyRLAlgorithm):
     def reinitialize_hidden(self) -> None:
         """For recurrent agents only; called at the beginning of each episode to reset hidden states"""
         self.h_and_c = None
+
+    @staticmethod
+    def rescale_loss(loss: torch.tensor, mask: torch.tensor) -> torch.tensor:
+        return loss / mask.sum() * np.prod(mask.shape)
+
+    @staticmethod
+    def feed_lstm(lstm, o):
+        """Nothing special; just making code more readbale in update_networks"""
+        lstm.flatten_parameters()  # prevent some arbitrary error that I don't understand
+        h, h_and_c = lstm(o)
+        return h
+
+    @abstractmethod
+    def update_networks(self, b: RecurrentBatch) -> dict:
+        """Only called during learning"""
+        pass
 
     def load_actor(self, save_dir: str) -> None:
         """Load the actor network only"""

@@ -1,4 +1,3 @@
-import os
 import gin
 
 from copy import deepcopy
@@ -49,12 +48,7 @@ class DDPG(OffPolicyRLAlgorithm):
         self.Q_targ = deepcopy(self.Q)
         set_requires_grad_flag(self.Q_targ, False)
 
-        self.networks_dict.update({
-            "actor": self.actor,
-            "actor_targ": self.actor_targ,
-            "Q": self.Q,
-            "Q_targ": self.Q_targ
-        })  # these networks will be saved as KEY.pth upon calls to super().save_networks
+        self.networks_to_save_dict.update({"actor": self.actor})
 
         # optimizers
 
