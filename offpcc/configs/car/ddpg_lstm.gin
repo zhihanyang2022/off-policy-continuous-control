@@ -6,7 +6,7 @@
 
 hidden_dimensions = (256, 256)
 
-num_bptt = 20
+num_bptt = 160
 hidden_size = 256
 num_lstm_layers = 2
 use_target_for_lstm = True
