@@ -1,3 +1,15 @@
+Design of the codebase for rdpg
+
+When it comes to rdpg, there are several things to handle correctly:
+- partial episodes vs full episodes (depend on buffer)
+- use target network for lstms or not (depend on algorithm)
+- burn in or not (depend on both buffer and algorithm)
+- store state or not (depend entirely on buffer)
+
+Where "depends on" means "changes need to be made to"
+
+must check isinstance for Recurrent class first
+
 create a configuration guideline
 as to be <= than num_steps_per_epoch - update_every for spinup to work
 
