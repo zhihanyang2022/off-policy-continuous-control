@@ -24,9 +24,9 @@ def make_log_dir(env_name, algo_name, run_id) -> str:
     return log_dir
 
 
-def maybe_reset_noise(algorithm):
+def maybe_reset_noise(algorithm: Union[OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm]):
     """The outer function depends on algorithm; the inner function depends on action noise type"""
-    if isinstance(algorithm, DDPG) or isinstance(algorithm, DDPG):
+    if isinstance(algorithm, DDPG) or isinstance(algorithm, TD3):
         algorithm.maybe_reset_noise()
 
 

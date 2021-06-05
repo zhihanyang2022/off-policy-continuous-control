@@ -89,8 +89,8 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
 
     def maybe_reset_noise(self):
         """Noise types of OU-noise need to be reset upon episode termination."""
-        if isinstance(self.noise_gen, OrnsteinUhlenbeckActionNoise):
-            self.noise_gen.reset()
+        if isinstance(self.noise_callable, OrnsteinUhlenbeckActionNoise):
+            self.noise_callable.reset()
 
     def act(self, observation: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
