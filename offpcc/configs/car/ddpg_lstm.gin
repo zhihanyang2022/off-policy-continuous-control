@@ -29,6 +29,7 @@ num_steps_per_epoch = 1000
 update_every = 1
 num_test_episodes_per_epoch = 3
 update_after = 10000
+initial_exploration_type = "ou"
 
 # ====================================================================================
 # applying the parameters above to two codebases (sb3 and ours)
@@ -67,3 +68,4 @@ basics.run_fns.train.num_steps_per_epoch = %num_steps_per_epoch
 basics.run_fns.train.update_every = %update_every
 basics.run_fns.train.num_test_episodes_per_epoch = %num_test_episodes_per_epoch
 basics.run_fns.train.update_after = %update_after
+basics.run_fns.train.initial_exploration_type = %initial_exploration_type
