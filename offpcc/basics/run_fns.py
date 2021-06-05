@@ -11,6 +11,7 @@ from copy import deepcopy
 import numpy as np
 from gym.wrappers import Monitor
 
+from algorithms import *
 from basics.abstract_algorithm import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from basics.replay_buffer import ReplayBuffer
 from basics.replay_buffer_recurrent import RecurrentReplayBufferGlobal, RecurrentReplayBufferLocal
@@ -23,8 +24,15 @@ def make_log_dir(env_name, algo_name, run_id) -> str:
     return log_dir
 
 
+def maybe_reset_noise(algorithm):
+    """The outer function depends on algorithm; the inner function depends on action noise type"""
+    if isinstance(algorithm, DDPG) or isinstance(algorithm, DDPG):
+        algorithm.maybe_reset_noise()
+
+
 def test_for_one_episode(env, algorithm, render=False) -> tuple:
     state, done, episode_return, episode_len = env.reset(), False, 0, 0
+    maybe_reset_noise(algorithm)
     if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
         algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
     while not done:
@@ -189,6 +197,8 @@ def train(
             train_episode_lens.append(episode_len)
             train_episode_rets.append(episode_ret)
             state, episode_len, episode_ret = env.reset(), 0, 0  # reset state and stats trackers
+
+            maybe_reset_noise(algorithm)
 
             if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
 

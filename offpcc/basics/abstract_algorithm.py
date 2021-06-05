@@ -4,6 +4,7 @@ import os
 import numpy as np
 import torch
 import torch.nn as nn
+from stable_baselines3.common.noise import OrnsteinUhlenbeckActionNoise
 
 from basics.replay_buffer import Batch
 from basics.replay_buffer_recurrent import RecurrentBatch

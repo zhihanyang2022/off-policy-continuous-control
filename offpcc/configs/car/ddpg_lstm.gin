@@ -12,6 +12,7 @@ num_lstm_layers = 2
 use_target_for_lstm = True
 
 gamma = 0.99
+action_noise_type = "ou"
 action_noise = 0.1
 lr = 3e-4
 polyak = 0.995
