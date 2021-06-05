@@ -146,8 +146,6 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
 
         # compute policy loss
 
-        set_requires_grad_flag(self.Q, False)
-
         a = self.actor(actor_h_1_T)
         Q_values = self.Q(critic_h_1_T.detach(), a)
         policy_loss_elementwise = - Q_values
@@ -165,8 +163,6 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
 
         self.actor_lstm_optimizer.step()
         self.actor_optimizer.step()
-
-        set_requires_grad_flag(self.Q, True)
 
         # update target networks
 
