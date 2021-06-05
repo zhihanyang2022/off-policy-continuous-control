@@ -10,6 +10,7 @@ from typing import Union
 from copy import deepcopy
 import numpy as np
 from gym.wrappers import Monitor
+from stable_baselines3.common.noise import OrnsteinUhlenbeckActionNoise
 
 from algorithms import *
 from basics.abstract_algorithm import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
@@ -100,6 +101,7 @@ def train(
         num_test_episodes_per_epoch=gin.REQUIRED,
         update_every=gin.REQUIRED,  # number of env interactions between grad updates; but the ratio is locked to 1-to-1
         update_after=gin.REQUIRED,  # for exploration; no update & random action from action space
+        initial_exploration_type=gin.REQUIRED
 ) -> None:
 
     """Follow from OpenAI Spinup's training loop style"""
@@ -146,6 +148,10 @@ def train(
         # while algorithm is not. Once an episode has finished, we do algorithm = deepcopy(algorithm_clone) to carry
         # over the changes.
 
+    if initial_exploration_type == "ou":
+        noise_callable = OrnsteinUhlenbeckActionNoise(mean=np.zeros(env.action_space.shape),
+                                                      sigma=np.ones(env.action_space.shape))
+
     for t in range(total_steps):
 
         # action = algorithm.act(state, deterministic=False)
@@ -153,7 +159,12 @@ def train(
         if t >= update_after:  # exploration is done
             action = algorithm.act(state, deterministic=False)
         else:
-            action = env.action_space.sample()
+            if initial_exploration_type == "ou":
+                action = noise_callable()
+            elif initial_exploration_type == "uniform":
+                action = env.action_space.sample()
+            else:
+                raise NotImplementedError
 
         next_state, reward, done, info = env.step(action)
         episode_len += 1
@@ -198,7 +209,10 @@ def train(
             train_episode_rets.append(episode_ret)
             state, episode_len, episode_ret = env.reset(), 0, 0  # reset state and stats trackers
 
-            maybe_reset_noise(algorithm)
+            if initial_exploration_type == "ou":  # actually not necessary after initial exploration finishes
+                noise_callable.reset()
+
+            maybe_reset_noise(algorithm)  # actually not necessary before initial exploration finishes
 
             if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
 

@@ -43,9 +43,10 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
         )
 
         if action_noise_type == "ou":
-            self.noise_callable = OrnsteinUhlenbeckActionNoise(mean=np.array([0]), sigma=np.array([1]))
+            self.noise_callable = OrnsteinUhlenbeckActionNoise(mean=np.zeros((action_dim,)),
+                                                               sigma=np.ones((action_dim,)))
         elif action_noise_type == "uniform":
-            self.noise_callable = lambda: np.random.randn(len(action_dim))
+            self.noise_callable = lambda: np.random.randn(action_dim)
         else:
             raise NotImplementedError(f"Noise type {action_noise_type} is not implemented.")
 
