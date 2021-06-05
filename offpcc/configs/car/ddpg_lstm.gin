@@ -49,6 +49,7 @@ algorithms.ddpg_lstm.DDPG_LSTM.num_lstm_layers = %num_lstm_layers
 algorithms.ddpg_lstm.DDPG_LSTM.use_target_for_lstm = %use_target_for_lstm
 
 algorithms.ddpg_lstm.DDPG_LSTM.gamma = %gamma
+algorithms.ddpg_lstm.DDPG_LSTM.action_noise_type =%action_noise_type
 algorithms.ddpg_lstm.DDPG_LSTM.action_noise = %action_noise
 algorithms.ddpg_lstm.DDPG_LSTM.lr = %lr
 algorithms.ddpg_lstm.DDPG_LSTM.polyak = %polyak
