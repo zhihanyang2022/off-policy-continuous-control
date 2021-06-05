@@ -160,7 +160,7 @@ def train(
             action = algorithm.act(state, deterministic=False)
         else:
             if initial_exploration_type == "ou":
-                action = noise_callable()
+                action = np.clip(noise_callable(), -1, 1)
             elif initial_exploration_type == "uniform":
                 action = env.action_space.sample()
             else:
