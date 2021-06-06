@@ -153,10 +153,8 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         polyak_update(targ_net=self.actor_targ, pred_net=self.actor, polyak=self.polyak)
         polyak_update(targ_net=self.Q_targ, pred_net=self.Q, polyak=self.polyak)
 
-        if self.use_target_for_summarizer:
-
-            polyak_update(targ_net=self.actor_summarizer_targ, pred_net=self.actor_summarizer, polyak=self.polyak)
-            polyak_update(targ_net=self.critic_summarizer_targ, pred_net=self.critic_summarizer, polyak=self.polyak)
+        polyak_update(targ_net=self.actor_summarizer_targ, pred_net=self.actor_summarizer, polyak=self.polyak)
+        polyak_update(targ_net=self.critic_summarizer_targ, pred_net=self.critic_summarizer, polyak=self.polyak)
 
         return {
             # for learning the q functions
