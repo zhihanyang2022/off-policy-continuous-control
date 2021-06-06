@@ -35,10 +35,10 @@ class SAC(OffPolicyRLAlgorithm):
             input_dim: int,
             action_dim: int,
             gamma: float = gin.REQUIRED,
+            lr: float = gin.REQUIRED,
+            polyak: float = gin.REQUIRED,
             alpha: float = gin.REQUIRED,  # if autotune_alpha, this becomes the initial alpha value
             autotune_alpha: bool = gin.REQUIRED,
-            lr: float = gin.REQUIRED,
-            polyak: float = gin.REQUIRED
     ):
 
         # hyperparameters
