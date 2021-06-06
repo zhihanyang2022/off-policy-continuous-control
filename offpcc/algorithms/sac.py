@@ -47,7 +47,7 @@ class SAC(OffPolicyRLAlgorithm):
         self.autotune_alpha = autotune_alpha
 
         if autotune_alpha:
-            self.log_alpha = torch.log(torch.ones(1) * alpha).requires_grad(True).to(get_device())
+            self.log_alpha = torch.log(torch.ones(1, device=get_device()) * alpha).requires_grad_(True)
             self.log_alpha_optimizer = optim.Adam([self.log_alpha], lr=lr)
         else:
             self.alpha = alpha
