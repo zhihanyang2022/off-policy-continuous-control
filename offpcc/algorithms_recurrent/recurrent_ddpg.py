@@ -8,7 +8,7 @@ from basics.abstract_algorithms import RecurrentOffPolicyRLAlgorithm
 from basics.summarizer import Summarizer
 from basics.actors_and_critics import MLPTanhActor, MLPCritic
 from basics.replay_buffer_recurrent import RecurrentBatch
-from basics.utils import get_device, create_target, polyak_update, save_net, load_net
+from basics.utils import get_device, create_target, rescale_loss, polyak_update, save_net, load_net
 
 
 @gin.configurable(module=__name__)
@@ -113,7 +113,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         # compute td error
 
         Q_loss_elementwise = (predictions - targets) ** 2
-        Q_loss = self.rescale_loss(torch.mean(b.m * Q_loss_elementwise), b.m)
+        Q_loss = rescale_loss(torch.mean(b.m * Q_loss_elementwise), b.m)
 
         assert Q_loss.shape == ()
 
@@ -132,7 +132,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         a = self.actor(actor_summary_1_T)
         Q_values = self.Q(critic_summary_1_T.detach(), a)
         policy_loss_elementwise = - Q_values
-        policy_loss = self.rescale_loss(torch.mean(b.m * policy_loss_elementwise), b.m)
+        policy_loss = rescale_loss(torch.mean(b.m * policy_loss_elementwise), b.m)
 
         assert a.shape == (bs, num_bptt, self.action_dim)
         assert Q_values.shape == (bs, num_bptt, 1)
