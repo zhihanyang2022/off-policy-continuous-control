@@ -127,7 +127,7 @@ class TD3(OffPolicyRLAlgorithm):
             Q1_values = self.Q1(b.s, a)  # val stands for values
             policy_loss = - torch.mean(Q1_values)
 
-            self.mean_Q1_value = float(Q1_values.mean())
+            self.mean_Q1_value = float(-policy_loss)
             assert a.shape == (bs, self.action_dim)
             assert Q1_values.shape == (bs, 1)
             assert policy_loss.shape == ()
