@@ -21,15 +21,15 @@ from basics.utils import get_device
 def configure_ddpg(
         env_fn,
         seed,
-        hidden_dimensions=gin.REQUIRED,
-        capacity=gin.REQUIRED,
-        gamma=gin.REQUIRED,
-        polyak=gin.REQUIRED,
-        lr=gin.REQUIRED,
-        batch_size=gin.REQUIRED,
+        hidden_dimensions=(256, 256),
+        capacity=int(1e6),
+        gamma=0.99,
+        polyak=0.995,
+        lr=3e-4,
+        batch_size=100,
         update_after=gin.REQUIRED,
-        update_every=gin.REQUIRED,
-        action_noise=gin.REQUIRED
+        update_every=1,
+        action_noise=0.1
 ):
     env = env_fn()
     model = DDPG(
@@ -57,18 +57,18 @@ def configure_ddpg(
 def configure_td3(
         env_fn,
         seed,
-        hidden_dimensions=gin.REQUIRED,
-        capacity=gin.REQUIRED,
-        gamma=gin.REQUIRED,
-        polyak=gin.REQUIRED,
-        lr=gin.REQUIRED,
-        batch_size=gin.REQUIRED,
+        hidden_dimensions=(256, 256),
+        capacity=int(1e6),
+        gamma=0.99,
+        polyak=0.995,
+        lr=3e-4,
+        batch_size=100,
         update_after=gin.REQUIRED,
-        update_every=gin.REQUIRED,
-        action_noise=gin.REQUIRED,
-        target_noise=gin.REQUIRED,
-        noise_clip=gin.REQUIRED,
-        policy_delay=gin.REQUIRED
+        update_every=1,
+        action_noise=0.1,
+        target_noise=0.2,
+        noise_clip=0.5,
+        policy_delay=2
 ):
     env = env_fn()
     model = TD3(
@@ -99,16 +99,16 @@ def configure_td3(
 def configure_sac(
         env_fn,
         seed,
-        hidden_dimensions=gin.REQUIRED,
-        capacity=gin.REQUIRED,
-        gamma=gin.REQUIRED,
-        polyak=gin.REQUIRED,
-        lr=gin.REQUIRED,
-        alpha=gin.REQUIRED,
-        autotune_alpha=gin.REQUIRED,
-        batch_size=gin.REQUIRED,
+        hidden_dimensions=(256, 256),
+        capacity=int(1e6),
+        gamma=0.99,
+        polyak=0.995,
+        lr=3e-4,
+        alpha=1.0,
+        autotune_alpha=True,
+        batch_size=100,
         update_after=gin.REQUIRED,
-        update_every=gin.REQUIRED
+        update_every=1
 ):
     model = SAC(
         policy='MlpPolicy',

@@ -29,7 +29,7 @@ def instantiate_recurrent_replay_buffer(
     o_dim,
     a_dim,
     max_episode_len,
-    capacity=gin.REQUIRED,
+    capacity=int(1e6),
     num_bptt=gin.REQUIRED,
     batch_size=gin.REQUIRED
 ):

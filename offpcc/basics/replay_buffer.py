@@ -12,7 +12,7 @@ Batch = namedtuple('Batch', 's a r ns d')
 class ReplayBuffer:
     """Just a standard FIFO replay buffer."""
 
-    def __init__(self, capacity=gin.REQUIRED, batch_size=gin.REQUIRED):
+    def __init__(self, capacity=int(1e6), batch_size=100):
         self.capacity = capacity
         self.memory = deque(maxlen=capacity)
         self.batch_size = batch_size
