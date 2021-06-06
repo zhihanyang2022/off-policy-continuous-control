@@ -125,7 +125,7 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
 
     def update_networks(self, b: RecurrentBatch) -> dict:
 
-        bs = len(b.ns)  # for shape checking
+        bs, num_bptt = b.r.shape[0], b.r.shape[1]
 
         # compute summary
 
@@ -152,18 +152,19 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
 
         with torch.no_grad():
 
-            na, log_pi_na_given_ns = self.sample_action_from_distribution(b.ns, deterministic=False,
+            na, log_pi_na_given_ns = self.sample_action_from_distribution(actor_summary_2_Tplus1, deterministic=False,
                                                                           return_log_prob=True)
 
-            n_min_Q_targ = torch.min(self.Q1_targ(b.ns, na), self.Q2_targ(b.ns, na))
+            n_min_Q_targ = torch.min(self.Q1_targ(Q1_summary_2_Tplus1, na),
+                                     self.Q2_targ(Q2_summary_2_Tplus1, na))
             n_sample_entropy = - log_pi_na_given_ns
 
             targets = b.r + self.gamma * (1 - b.d) * (n_min_Q_targ + self.get_current_alpha() * n_sample_entropy)
 
-            assert na.shape == (bs, self.action_dim)
-            assert log_pi_na_given_ns.shape == (bs, 1)
-            assert n_min_Q_targ.shape == (bs, 1)
-            assert targets.shape == (bs, 1)
+            assert na.shape == (bs, num_bptt, self.action_dim)
+            assert log_pi_na_given_ns.shape == (bs, num_bptt, 1)
+            assert n_min_Q_targ.shape == (bs, num_bptt, 1)
+            assert targets.shape == (bs, num_bptt, 1)
 
         # compute td error
 
@@ -175,63 +176,50 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
 
         # reduce td error
 
+        self.Q1_summarizer_optimizer.zero_grad()
         self.Q1_optimizer.zero_grad()
         Q1_loss.backward()
+        self.Q1_summarizer_optimizer.step()
         self.Q1_optimizer.step()
 
+        self.Q2_summarizer_optimizer.zero_grad()
         self.Q2_optimizer.zero_grad()
         Q2_loss.backward()
+        self.Q2_summarizer_optimizer.step()
         self.Q2_optimizer.step()
 
         # compute policy loss
 
-        a, log_pi_a_given_s = self.sample_action_from_distribution(b.s, deterministic=False, return_log_prob=True)
+        a, log_pi_a_given_s = self.sample_action_from_distribution(actor_summary_1_T, deterministic=False,
+                                                                   return_log_prob=True)
 
-        min_Q = torch.min(self.Q1(b.s, a), self.Q2(b.s, a))
+        min_Q = torch.min(self.Q1(Q1_summary_1_T.detach(), a),
+                          self.Q2(Q2_summary_1_T.detach(), a))
         sample_entropy = - log_pi_a_given_s
 
         policy_loss = - torch.mean(min_Q + self.get_current_alpha() * sample_entropy)
 
-        assert a.shape == (bs, self.action_dim)
-        assert log_pi_a_given_s.shape == (bs, 1)
-        assert min_Q.shape == (bs, 1)
+        assert a.shape == (bs, num_bptt, self.action_dim)
+        assert log_pi_a_given_s.shape == (bs, num_bptt, 1)
+        assert min_Q.shape == (bs, num_bptt, 1)
         assert policy_loss.shape == ()
 
         # reduce policy loss
 
+        self.actor_summarizer_optimizer.zero_grad()
         self.actor_optimizer.zero_grad()
         policy_loss.backward()
+        self.actor_summarizer_optimizer.step()
         self.actor_optimizer.step()
 
         if self.autotune_alpha:
 
             # compute log alpha loss
 
-            # derivation to make things more intuitive
-            #
-            # alpha_loss = - self.log_alpha * (log_pi_a_given_s.detach() + self.target_entropy)  (eq used in SB3)
-            #            = self.log_alpha * (- log_pi_a_given_s.detach() - self.target_entropy)
-            #            = self.log_alpha * (sample_entropy - self.target_entropy)
-            #            = self.log_alpha * excess_entropy (in expectation) (eq used in this codebase)
-            #
-            # If excess_entropy > 0, minimum is achieved by settings log_alpha to negative (ideally negative infinity),
-            # which corresponds to an alpha value between (0, 1).
-            #
-            # If excess_entropy < 0, minimum is achieved by setting log_alpha to positive (ideally positive infinity),
-            # which corresponds to an alpha value greater than 1.
-            #
-            # Intuitively, an alpha value in (0, 1) means that entropy maximization is less important than other
-            # objectives, while an alpha value greater than 1 means that it is more important.
-            #
-            # Q: Where does SB3 compute alpha loss?
-            # https://github.com/DLR-RM/stable-baselines3/blob/78e8d405d7bf6186c8529ed26967cb17ccbe420c/stable_baselines3/sac/sac.py#L184
-            #
-            # Q: Why use log_alpha instead of alpha directly?
-            # - https://github.com/DLR-RM/stable-baselines3/issues/36
-            # - https://github.com/rail-berkeley/softlearning/issues/37
-
             excess_entropy = sample_entropy.detach() - self.target_entropy
             log_alpha_loss = self.log_alpha * torch.mean(excess_entropy)
+
+            assert log_alpha_loss.shape == ()
 
             # reduce log alpha loss
 
@@ -245,8 +233,11 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
 
         # update target networks
 
-        self.polyak_update(targ_net=self.Q1_targ, pred_net=self.Q1)
-        self.polyak_update(targ_net=self.Q2_targ, pred_net=self.Q2)
+        polyak_update(targ_net=self.Q1_summarizer_targ, pred_net=self.Q1_summarizer, polyak=self.polyak)
+        polyak_update(targ_net=self.Q2_summarizer_targ, pred_net=self.Q2_summarizer, polyak=self.polyak)
+
+        polyak_update(targ_net=self.Q1_targ, pred_net=self.Q1, polyak=self.polyak)
+        polyak_update(targ_net=self.Q2_targ, pred_net=self.Q2, polyak=self.polyak)
 
         return {
             # for learning the q functions
@@ -260,11 +251,13 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
             '(actor) policy loss': float(policy_loss),
             # for learning the entropy coefficient (alpha)
             '(alpha) alpha': self.get_current_alpha(),
-            '(alpha) log alpha loss': float(log_alpha_loss.mean())
+            '(alpha) log alpha loss': float(log_alpha_loss)
         }
 
     def save_actor(self, save_dir: str) -> None:
+        save_net(net=self.actor_summarizer, save_dir=save_dir, save_name="actor_summarizer.pth")
         save_net(net=self.actor, save_dir=save_dir, save_name="actor.pth")
 
     def load_actor(self, save_dir: str) -> None:
+        load_net(net=self.actor_summarizer, save_dir=save_dir, save_name="actor_summarizer.pth")
         load_net(net=self.actor, save_dir=save_dir, save_name="actor.pth")

@@ -225,8 +225,8 @@ class SAC(OffPolicyRLAlgorithm):
 
         # update target networks
 
-        self.polyak_update(targ_net=self.Q1_targ, pred_net=self.Q1)
-        self.polyak_update(targ_net=self.Q2_targ, pred_net=self.Q2)
+        polyak_update(targ_net=self.Q1_targ, pred_net=self.Q1, polyak=self.polyak)
+        polyak_update(targ_net=self.Q2_targ, pred_net=self.Q2, polyak=self.polyak)
 
         return {
             # for learning the q functions
