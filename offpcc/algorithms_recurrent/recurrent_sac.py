@@ -11,7 +11,7 @@ from basics.abstract_algorithms import RecurrentOffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPGaussianActor, MLPCritic
 from basics.summarizer import Summarizer
 from basics.replay_buffer_recurrent import RecurrentBatch
-from basics.utils import get_device, create_target, polyak_update, save_net, load_net
+from basics.utils import get_device, create_target, mean_of_unmasked_elements, polyak_update, save_net, load_net
 
 
 @gin.configurable(module=__name__)
@@ -41,7 +41,7 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
         self.autotune_alpha = autotune_alpha
 
         if autotune_alpha:
-            self.log_alpha = torch.log(torch.ones(1, device=get_device()) * alpha).requires_grad_(True)
+            self.log_alpha = torch.log(torch.ones(1) * alpha).to(get_device()).requires_grad_(True)
             self.log_alpha_optimizer = optim.Adam([self.log_alpha], lr=lr)
         else:
             self.alpha = alpha
@@ -170,8 +170,11 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
 
         # compute td error
 
-        Q1_loss = torch.mean((Q1_predictions - targets) ** 2)
-        Q2_loss = torch.mean((Q2_predictions - targets) ** 2)
+        Q1_loss_elementwise = (Q1_predictions - targets) ** 2
+        Q1_loss = mean_of_unmasked_elements(Q1_loss_elementwise, b.m)
+
+        Q2_loss_elementwise = (Q2_predictions - targets) ** 2
+        Q2_loss = mean_of_unmasked_elements(Q2_loss_elementwise, b.m)
 
         assert Q1_loss.shape == ()
         assert Q2_loss.shape == ()
@@ -199,7 +202,8 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
                           self.Q2(Q2_summary_1_T.detach(), a))
         sample_entropy = - log_pi_a_given_s
 
-        policy_loss = - torch.mean(min_Q + self.get_current_alpha() * sample_entropy)
+        policy_loss_elementwise = - (min_Q + self.get_current_alpha() * sample_entropy)
+        policy_loss = mean_of_unmasked_elements(policy_loss_elementwise, b.m)
 
         assert a.shape == (bs, num_bptt, self.action_dim)
         assert log_pi_a_given_s.shape == (bs, num_bptt, 1)
@@ -243,14 +247,13 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
 
         return {
             # for learning the q functions
-            '(qfunc) Q1 pred': float(Q1_predictions.mean()),
-            '(qfunc) Q2 pred': float(Q2_predictions.mean()),
+            '(qfunc) Q1 pred': float(mean_of_unmasked_elements(Q1_predictions, b.m)),
+            '(qfunc) Q2 pred': float(mean_of_unmasked_elements(Q2_predictions, b.m)),
             '(qfunc) Q1 loss': float(Q1_loss),
             '(qfunc) Q2 loss': float(Q2_loss),
             # for learning the actor
-            '(actor) min Q pred': float(min_Q.mean()),
-            '(actor) entropy (sample)': float(sample_entropy.mean()),
-            '(actor) policy loss': float(policy_loss),
+            '(actor) min Q value': float(mean_of_unmasked_elements(min_Q, b.m)),
+            '(actor) entropy (sample)': float(mean_of_unmasked_elements(sample_entropy, b.m)),
             # for learning the entropy coefficient (alpha)
             '(alpha) alpha': self.get_current_alpha(),
             '(alpha) log alpha loss': float(log_alpha_loss)

@@ -112,7 +112,7 @@ class DDPG(OffPolicyRLAlgorithm):
             '(qfunc) Q pred': float(predictions.mean()),
             '(qfunc) Q loss': float(Q_loss),
             # for learning the actor
-            '(actor) policy loss': float(policy_loss),
+            '(actor) Q values': float(Q_values.mean()),
         }
 
     def save_actor(self, save_dir: str) -> None:

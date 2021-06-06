@@ -43,7 +43,7 @@ class TD3(OffPolicyRLAlgorithm):
         # trackers
 
         self.num_Q_updates = 0  # for delaying updates
-        self.mean_Q1_val = 0  # for logging; the actor does not get updated every iteration,
+        self.mean_Q1_value = 0  # for logging; the actor does not get updated every iteration,
         # so this statistic is not available every iteration
 
         # networks
@@ -124,12 +124,12 @@ class TD3(OffPolicyRLAlgorithm):
             # compute policy loss
 
             a = self.actor(b.s)
-            Q1_val = self.Q1(b.s, a)  # val stands for values
-            policy_loss = - torch.mean(Q1_val)
+            Q1_values = self.Q1(b.s, a)  # val stands for values
+            policy_loss = - torch.mean(Q1_values)
 
-            self.mean_Q1_val = float(Q1_val.mean())
+            self.mean_Q1_value = float(Q1_values.mean())
             assert a.shape == (bs, self.action_dim)
-            assert Q1_val.shape == (bs, 1)
+            assert Q1_values.shape == (bs, 1)
             assert policy_loss.shape == ()
 
             # reduce policy loss
@@ -151,7 +151,7 @@ class TD3(OffPolicyRLAlgorithm):
             '(qfunc) Q1 loss': float(Q1_loss),
             '(qfunc) Q2 loss': float(Q2_loss),
             # for learning the actor
-            '(actor) Q1 val': self.mean_Q1_val  # no need to track policy loss; just its negation
+            '(actor) Q1 value': self.mean_Q1_value
         }
 
     def save_actor(self, save_dir: str) -> None:

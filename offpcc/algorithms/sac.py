@@ -47,8 +47,14 @@ class SAC(OffPolicyRLAlgorithm):
         self.autotune_alpha = autotune_alpha
 
         if autotune_alpha:
-            self.log_alpha = torch.log(torch.ones(1, device=get_device()) * alpha).requires_grad_(True)
+
+            # Since self.log_alpha must be a leaf variable to be optimized by an optimizer,
+            # setting it to require grad is done at last.
+            # Ref: see is_leaf attribute at https://pytorch.org/docs/stable/tensors.html
+
+            self.log_alpha = torch.log(torch.ones(1) * alpha).to(get_device()).requires_grad_(True)
             self.log_alpha_optimizer = optim.Adam([self.log_alpha], lr=lr)
+
         else:
             self.alpha = alpha
 
@@ -235,9 +241,8 @@ class SAC(OffPolicyRLAlgorithm):
             '(qfunc) Q1 loss': float(Q1_loss),
             '(qfunc) Q2 loss': float(Q2_loss),
             # for learning the actor
-            '(actor) min Q pred': float(min_Q.mean()),
+            '(actor) min Q value': float(min_Q.mean()),
             '(actor) entropy (sample)': float(sample_entropy.mean()),
-            '(actor) policy loss': float(policy_loss),
             # for learning the entropy coefficient (alpha)
             '(alpha) alpha': self.get_current_alpha(),
             '(alpha) log alpha loss': float(log_alpha_loss.mean())

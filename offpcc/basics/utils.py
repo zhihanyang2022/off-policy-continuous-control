@@ -14,8 +14,8 @@ def polyak_update(targ_net: nn.Module, pred_net: nn.Module, polyak: float) -> No
         for targ_p, p in zip(targ_net.parameters(), pred_net.parameters()):
             targ_p.data.copy_(targ_p.data * polyak + p.data * (1 - polyak))
 
-def rescale_loss(loss: torch.tensor, mask: torch.tensor) -> torch.tensor:
-    return loss / mask.sum() * np.prod(mask.shape)
+def mean_of_unmasked_elements(tensor: torch.tensor, mask: torch.tensor) -> torch.tensor:
+    return torch.mean(tensor * mask) / mask.sum() * np.prod(mask.shape)
 
 def save_net(net: nn.Module, save_dir: str, save_name: str) -> None:
     torch.save(net.state_dict(), os.path.join(save_dir, save_name))

@@ -8,7 +8,7 @@ from basics.abstract_algorithms import RecurrentOffPolicyRLAlgorithm
 from basics.summarizer import Summarizer
 from basics.actors_and_critics import MLPTanhActor, MLPCritic
 from basics.replay_buffer_recurrent import RecurrentBatch
-from basics.utils import get_device, create_target, polyak_update, save_net, load_net
+from basics.utils import get_device, create_target, mean_of_unmasked_elements, polyak_update, save_net, load_net
 
 
 @gin.configurable(module=__name__)
@@ -47,7 +47,7 @@ class RecurrentTD3(RecurrentOffPolicyRLAlgorithm):
 
         self.hidden = None
         self.num_Q_updates = 0
-        self.mean_Q1_val = 0
+        self.mean_Q1_value = 0
 
         # networks
 
@@ -141,8 +141,11 @@ class RecurrentTD3(RecurrentOffPolicyRLAlgorithm):
 
         # compute td error
 
-        Q1_loss = torch.mean((Q1_predictions - targets) ** 2)
-        Q2_loss = torch.mean((Q2_predictions - targets) ** 2)
+        Q1_loss_elementwise = (Q1_predictions - targets) ** 2
+        Q1_loss = mean_of_unmasked_elements(Q1_loss_elementwise, b.m)
+
+        Q2_loss_elementwise = (Q2_predictions - targets) ** 2
+        Q2_loss = mean_of_unmasked_elements(Q2_loss_elementwise, b.m)
 
         assert Q1_loss.shape == ()
         assert Q2_loss.shape == ()
@@ -168,12 +171,13 @@ class RecurrentTD3(RecurrentOffPolicyRLAlgorithm):
             # compute policy loss
 
             a = self.actor(actor_summary_1_T)
-            Q1_val = self.Q1(Q1_summary_1_T.detach(), a)  # val stands for values
-            policy_loss = - torch.mean(Q1_val)
+            Q1_values = self.Q1(Q1_summary_1_T.detach(), a)  # val stands for values
+            policy_loss_elementwise = - Q1_values
+            policy_loss = mean_of_unmasked_elements(policy_loss_elementwise, b.m)
 
-            self.mean_Q1_val = float(Q1_val.mean())
+            self.mean_Q1_value = float(mean_of_unmasked_elements(Q1_values, b.m))
             assert a.shape == (bs, num_bptt, self.action_dim)
-            assert Q1_val.shape == (bs, num_bptt, 1)
+            assert Q1_values.shape == (bs, num_bptt, 1)
             assert policy_loss.shape == ()
 
             # reduce policy loss
@@ -196,12 +200,12 @@ class RecurrentTD3(RecurrentOffPolicyRLAlgorithm):
 
         return {
             # for learning the q functions
-            '(qfunc) Q1 pred': float(Q1_predictions.mean()),
-            '(qfunc) Q2 pred': float(Q2_predictions.mean()),
+            '(qfunc) Q1 pred': float(mean_of_unmasked_elements(Q1_predictions, b.m)),
+            '(qfunc) Q2 pred': float(mean_of_unmasked_elements(Q2_predictions, b.m)),
             '(qfunc) Q1 loss': float(Q1_loss),
             '(qfunc) Q2 loss': float(Q2_loss),
             # for learning the actor
-            '(actor) Q1 val': self.mean_Q1_val  # no need to track policy loss; just its negation
+            '(actor) Q1 value': self.mean_Q1_value
         }
 
     def save_actor(self, save_dir: str) -> None:
