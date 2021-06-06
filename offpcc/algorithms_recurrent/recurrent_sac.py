@@ -20,7 +20,7 @@ def rescale_loss(loss: torch.tensor, mask: torch.tensor) -> torch.tensor:
 
 
 @gin.configurable(module=__name__)
-class SAC_LSTM(RecurrentOffPolicyRLAlgorithm):
+class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
 
     """Soft actor-critic with LSTM-based recurrent actor and critic."""
 

@@ -14,7 +14,7 @@ from basics.utils import get_device, create_target, polyak_update, save_net, loa
 
 
 @gin.configurable(module=__name__)
-class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
+class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
 
     """Deep deterministic policy gradient with recurrent networks"""
 
@@ -23,7 +23,6 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
             input_dim,
             action_dim,
             hidden_dim=gin.REQUIRED,
-            use_target_for_summarizer=gin.REQUIRED,
             gamma=gin.REQUIRED,
             lr=gin.REQUIRED,
             polyak=gin.REQUIRED,
@@ -35,7 +34,6 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
         self.input_dim = input_dim
         self.action_dim = action_dim
         self.hidden_dim = hidden_dim
-        self.use_target_for_summarizer = use_target_for_summarizer
         self.gamma = gamma
         self.lr = lr
         self.polyak = polyak
@@ -45,12 +43,10 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
         # networks
 
         self.actor_summarizer = Summarizer(input_dim, hidden_dim).to(get_device())
+        self.actor_summarizer_targ = create_target(self.actor_summarizer)
+
         self.critic_summarizer = Summarizer(input_dim, hidden_dim).to(get_device())
-
-        if self.use_target_for_summarizer:
-
-            self.actor_summarizer_targ = create_target(self.actor_summarizer)
-            self.critic_summarizer_targ = create_target(self.critic_summarizer)
+        self.critic_summarizer_targ = create_target(self.critic_summarizer)
 
         self.actor = MLPTanhActor(hidden_dim, action_dim).to(get_device())
         self.actor_targ = create_target(self.actor)
@@ -88,18 +84,11 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
         actor_summary = self.actor_summarizer(b.o)
         critic_summary = self.critic_summarizer(b.o)
 
-        if self.use_target_for_lstm:
+        actor_summary_targ = self.actor_summarizer_targ(b.o)
+        critic_summary_targ = self.critic_summarizer_targ(b.o)
 
-            actor_summary_targ = self.actor_summarizer_targ(b.o)
-            critic_summary_targ = self.critic_summarizer_targ(b.o)
-
-            actor_summary_1_T, actor_summary_2_Tplus1 = actor_summary[:, :-1, :], actor_summary_targ[:, 1:, :]
-            critic_summary_1_T, critic_summary_2_Tplus1 = critic_summary[:, :-1, :], critic_summary_targ[:, 1:, :]
-
-        else:
-
-            actor_summary_1_T, actor_summary_2_Tplus1 = actor_summary[:, :-1, :], actor_summary[:, 1:, :]
-            critic_summary_1_T, critic_summary_2_Tplus1 = critic_summary[:, :-1, :], critic_summary[:, 1:, :]
+        actor_summary_1_T, actor_summary_2_Tplus1 = actor_summary[:, :-1, :], actor_summary_targ[:, 1:, :]
+        critic_summary_1_T, critic_summary_2_Tplus1 = critic_summary[:, :-1, :], critic_summary_targ[:, 1:, :]
 
         # compute predictions
 
