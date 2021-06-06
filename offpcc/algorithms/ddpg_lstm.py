@@ -5,7 +5,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from stable_baselines3.common.noise import OrnsteinUhlenbeckActionNoise
 
 from basics.abstract_algorithm import RecurrentOffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPTanhActor, MLPCritic, set_requires_grad_flag
@@ -25,7 +24,6 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
             hidden_size=gin.REQUIRED,
             num_lstm_layers=gin.REQUIRED,  # should ideally be configured somewhere else; TODO(zhihan)
             use_target_for_lstm=gin.REQUIRED,
-            action_noise_type=gin.REQUIRED,
             action_noise=gin.REQUIRED,
             gamma=gin.REQUIRED,
             lr=gin.REQUIRED,
@@ -41,14 +39,6 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
             lr=lr,
             polyak=polyak
         )
-
-        if action_noise_type == "ou":
-            self.noise_callable = OrnsteinUhlenbeckActionNoise(mean=np.zeros((action_dim,)),
-                                                               sigma=np.ones((action_dim,)))
-        elif action_noise_type == "uniform":
-            self.noise_callable = lambda: np.random.randn(action_dim)
-        else:
-            raise NotImplementedError(f"Noise type {action_noise_type} is not implemented.")
 
         self.action_noise = action_noise
 
@@ -88,21 +78,16 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
         self.Q_optimizer = optim.Adam(self.Q.parameters(), lr=lr)
 
-    def maybe_reset_noise(self):
-        """Noise types of OU-noise need to be reset upon episode termination."""
-        if isinstance(self.noise_callable, OrnsteinUhlenbeckActionNoise):
-            self.noise_callable.reset()
-
     def act(self, observation: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
             observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
             self.actor_lstm.flatten_parameters()
             h, self.h_and_c = self.actor_lstm(observation, self.h_and_c)
             greedy_action = self.actor(h).view(-1).cpu().numpy()  # view as 1d -> to cpu -> to numpy
-            if not deterministic:
-                return np.clip(greedy_action + self.action_noise * self.noise_callable(), -1.0, 1.0)
-            else:
+            if deterministic:
                 return greedy_action
+            else:
+                return np.clip(greedy_action + self.action_noise * np.random.randn(self.action_dim), -1.0, 1.0)
 
     def update_networks(self, b: RecurrentBatch):
 

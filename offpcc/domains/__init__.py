@@ -150,3 +150,9 @@ register(
     entry_point='domains.reacher:pomdp_v1',
     max_episode_steps=50
 )
+
+register(
+    id='water-maze-v0',
+    entry_point='domains.water_maze:WaterMazeEnv',
+    max_episode_steps=200,
+)

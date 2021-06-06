@@ -1,7 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
-import random
 import gym
 from gym import spaces
 from gym.utils import seeding

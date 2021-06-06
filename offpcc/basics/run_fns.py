@@ -25,15 +25,8 @@ def make_log_dir(env_name, algo_name, run_id) -> str:
     return log_dir
 
 
-def maybe_reset_noise(algorithm: Union[OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm]):
-    """The outer function depends on algorithm; the inner function depends on action noise type"""
-    if isinstance(algorithm, DDPG) or isinstance(algorithm, TD3):
-        algorithm.maybe_reset_noise()
-
-
 def test_for_one_episode(env, algorithm, render=False) -> tuple:
     state, done, episode_return, episode_len = env.reset(), False, 0, 0
-    maybe_reset_noise(algorithm)
     if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
         algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
     while not done:
@@ -148,10 +141,6 @@ def train(
         # while algorithm is not. Once an episode has finished, we do algorithm = deepcopy(algorithm_clone) to carry
         # over the changes.
 
-    if initial_exploration_type == "ou":
-        noise_callable = OrnsteinUhlenbeckActionNoise(mean=np.zeros(env.action_space.shape),
-                                                      sigma=np.ones(env.action_space.shape))
-
     for t in range(total_steps):
 
         # action = algorithm.act(state, deterministic=False)
@@ -159,12 +148,7 @@ def train(
         if t >= update_after:  # exploration is done
             action = algorithm.act(state, deterministic=False)
         else:
-            if initial_exploration_type == "ou":
-                action = np.clip(noise_callable(), -1, 1)
-            elif initial_exploration_type == "uniform":
-                action = env.action_space.sample()
-            else:
-                raise NotImplementedError
+            action = env.action_space.sample()
 
         next_state, reward, done, info = env.step(action)
         episode_len += 1
@@ -208,11 +192,6 @@ def train(
             train_episode_lens.append(episode_len)
             train_episode_rets.append(episode_ret)
             state, episode_len, episode_ret = env.reset(), 0, 0  # reset state and stats trackers
-
-            if initial_exploration_type == "ou":  # actually not necessary after initial exploration finishes
-                noise_callable.reset()
-
-            maybe_reset_noise(algorithm)  # actually not necessary before initial exploration finishes
 
             if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
 
