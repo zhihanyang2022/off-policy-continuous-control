@@ -313,5 +313,5 @@ def train(
             print(stats_string)
 
     # save stats and model after training loop finishes
-    algorithm.save_networks(wandb.run.dir)  # will get uploaded to cloud after script finishes
+    algorithm.save_actor(wandb.run.dir)  # will get uploaded to cloud after script finishes
     csv_file.close()

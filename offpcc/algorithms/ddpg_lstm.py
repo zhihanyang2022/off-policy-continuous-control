@@ -49,8 +49,6 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
         self.critic_lstm = nn.LSTM(input_dim, hidden_size, batch_first=True, num_layers=num_lstm_layers).to(
             get_device())
 
-        self.networks_to_save_dict.update({'actor_lstm': self.actor_lstm})
-
         self.use_target_for_lstm = use_target_for_lstm
 
         if use_target_for_lstm:
@@ -64,8 +62,6 @@ class DDPG_LSTM(RecurrentOffPolicyRLAlgorithm):
         self.actor = MLPTanhActor(hidden_size, action_dim).to(get_device())
         self.actor_targ = deepcopy(self.actor)
         set_requires_grad_flag(self.actor_targ, False)
-
-        self.networks_to_save_dict.update({'actor': self.actor})
 
         self.Q = MLPCritic(hidden_size, action_dim).to(get_device())
         self.Q_targ = deepcopy(self.Q)

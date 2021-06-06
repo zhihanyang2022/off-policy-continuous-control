@@ -2,6 +2,7 @@ from typing import Union
 import gin
 import os
 
+from copy import deepcopy
 import numpy as np
 import torch
 import torch.nn as nn
@@ -23,6 +24,10 @@ class SAC(OffPolicyRLAlgorithm):
 
     The autotuning of the entropy coefficient (alpha) follows almost EXACTLY from SB3's SAC implementation, while
     other code follows from spinup's implementation.
+
+    Alpha is called the entropy coefficient, which determines how much the training code cares about
+    entropy maximization. Target entropy is NOT a target for alpha; instead, it is a target for the
+    policy entropy, which is achieved by tuning alpha appropriately.
     """
 
     def __init__(
@@ -30,37 +35,23 @@ class SAC(OffPolicyRLAlgorithm):
             input_dim: int,
             action_dim: int,
             gamma: float = gin.REQUIRED,
-            alpha: float = gin.REQUIRED,
+            alpha: float = gin.REQUIRED,  # if autotune_alpha, this becomes the initial alpha value
             autotune_alpha: bool = gin.REQUIRED,
             lr: float = gin.REQUIRED,
             polyak: float = gin.REQUIRED
     ):
 
-        # networks
+        # hyperparameters
 
-        self.actor = MLPGaussianActor(input_dim=input_dim, action_dim=action_dim).to(get_device())
+        super().__init__(
+            input_dim=input_dim,
+            action_dim=action_dim,
+            gamma=gamma,
+            lr=lr,
+            polyak=polyak
+        )
 
-        self.Q1 = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
-        self.Q1_targ = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
-        set_requires_grad_flag(self.Q1_targ, False)
-        self.Q1_targ.load_state_dict(self.Q1.state_dict())
-
-        self.Q2 = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
-        self.Q2_targ = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
-        set_requires_grad_flag(self.Q2_targ, False)
-        self.Q2_targ.load_state_dict(self.Q2.state_dict())
-
-        # optimizers
-
-        self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
-        self.Q1_optimizer = optim.Adam(self.Q1.parameters(), lr=lr)
-        self.Q2_optimizer = optim.Adam(self.Q2.parameters(), lr=lr)
-
-        # hyper-parameters
-
-        self.gamma = gamma
         self.autotune_alpha = autotune_alpha
-        self.polyak = polyak
 
         if autotune_alpha:
             self.log_alpha = torch.log(torch.ones(1) * alpha).requires_grad(True).to(get_device())
@@ -68,11 +59,25 @@ class SAC(OffPolicyRLAlgorithm):
         else:
             self.alpha = alpha
 
-        # miscellaneous
-
-        self.input_dim = input_dim
-        self.action_dim = action_dim  # for shape checking
         self.target_entropy = - self.action_dim  # int, but it will get broadcasted over a FloatTensor as a float
+
+        # networks
+
+        self.actor = MLPGaussianActor(input_dim=input_dim, action_dim=action_dim).to(get_device())
+
+        self.Q1 = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
+        self.Q1_targ = deepcopy(self.Q1)
+        set_requires_grad_flag(self.Q1_targ, False)
+
+        self.Q2 = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
+        self.Q2_targ = deepcopy(self.Q2)
+        set_requires_grad_flag(self.Q2_targ, False)
+
+        # optimizers
+
+        self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
+        self.Q1_optimizer = optim.Adam(self.Q1.parameters(), lr=lr)
+        self.Q2_optimizer = optim.Adam(self.Q2.parameters(), lr=lr)
 
     def sample_action_from_distribution(
             self,
@@ -120,15 +125,11 @@ class SAC(OffPolicyRLAlgorithm):
         else:
             return self.alpha
 
-    def polyak_update(self, target_net: nn.Module, prediction_net: nn.Module) -> None:
-        for target_param, prediction_param in zip(target_net.parameters(), prediction_net.parameters()):
-            target_param.data.copy_(target_param.data * self.polyak + prediction_param.data * (1 - self.polyak))
-
     def update_networks(self, b: Batch) -> dict:
 
         bs = len(b.ns)  # for shape checking
 
-        # compute prediction
+        # compute predictions
 
         Q1_predictions = self.Q1(b.s, b.a)
         Q2_predictions = self.Q2(b.s, b.a)
@@ -136,7 +137,7 @@ class SAC(OffPolicyRLAlgorithm):
         assert Q1_predictions.shape == (bs, 1)
         assert Q2_predictions.shape == (bs, 1)
 
-        # compute target (n stands for next)
+        # compute targets
 
         with torch.no_grad():
 
@@ -173,9 +174,6 @@ class SAC(OffPolicyRLAlgorithm):
 
         # compute policy loss
 
-        set_requires_grad_flag(self.Q1, False)
-        set_requires_grad_flag(self.Q2, False)
-
         a, log_pi_a_given_s = self.sample_action_from_distribution(b.s, deterministic=False, return_log_prob=True)
 
         min_Q = torch.min(self.Q1(b.s, a), self.Q2(b.s, a))
@@ -194,9 +192,6 @@ class SAC(OffPolicyRLAlgorithm):
         policy_loss.backward()
         self.actor_optimizer.step()
 
-        set_requires_grad_flag(self.Q1, True)
-        set_requires_grad_flag(self.Q2, True)
-
         if self.autotune_alpha:
 
             # compute log alpha loss
@@ -206,16 +201,26 @@ class SAC(OffPolicyRLAlgorithm):
             # alpha_loss = - self.log_alpha * (log_pi_a_given_s.detach() + self.target_entropy)  (eq used in SB3)
             #            = self.log_alpha * (- log_pi_a_given_s.detach() - self.target_entropy)
             #            = self.log_alpha * (sample_entropy - self.target_entropy)
-            #            = self.log_alpha * excess_entropy  (eq used in here)
+            #            = self.log_alpha * excess_entropy (in expectation) (eq used in this codebase)
             #
-            # If excess_entropy > 0, then log_alpha needs to be decreased to reduce alpha_loss, which corresponds to
-            # less weighting on sample_entropy in the upcoming policy loss and hence reduces excess_entropy.
+            # If excess_entropy > 0, minimum is achieved by settings log_alpha to negative (ideally negative infinity),
+            # which corresponds to an alpha value between (0, 1).
             #
-            # If excess_entropy < 0, then log_alpha needs to be increased to reduce alpha_loss, which corresponds to
-            # more weighting on sample_entropy in the upcoming policy loss and hence increases excess_entropy.
+            # If excess_entropy < 0, minimum is achieved by setting log_alpha to positive (ideally positive infinity),
+            # which corresponds to an alpha value greater than 1.
+            #
+            # Intuitively, an alpha value in (0, 1) means that entropy maximization is less important than other
+            # objectives, while an alpha value greater than 1 means that it is more important.
+            #
+            # Q: Where does SB3 compute alpha loss?
+            # https://github.com/DLR-RM/stable-baselines3/blob/78e8d405d7bf6186c8529ed26967cb17ccbe420c/stable_baselines3/sac/sac.py#L184
+            #
+            # Q: Why use log_alpha instead of alpha directly?
+            # - https://github.com/DLR-RM/stable-baselines3/issues/36
+            # - https://github.com/rail-berkeley/softlearning/issues/37
 
             excess_entropy = sample_entropy.detach() - self.target_entropy
-            log_alpha_loss = self.log_alpha * excess_entropy
+            log_alpha_loss = self.log_alpha * torch.mean(excess_entropy)
 
             # reduce log alpha loss
 
@@ -229,8 +234,8 @@ class SAC(OffPolicyRLAlgorithm):
 
         # update target networks
 
-        self.polyak_update(target_net=self.Q1_targ, prediction_net=self.Q1)
-        self.polyak_update(target_net=self.Q2_targ, prediction_net=self.Q2)
+        self.polyak_update(targ_net=self.Q1_targ, pred_net=self.Q1)
+        self.polyak_update(targ_net=self.Q2_targ, pred_net=self.Q2)
 
         return {
             # for learning the q functions
@@ -246,26 +251,3 @@ class SAC(OffPolicyRLAlgorithm):
             '(alpha) alpha': self.get_current_alpha(),
             '(alpha) log alpha loss': float(log_alpha_loss.mean())
         }
-
-    def save_networks(self, save_dir: str) -> None:
-        torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))
-        torch.save(self.Q1.state_dict(), os.path.join(save_dir, 'Q1.pth'))
-        torch.save(self.Q1_targ.state_dict(), os.path.join(save_dir, 'Q1_targ.pth'))
-        torch.save(self.Q2.state_dict(), os.path.join(save_dir, 'Q2.pth'))
-        torch.save(self.Q2_targ.state_dict(), os.path.join(save_dir, 'Q2_targ.pth'))
-
-    def load_actor(self, save_dir: str) -> None:
-        self.actor.load_state_dict(
-            torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
-
-    def load_networks(self, save_dir: str) -> None:
-        self.actor.load_state_dict(
-            torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device())))
-        self.Q1.load_state_dict(
-            torch.load(os.path.join(save_dir, 'Q1.pth'), map_location=torch.device(get_device())))
-        self.Q1_targ.load_state_dict(
-            torch.load(os.path.join(save_dir, 'Q1_targ.pth'), map_location=torch.device(get_device())))
-        self.Q2.load_state_dict(
-            torch.load(os.path.join(save_dir, 'Q2.pth'), map_location=torch.device(get_device())))
-        self.Q2_targ.load_state_dict(
-            torch.load(os.path.join(save_dir, 'Q2_targ.pth'), map_location=torch.device(get_device())))

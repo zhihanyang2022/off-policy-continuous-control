@@ -24,7 +24,6 @@ class OffPolicyRLAlgorithm(ABC):
         self.polyak = polyak
 
         self.actor = None
-        self.networks_to_save_dict = {}
 
     # methods for collecting rollouts
 
@@ -47,29 +46,14 @@ class OffPolicyRLAlgorithm(ABC):
 
     # methods for saving networks
 
-    def save_networks(self, save_dir: str) -> None:
-        """Save all the networks"""
-        for network_name, network in self.networks_to_save_dict.items():
-            torch.save(network.state_dict(), os.path.join(save_dir, f'{network_name}.pth'))
+    def save_actor(self, save_dir: str) -> None:
+        torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))
 
     def load_actor(self, save_dir: str) -> None:
         """Load the actor network only"""
         self.actor.load_state_dict(
-            torch.load(
-                os.path.join(save_dir, 'actor.pth'),
-                map_location=torch.device(get_device())
-            )
+            torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device()))
         )
-
-    def load_networks(self, save_dir: str) -> None:
-        """Load all the networks"""
-        for network_name, network in self.networks_to_save_dict.items():
-            network.load_state_dict(
-                torch.load(
-                    os.path.join(save_dir, f'{network_name}.pth'),
-                    map_location=torch.device(get_device())
-                )
-            )
 
 
 class RecurrentOffPolicyRLAlgorithm(OffPolicyRLAlgorithm):
@@ -98,24 +82,14 @@ class RecurrentOffPolicyRLAlgorithm(OffPolicyRLAlgorithm):
         h, h_and_c = lstm(o)
         return h
 
-    @abstractmethod
-    def update_networks(self, b: RecurrentBatch) -> dict:
-        """Only called during learning"""
-        pass
-
-    # methods for saving networks
+    def save_actor(self, save_dir: str) -> None:
+        torch.save(self.actor.state_dict(), os.path.join(save_dir, 'actor.pth'))
+        torch.save(self.actor_lstm.state_dict(), os.path.join(save_dir, 'actor_lstm.pth'))
 
     def load_actor(self, save_dir: str) -> None:
-        """Load the actor network only"""
-        self.actor_lstm.load_state_dict(
-            torch.load(
-                os.path.join(save_dir, 'actor_lstm.pth'),
-                map_location=torch.device(get_device())
-            )
-        )
         self.actor.load_state_dict(
-            torch.load(
-                os.path.join(save_dir, 'actor.pth'),
-                map_location=torch.device(get_device())
-            )
+            torch.load(os.path.join(save_dir, 'actor.pth'), map_location=torch.device(get_device()))
+        )
+        self.actor_lstm.load_state_dict(
+            torch.load(os.path.join(save_dir, 'actor_lstm.pth'), map_location=torch.device(get_device()))
         )

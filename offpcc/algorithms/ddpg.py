@@ -48,8 +48,6 @@ class DDPG(OffPolicyRLAlgorithm):
         self.Q_targ = deepcopy(self.Q)
         set_requires_grad_flag(self.Q_targ, False)
 
-        self.networks_to_save_dict.update({"actor": self.actor})
-
         # optimizers
 
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
@@ -62,7 +60,7 @@ class DDPG(OffPolicyRLAlgorithm):
             if deterministic:
                 return greedy_action
             else:
-                return np.clip(greedy_action + self.action_noise * np.random.randn(len(greedy_action)), -1.0, 1.0)
+                return np.clip(greedy_action + self.action_noise * np.random.randn(self.action_dim), -1.0, 1.0)
 
     def update_networks(self, b: Batch):
 
