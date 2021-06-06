@@ -175,7 +175,7 @@ class RecurrentTD3(RecurrentOffPolicyRLAlgorithm):
             policy_loss_elementwise = - Q1_values
             policy_loss = mean_of_unmasked_elements(policy_loss_elementwise, b.m)
 
-            self.mean_Q1_value = float(mean_of_unmasked_elements(Q1_values, b.m))
+            self.mean_Q1_value = float(-policy_loss)
             assert a.shape == (bs, num_bptt, self.action_dim)
             assert Q1_values.shape == (bs, num_bptt, 1)
             assert policy_loss.shape == ()
