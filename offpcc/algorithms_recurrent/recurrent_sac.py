@@ -221,7 +221,7 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
             excess_entropy = sample_entropy.detach() - self.target_entropy
             log_alpha_loss = self.log_alpha * torch.mean(excess_entropy)
 
-            assert log_alpha_loss.shape == ()
+            assert log_alpha_loss.shape == (1,)
 
             # reduce log alpha loss
 
