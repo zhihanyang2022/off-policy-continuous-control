@@ -81,7 +81,7 @@ class PendulumVarLenFullEnv(gym.Env):
         self.last_u = np.zeros(self.action_space.shape)  # modified; originally None
         self.l = self.np_random.choice([LOW, HIGH])
         self.should_update_viewer = True
-        print(f'Called reset with l={self.l}')
+        # print(f'Called reset with l={self.l}')
         return self._get_obs()
 
     def _get_obs(self):
