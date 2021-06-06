@@ -17,4 +17,5 @@ seaborn
 tensorflow==1.8.0
 tqdm
 joblib
-# stable-baselines3 (plz install this last on your own, i.e., via pip install)
+# stable-baselines3 (plz install this on your own, i.e., via pip install)
+# pybullet (plz install this on your own following instructions here: https://github.com/benelot/pybullet-gym)
