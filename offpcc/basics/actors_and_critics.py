@@ -4,7 +4,7 @@ import torch.nn as nn
 
 
 @gin.configurable(module=__name__)
-def make_MLP(num_in, num_out, final_activation, hidden_dimensions=gin.REQUIRED):
+def make_MLP(num_in, num_out, final_activation, hidden_dimensions=(256, 256)):
 
     tensor_dimensions = [num_in]
     if hidden_dimensions is not None:

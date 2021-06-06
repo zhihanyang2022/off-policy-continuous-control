@@ -92,6 +92,8 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         actor_summary_1_T, actor_summary_2_Tplus1 = actor_summary[:, :-1, :], actor_summary_targ[:, 1:, :]
         critic_summary_1_T, critic_summary_2_Tplus1 = critic_summary[:, :-1, :], critic_summary_targ[:, 1:, :]
 
+        assert self.actor_summary.shape == (bs, num_bptt+1, self.hidden_dim)
+
         # compute predictions
 
         predictions = self.Q(critic_summary_1_T, b.a)
@@ -133,6 +135,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         policy_loss = self.rescale_loss(torch.mean(b.m * policy_loss_elementwise), b.m)
 
         assert a.shape == (bs, num_bptt, self.action_dim)
+        assert Q_values.shape == (bs, num_bptt, 1)
         assert policy_loss.shape == ()
 
         # reduce policy loss

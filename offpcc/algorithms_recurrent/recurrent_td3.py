@@ -84,7 +84,7 @@ class RecurrentTD3(RecurrentOffPolicyRLAlgorithm):
 
     def act(self, observation: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
-            observation = torch.tensor(observation).unsqueeze(0).float().to(get_device())
+            observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
             summary, self.hidden = self.actor_summarizer(observation, self.hidden, return_hidden=True)
             greedy_action = self.actor(summary).view(-1).cpu().numpy()  # view as 1d -> to cpu -> to numpy
             if deterministic:
@@ -94,7 +94,7 @@ class RecurrentTD3(RecurrentOffPolicyRLAlgorithm):
 
     def update_networks(self, b: RecurrentBatch):
 
-        bs = len(b.ns)  # for shape checking
+        bs, num_bptt = b.r.shape[0], b.r.shape[1]
 
         # compute summary
 
@@ -110,10 +110,15 @@ class RecurrentTD3(RecurrentOffPolicyRLAlgorithm):
         Q1_summary_1_T, Q1_summary_2_Tplus1 = Q1_summary[:, :-1, :], Q1_summary_targ[:, 1:, :]
         Q2_summary_1_T, Q2_summary_2_Tplus1 = Q2_summary[:, :-1, :], Q2_summary_targ[:, 1:, :]
 
+        assert self.actor_summary.shape == (bs, num_bptt+1, self.hidden_dim)
+
         # compute predictions
 
         Q1_predictions = self.Q1(Q1_summary_1_T, b.a)
         Q2_predictions = self.Q2(Q2_summary_1_T, b.a)
+
+        assert Q1_predictions.shape == (bs, num_bptt, 1)
+        assert Q2_predictions.shape == (bs, num_bptt, 1)
 
         # compute targets
 
@@ -130,8 +135,8 @@ class RecurrentTD3(RecurrentOffPolicyRLAlgorithm):
 
             targets = b.r + self.gamma * (1 - b.d) * n_min_Q_targ
 
-            assert na.shape == (bs, self.action_dim)
-            assert n_min_Q_targ.shape == (bs, 1)
+            assert na.shape == (bs, num_bptt, self.action_dim)
+            assert n_min_Q_targ.shape == (bs, num_bptt, 1)
             assert targets.shape == (bs, 1)
 
         # compute td error
@@ -167,8 +172,8 @@ class RecurrentTD3(RecurrentOffPolicyRLAlgorithm):
             policy_loss = - torch.mean(Q1_val)
 
             self.mean_Q1_val = float(Q1_val.mean())
-            assert a.shape == (bs, self.action_dim)
-            assert Q1_val.shape == (bs, 1)
+            assert a.shape == (bs, num_bptt, self.action_dim)
+            assert Q1_val.shape == (bs, num_bptt, 1)
             assert policy_loss.shape == ()
 
             # reduce policy loss
