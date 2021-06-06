@@ -1,9 +1,7 @@
 import gin
 
-from copy import deepcopy
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.optim as optim
 
 from basics.abstract_algorithms import RecurrentOffPolicyRLAlgorithm
@@ -19,14 +17,14 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
     """Deep deterministic policy gradient with recurrent networks"""
 
     def __init__(
-            self,
-            input_dim,
-            action_dim,
-            hidden_dim=gin.REQUIRED,
-            gamma=gin.REQUIRED,
-            lr=gin.REQUIRED,
-            polyak=gin.REQUIRED,
-            action_noise=gin.REQUIRED,
+        self,
+        input_dim,
+        action_dim,
+        hidden_dim=256,
+        gamma=0.99,
+        lr=3e-4,
+        polyak=0.995,
+        action_noise=0.1,
     ):
 
         # hyperparameters
@@ -39,6 +37,10 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         self.polyak = polyak
 
         self.action_noise = action_noise
+
+        # trackers
+
+        self.hidden = None
 
         # networks
 
@@ -58,6 +60,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
 
         self.actor_summarizer_optimizer = optim.Adam(self.actor_summarizer.parameters(), lr=lr)
         self.critic_summarizer_optimizer = optim.Adam(self.critic_summarizer.parameters(), lr=lr)
+
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
         self.Q_optimizer = optim.Adam(self.Q.parameters(), lr=lr)
 
@@ -67,7 +70,6 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
     def act(self, observation: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
             observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
-            self.actor_lstm.flatten_parameters()
             summary, self.hidden = self.actor_summarizer(observation, self.hidden, return_hidden=True)
             greedy_action = self.actor(summary).view(-1).cpu().numpy()  # view as 1d -> to cpu -> to numpy
             if deterministic:

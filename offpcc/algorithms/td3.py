@@ -16,16 +16,16 @@ from basics.utils import get_device, create_target, polyak_update, save_net, loa
 class TD3(OffPolicyRLAlgorithm):
 
     def __init__(
-            self,
-            input_dim,
-            action_dim,
-            gamma=gin.REQUIRED,
-            lr=gin.REQUIRED,
-            polyak=gin.REQUIRED,
-            action_noise=gin.REQUIRED,  # standard deviation of action noise
-            target_noise=gin.REQUIRED,  # standard deviation of target smoothing noise
-            noise_clip=gin.REQUIRED,  # max abs value of target smoothing noise
-            policy_delay=gin.REQUIRED
+        self,
+        input_dim,
+        action_dim,
+        gamma=0.99,
+        lr=3e-4,
+        polyak=0.995,
+        action_noise=0.1,  # standard deviation of action noise
+        target_noise=0.2,  # standard deviation of target smoothing noise
+        noise_clip=0.5,  # max abs value of target smoothing noise
+        policy_delay=2
     ):
 
         # hyper-parameters
@@ -148,8 +148,8 @@ class TD3(OffPolicyRLAlgorithm):
 
         return {
             # for learning the q functions
-            '(qfunc) Q1 pred': float(Q1_pred.mean()),
-            '(qfunc) Q2 pred': float(Q2_pred.mean()),
+            '(qfunc) Q1 pred': float(Q1_predictions.mean()),
+            '(qfunc) Q2 pred': float(Q2_predictions.mean()),
             '(qfunc) Q1 loss': float(Q1_loss),
             '(qfunc) Q2 loss': float(Q2_loss),
             # for learning the actor

@@ -17,10 +17,10 @@ class DDPG(OffPolicyRLAlgorithm):
         self,
         input_dim,
         action_dim,
-        gamma=gin.REQUIRED,
-        lr=gin.REQUIRED,
-        polyak=gin.REQUIRED,
-        action_noise=gin.REQUIRED,
+        gamma=0.99,
+        lr=3e-4,
+        polyak=0.995,
+        action_noise=0.1,
     ):
 
         # hyper-parameters
