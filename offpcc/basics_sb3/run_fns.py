@@ -12,6 +12,7 @@ from stable_baselines3.common.noise import NormalActionNoise
 from stable_baselines3.common.evaluation import evaluate_policy
 
 from basics_sb3.callbacks import MyEvalCallback
+from basics.cuda_utils import get_device
 
 # @@@@@ wrapper functions for gin to configure models from SB3 @@@@@
 
@@ -47,7 +48,7 @@ def configure_ddpg(
         policy_kwargs={'net_arch': list(hidden_dimensions)},
         verbose=1,
         seed=seed,
-        device='cpu',
+        device=get_device(),
     )
     return model
 
@@ -89,7 +90,7 @@ def configure_td3(
         policy_kwargs={'net_arch': list(hidden_dimensions)},
         verbose=1,
         seed=seed,
-        device='cpu',
+        device=get_device(),
     )
     return model
 
@@ -126,7 +127,7 @@ def configure_sac(
         policy_kwargs={'net_arch': list(hidden_dimensions)},
         verbose=1,
         seed=seed,
-        device='cpu'
+        device=get_device()
     )
     return model
 
