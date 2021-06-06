@@ -11,6 +11,7 @@ from basics.replay_buffer import ReplayBuffer
 from basics.replay_buffer_recurrent import instantiate_recurrent_replay_buffer
 from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from algorithms import *
+from algorithms_recurrent import *
 
 from basics.run_fns import train, make_log_dir, load_and_visualize_policy
 
@@ -18,8 +19,9 @@ algo_name2class = {
     'ddpg': DDPG,
     'td3': TD3,
     'sac': SAC,
-    'ddpg_lstm': DDPG_LSTM,
-    'sac_lstm': SAC_LSTM
+    'rdpg': RecurrentDDPG,
+    'rtd3': RecurrentTD3,
+    'rsac': RecurrentSAC
 }
 
 parser = argparse.ArgumentParser()

@@ -1,3 +1,3 @@
 from algorithms_recurrent.recurrent_ddpg import RecurrentDDPG
 from algorithms_recurrent.recurrent_td3 import RecurrentTD3
-from algorithms_recurrent.recurrent_sac_incorrect import RecurrentSAC
+from algorithms_recurrent.recurrent_sac import RecurrentSAC
