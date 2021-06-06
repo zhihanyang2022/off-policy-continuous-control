@@ -92,7 +92,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         actor_summary_1_T, actor_summary_2_Tplus1 = actor_summary[:, :-1, :], actor_summary_targ[:, 1:, :]
         critic_summary_1_T, critic_summary_2_Tplus1 = critic_summary[:, :-1, :], critic_summary_targ[:, 1:, :]
 
-        assert self.actor_summary.shape == (bs, num_bptt+1, self.hidden_dim)
+        assert actor_summary.shape == (bs, num_bptt+1, self.hidden_dim)
 
         # compute predictions
 
