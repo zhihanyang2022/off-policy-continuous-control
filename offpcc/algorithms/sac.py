@@ -11,17 +11,15 @@ import torch.optim as optim
 from torch.distributions import Normal, Independent
 
 from basics.abstract_algorithm import OffPolicyRLAlgorithm
-from basics.actors_and_critics import MLPGaussianActor, MLPCritic, set_requires_grad_flag
+from basics.actors_and_critics import MLPGaussianActor, MLPCritic
 from basics.replay_buffer import Batch
-from basics.utils import get_device
+from basics.utils import get_device, create_target, polyak_update, save_net, load_net
 
 
 @gin.configurable(module=__name__)
 class SAC(OffPolicyRLAlgorithm):
 
     """
-    Soft actor-critic
-
     The autotuning of the entropy coefficient (alpha) follows almost EXACTLY from SB3's SAC implementation, while
     other code follows from spinup's implementation.
 
@@ -31,25 +29,23 @@ class SAC(OffPolicyRLAlgorithm):
     """
 
     def __init__(
-            self,
-            input_dim: int,
-            action_dim: int,
-            gamma: float = gin.REQUIRED,
-            lr: float = gin.REQUIRED,
-            polyak: float = gin.REQUIRED,
-            alpha: float = gin.REQUIRED,  # if autotune_alpha, this becomes the initial alpha value
-            autotune_alpha: bool = gin.REQUIRED,
+        self,
+        input_dim,
+        action_dim,
+        gamma=gin.REQUIRED,
+        lr=gin.REQUIRED,
+        polyak=gin.REQUIRED,
+        alpha=gin.REQUIRED,  # if autotune_alpha, this becomes the initial alpha value
+        autotune_alpha:bool=gin.REQUIRED,
     ):
 
         # hyperparameters
 
-        super().__init__(
-            input_dim=input_dim,
-            action_dim=action_dim,
-            gamma=gamma,
-            lr=lr,
-            polyak=polyak
-        )
+        self.input_dim = input_dim,
+        self.action_dim = action_dim,
+        self.gamma = gamma,
+        self.lr = lr,
+        self.polyak = polyak
 
         self.autotune_alpha = autotune_alpha
 
@@ -66,12 +62,10 @@ class SAC(OffPolicyRLAlgorithm):
         self.actor = MLPGaussianActor(input_dim=input_dim, action_dim=action_dim).to(get_device())
 
         self.Q1 = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
-        self.Q1_targ = deepcopy(self.Q1)
-        set_requires_grad_flag(self.Q1_targ, False)
+        self.Q1_targ = create_target(self.Q1)
 
         self.Q2 = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
-        self.Q2_targ = deepcopy(self.Q2)
-        set_requires_grad_flag(self.Q2_targ, False)
+        self.Q2_targ = create_target(self.Q2)
 
         # optimizers
 
@@ -251,3 +245,9 @@ class SAC(OffPolicyRLAlgorithm):
             '(alpha) alpha': self.get_current_alpha(),
             '(alpha) log alpha loss': float(log_alpha_loss.mean())
         }
+
+    def save_actor(self, save_dir: str) -> None:
+        save_net(net=self.actor, save_dir=save_dir, save_name="actor.pth")
+
+    def load_actor(self, save_dir: str) -> None:
+        load_net(net=self.actor, save_dir=save_dir, save_name="actor.pth")
