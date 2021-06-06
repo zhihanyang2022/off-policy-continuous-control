@@ -92,7 +92,7 @@ def train(
         num_epochs=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
         num_test_episodes_per_epoch=gin.REQUIRED,
-        update_every=gin.REQUIRED,  # number of env interactions between grad updates; but the ratio is locked to 1-to-1
+        update_every=1,  # number of env interactions between grad updates; but the ratio is locked to 1-to-1
         update_after=gin.REQUIRED,  # for exploration; no update & random action from action space
         initial_exploration_type=gin.REQUIRED
 ) -> None:
