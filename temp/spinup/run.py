@@ -11,7 +11,7 @@ from textwrap import dedent
 # values (therefore must be treated separately).
 RUN_KEYS = ['num_cpu', 'data_dir', 'datestamp']
 
-# Command line sweetener, allowing short-form flags for common, longer flags.
+# Command line sweetener, allowing short-form flags for basics, longer flags.
 SUBSTITUTIONS = {'env': 'env_name',
                  'hid': 'ac_kwargs:hidden_sizes',
                  'act': 'ac_kwargs:activation',
@@ -224,7 +224,7 @@ if __name__ == '__main__':
 
             See the "Running Experiments" docs page for more details.
 
-            Also: Some common but long flags can be substituted for shorter
+            Also: Some basics but long flags can be substituted for shorter
             ones. Valid substitutions are:
             """) + str_valid_subs
         print(special_info)
