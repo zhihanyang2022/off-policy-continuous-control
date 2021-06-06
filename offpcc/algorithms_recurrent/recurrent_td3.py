@@ -137,7 +137,7 @@ class RecurrentTD3(RecurrentOffPolicyRLAlgorithm):
 
             assert na.shape == (bs, num_bptt, self.action_dim)
             assert n_min_Q_targ.shape == (bs, num_bptt, 1)
-            assert targets.shape == (bs, 1)
+            assert targets.shape == (bs, num_bptt, 1)
 
         # compute td error
 
