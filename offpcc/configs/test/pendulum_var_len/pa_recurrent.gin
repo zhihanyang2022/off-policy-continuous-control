@@ -11,12 +11,11 @@ batch_size = 100
 num_bptt = 10
 
 # ====================================================================================
-# applying the parameters above to two codebases (sb3 and ours)
+# applying the parameters above to our codebase
 # ====================================================================================
 
 import basics.replay_buffer_recurrent
 import basics.run_fns
-import basics_sb3.run_fns
 
 basics.replay_buffer_recurrent.instantiate_recurrent_replay_buffer.num_bptt = %num_bptt
 basics.replay_buffer_recurrent.instantiate_recurrent_replay_buffer.batch_size = %batch_size
