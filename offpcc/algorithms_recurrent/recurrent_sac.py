@@ -140,13 +140,15 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
         Q1_summary_1_T, Q1_summary_2_Tplus1 = Q1_summary[:, :-1, :], Q1_summary_targ[:, 1:, :]
         Q2_summary_1_T, Q2_summary_2_Tplus1 = Q2_summary[:, :-1, :], Q2_summary_targ[:, 1:, :]
 
+        assert actor_summary.shape == (bs, num_bptt, self.hidden_dim)
+
         # compute predictions
 
         Q1_predictions = self.Q1(Q1_summary_1_T, b.a)
         Q2_predictions = self.Q2(Q2_summary_1_T, b.a)
 
-        assert Q1_predictions.shape == (bs, 1)
-        assert Q2_predictions.shape == (bs, 1)
+        assert Q1_predictions.shape == (bs, num_bptt, 1)
+        assert Q2_predictions.shape == (bs, num_bptt, 1)
 
         # compute targets
 
