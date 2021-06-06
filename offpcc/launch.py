@@ -9,7 +9,7 @@ from gym.wrappers import RescaleAction
 
 from basics.replay_buffer import ReplayBuffer
 from basics.replay_buffer_recurrent import instantiate_recurrent_replay_buffer
-from basics.abstract_algorithm import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
+from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from algorithms import *
 
 from basics.run_fns import train, make_log_dir, load_and_visualize_policy

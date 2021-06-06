@@ -13,7 +13,7 @@ from gym.wrappers import Monitor
 from stable_baselines3.common.noise import OrnsteinUhlenbeckActionNoise
 
 from algorithms import *
-from basics.abstract_algorithm import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
+from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from basics.replay_buffer import ReplayBuffer
 from basics.replay_buffer_recurrent import RecurrentReplayBufferGlobal, RecurrentReplayBufferLocal
 

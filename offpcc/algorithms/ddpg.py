@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import torch.optim as optim
 
-from basics.abstract_algorithm import OffPolicyRLAlgorithm
+from basics.abstract_algorithms import OffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPTanhActor, MLPCritic
 from basics.replay_buffer import Batch
 from basics.utils import get_device, create_target, polyak_update, save_net, load_net

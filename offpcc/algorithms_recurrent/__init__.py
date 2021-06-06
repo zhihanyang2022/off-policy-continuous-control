@@ -1,0 +1,2 @@
+from algorithms_recurrent.ddpg_lstm import DDPG_LSTM
+from algorithms_recurrent.sac_lstm import SAC_LSTM

@@ -10,7 +10,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.distributions import Normal, Independent
 
-from basics.abstract_algorithm import OffPolicyRLAlgorithm
+from basics.abstract_algorithms import OffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPGaussianActor, MLPCritic
 from basics.replay_buffer import Batch
 from basics.utils import get_device, create_target, polyak_update, save_net, load_net

@@ -17,11 +17,6 @@ def polyak_update(targ_net: nn.Module, pred_net: nn.Module, polyak: float) -> No
 def rescale_loss(loss: torch.tensor, mask: torch.tensor) -> torch.tensor:
     return loss / mask.sum() * np.prod(mask.shape)
 
-def feed_rnn(rnn, o):
-    rnn.flatten_parameters()  # prevent some arbitrary error that I don't understand
-    hidden_out, hidden = rnn(o)
-    return hidden_out
-
 def save_net(net: nn.Module, save_dir: str, save_name: str) -> None:
     torch.save(net.state_dict(), os.path.join(save_dir, save_name))
 
