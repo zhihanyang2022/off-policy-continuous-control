@@ -21,7 +21,7 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
         self,
         input_dim,
         action_dim,
-        hidden_dim,
+        hidden_dim=256,
         gamma=0.99,
         lr=3e-4,
         polyak=0.995,
