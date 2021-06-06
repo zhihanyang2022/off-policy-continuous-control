@@ -3,11 +3,6 @@ import torch
 import torch.nn as nn
 
 
-def set_requires_grad_flag(net: nn.Module, requires_grad: bool) -> None:
-    for p in net.parameters():
-        p.requires_grad = requires_grad
-
-
 @gin.configurable(module=__name__)
 def make_MLP(num_in, num_out, final_activation, hidden_dimensions=gin.REQUIRED):
 

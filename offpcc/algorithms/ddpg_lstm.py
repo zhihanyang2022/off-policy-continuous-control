@@ -9,7 +9,7 @@ import torch.optim as optim
 from basics.abstract_algorithm import RecurrentOffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPTanhActor, MLPCritic, set_requires_grad_flag
 from basics.replay_buffer_recurrent import RecurrentBatch
-from basics.cuda_utils import get_device
+from basics.utils import get_device
 
 
 @gin.configurable(module=__name__)

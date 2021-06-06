@@ -13,7 +13,7 @@ from torch.distributions import Normal, Independent
 from basics.abstract_algorithm import OffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPGaussianActor, MLPCritic, set_requires_grad_flag
 from basics.replay_buffer import Batch
-from basics.cuda_utils import get_device
+from basics.utils import get_device
 
 
 @gin.configurable(module=__name__)

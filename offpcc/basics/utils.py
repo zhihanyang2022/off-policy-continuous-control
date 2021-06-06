@@ -1,0 +1,40 @@
+import os
+
+from copy import deepcopy
+import numpy as np
+import torch
+import torch.nn as nn
+
+
+def get_device():
+    return 'cuda' if torch.cuda.is_available() else 'cpu'
+
+def polyak_update(targ_net: nn.Module, pred_net: nn.Module, polyak: float) -> None:
+    with torch.no_grad():  # no grad is not actually required here; only for sanity check
+        for targ_p, p in zip(targ_net.parameters(), pred_net.parameters()):
+            targ_p.data.copy_(targ_p.data * polyak + p.data * (1 - polyak))
+
+def rescale_loss(loss: torch.tensor, mask: torch.tensor) -> torch.tensor:
+    return loss / mask.sum() * np.prod(mask.shape)
+
+def feed_rnn(rnn, o):
+    rnn.flatten_parameters()  # prevent some arbitrary error that I don't understand
+    hidden_out, hidden = rnn(o)
+    return hidden_out
+
+def save_net(net: nn.Module, save_dir: str, save_name: str) -> None:
+    torch.save(net.state_dict(), os.path.join(save_dir, save_name))
+
+def load_net(net: nn.Module, save_dir: str, save_name: str) -> None:
+    net.load_state_dict(
+        torch.load(os.path.join(save_dir, save_name), map_location=torch.device(get_device()))
+    )
+
+def set_requires_grad_flag(net: nn.Module, requires_grad: bool) -> None:
+    for p in net.parameters():
+        p.requires_grad = requires_grad
+
+def create_target(net: nn.Module) -> nn.Module:
+    target = deepcopy(net)
+    set_requires_grad_flag(target, False)
+    return target

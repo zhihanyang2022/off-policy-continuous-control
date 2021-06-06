@@ -9,7 +9,7 @@ import torch.optim as optim
 from basics.abstract_algorithm import OffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPTanhActor, MLPCritic
 from basics.replay_buffer import Batch
-from basics.cuda_utils import get_device
+from basics.utils import get_device
 
 
 @gin.configurable(module=__name__)

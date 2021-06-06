@@ -1,52 +1,45 @@
 import gin
 
-from copy import deepcopy
 import numpy as np
 import torch
 import torch.optim as optim
 
 from basics.abstract_algorithm import OffPolicyRLAlgorithm
-from basics.actors_and_critics import MLPTanhActor, MLPCritic, set_requires_grad_flag
+from basics.actors_and_critics import MLPTanhActor, MLPCritic
 from basics.replay_buffer import Batch
-from basics.cuda_utils import get_device
+from basics.utils import get_device, create_target, polyak_update, save_net, load_net
 
 
 @gin.configurable(module=__name__)
 class DDPG(OffPolicyRLAlgorithm):
 
-    """Deep deterministic policy gradient"""
-
     def __init__(
         self,
         input_dim,
         action_dim,
-        action_noise=gin.REQUIRED,
         gamma=gin.REQUIRED,
         lr=gin.REQUIRED,
         polyak=gin.REQUIRED,
+        action_noise=gin.REQUIRED,
     ):
 
         # hyper-parameters
 
-        super().__init__(
-            input_dim=input_dim,
-            action_dim=action_dim,
-            gamma=gamma,
-            lr=lr,
-            polyak=polyak
-        )
+        self.input_dim = input_dim
+        self.action_dim = action_dim
+        self.gamma = gamma
+        self.lr = lr
+        self.polyak = polyak
 
         self.action_noise = action_noise
 
         # networks
 
         self.actor = MLPTanhActor(input_dim, action_dim).to(get_device())
-        self.actor_targ = deepcopy(self.actor)
-        set_requires_grad_flag(self.actor_targ, False)
+        self.actor_targ = create_target(self.actor)
 
         self.Q = MLPCritic(input_dim, action_dim).to(get_device())
-        self.Q_targ = deepcopy(self.Q)
-        set_requires_grad_flag(self.Q_targ, False)
+        self.Q_targ = create_target(self.Q)
 
         # optimizers
 
@@ -111,8 +104,8 @@ class DDPG(OffPolicyRLAlgorithm):
 
         # update target networks
 
-        self.polyak_update(targ_net=self.actor_targ, pred_net=self.actor)
-        self.polyak_update(targ_net=self.Q_targ, pred_net=self.Q)
+        polyak_update(targ_net=self.actor_targ, pred_net=self.actor, polyak=self.polyak)
+        polyak_update(targ_net=self.Q_targ, pred_net=self.Q, polyak=self.polyak)
 
         return {
             # for learning the q functions
@@ -121,3 +114,9 @@ class DDPG(OffPolicyRLAlgorithm):
             # for learning the actor
             '(actor) policy loss': float(policy_loss),
         }
+
+    def save_actor(self, save_dir: str) -> None:
+        save_net(net=self.actor, save_dir=save_dir, save_name="actor.pth")
+
+    def load_actor(self, save_dir: str) -> None:
+        load_net(net=self.actor, save_dir=save_dir, save_name="actor.pth")

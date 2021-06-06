@@ -12,7 +12,7 @@ from stable_baselines3.common.noise import NormalActionNoise
 from stable_baselines3.common.evaluation import evaluate_policy
 
 from basics_sb3.callbacks import MyEvalCallback
-from basics.cuda_utils import get_device
+from basics.utils import get_device
 
 # @@@@@ wrapper functions for gin to configure models from SB3 @@@@@
 
