@@ -80,8 +80,8 @@ class TD3(OffPolicyRLAlgorithm):
 
         # compute predictions
 
-        Q1_pred = self.Q1(b.s, b.a)
-        Q2_pred = self.Q2(b.s, b.a)
+        Q1_predictions = self.Q1(b.s, b.a)
+        Q2_predictions = self.Q2(b.s, b.a)
 
         # compute targets
 
@@ -103,8 +103,8 @@ class TD3(OffPolicyRLAlgorithm):
 
         # compute td error
 
-        Q1_loss = torch.mean((Q1_pred - targets) ** 2)
-        Q2_loss = torch.mean((Q2_pred - targets) ** 2)
+        Q1_loss = torch.mean((Q1_predictions - targets) ** 2)
+        Q2_loss = torch.mean((Q2_predictions - targets) ** 2)
 
         assert Q1_loss.shape == ()
         assert Q2_loss.shape == ()
