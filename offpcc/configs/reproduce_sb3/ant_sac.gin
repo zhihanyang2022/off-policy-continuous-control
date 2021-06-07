@@ -22,7 +22,7 @@ num_test_episodes_per_epoch = 5
 # ====================================================================================
 
 import basics.run_fns
-import basics.actors_and_critics.make_MLP
+import basics.actors_and_critics
 import algorithms.sac.SAC
 import basics.replay_buffer.ReplayBuffer
 
