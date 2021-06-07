@@ -26,7 +26,7 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
         lr=3e-4,
         polyak=0.995,
         alpha=1.0,  # if autotune_alpha, this becomes the initial alpha value
-        autotune_alpha:bool = True,
+        autotune_alpha: bool = True,
     ):
 
         # hyperparameters
