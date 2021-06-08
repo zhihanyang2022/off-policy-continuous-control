@@ -20,7 +20,7 @@ class DDPG(OffPolicyRLAlgorithm):
         action_dim,
         gamma=0.99,
         lr=3e-4,
-        lr_schedule=lambda num_updates: 1,
+        lr_schedule=None,
         polyak=0.995,
         action_noise=0.1,
     ):
@@ -51,11 +51,12 @@ class DDPG(OffPolicyRLAlgorithm):
 
         # lr scheduler
 
-        self.lr_scheduler = LRScheduler(
-            optimizers=[self.actor_optimizer, self.Q_optimizer],
-            init_lr=lr,
-            schedule=lr_schedule
-        )
+        if lr_schedule is not None:
+            self.lr_scheduler = LRScheduler(
+                optimizers=[self.actor_optimizer, self.Q_optimizer],
+                init_lr=lr,
+                schedule=lr_schedule
+            )
 
     def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
@@ -120,7 +121,8 @@ class DDPG(OffPolicyRLAlgorithm):
 
         # update learning rate
 
-        self.lr_scheduler.update_lr()
+        if self.lr_schedule is not None:
+            self.lr_scheduler.update_lr()
 
         return {
             # for learning the q functions

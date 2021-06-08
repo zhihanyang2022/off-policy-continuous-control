@@ -20,7 +20,7 @@ class TD3(OffPolicyRLAlgorithm):
         action_dim,
         gamma=0.99,
         lr=3e-4,
-        lr_schedule=lambda num_updates: 1,
+        lr_schedule=None,
         polyak=0.995,
         action_noise=0.1,  # standard deviation of action noise
         target_noise=0.2,  # standard deviation of target smoothing noise
@@ -66,11 +66,12 @@ class TD3(OffPolicyRLAlgorithm):
         self.Q1_optimizer = optim.Adam(self.Q1.parameters(), lr=lr)
         self.Q2_optimizer = optim.Adam(self.Q2.parameters(), lr=lr)
 
-        self.lr_scheduler = LRScheduler(
-            optimizers=[self.actor_optimizer, self.Q1_optimizer, self.Q2_optimizer],
-            init_lr=lr,
-            schedule=lr_schedule
-        )
+        if lr_schedule is not None:
+            self.lr_scheduler = LRScheduler(
+                optimizers=[self.actor_optimizer, self.Q1_optimizer, self.Q2_optimizer],
+                init_lr=lr,
+                schedule=lr_schedule
+            )
 
     def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
@@ -155,7 +156,8 @@ class TD3(OffPolicyRLAlgorithm):
 
         # update learning rate
 
-        self.lr_scheduler.update_lr()
+        if self.lr_schedule is not None:
+            self.lr_scheduler.update_lr()
 
         return {
             # for learning the q functions
