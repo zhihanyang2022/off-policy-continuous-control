@@ -1,0 +1,41 @@
+# ====================================================================================
+# gin macros
+# https://github.com/zhihanyang2022/rl-trained-agents/blob/master/ddpg/HopperBulletEnv-v0_1/HopperBulletEnv-v0/config.yml
+# ====================================================================================
+
+hidden_dimensions = (400, 300)
+
+lr = 7e-4
+buffer_size = 1000000
+batch_size = 256
+
+gamma = 0.98
+
+num_epochs = 100
+num_steps_per_epoch = 10000
+update_every = 1
+update_after = 10000
+num_test_episodes_per_epoch = 5
+
+# ====================================================================================
+# applying the parameters above to our codebase
+# ====================================================================================
+
+import basics.run_fns
+import basics.actors_and_critics
+import algorithms.ddpg
+import basics.replay_buffer
+
+basics.actors_and_critics.make_MLP.hidden_dimensions = %hidden_dimensions
+
+algorithms.ddpg.DDPG.lr = %lr
+algorithms.ddpg.DDPG.gamma = %gamma
+
+basics.replay_buffer.ReplayBuffer.capacity = %buffer_size
+basics.replay_buffer.ReplayBuffer.batch_size = %batch_size
+
+basics.run_fns.train.num_epochs = %num_epochs
+basics.run_fns.train.num_steps_per_epoch = %num_steps_per_epoch
+basics.run_fns.train.update_every = %update_every
+basics.run_fns.train.update_after = %update_after
+basics.run_fns.train.num_test_episodes_per_epoch = %num_test_episodes_per_epoch
