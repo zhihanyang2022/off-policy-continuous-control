@@ -35,10 +35,12 @@ import basics.replay_buffer
 
 basics.actors_and_critics.make_MLP.hidden_dimensions = %hidden_dimensions
 
+algorithms.ddpg.DDPG.polyak = %polyak
 algorithms.ddpg.DDPG.lr = %lr
 algorithms.ddpg.DDPG.gamma = %gamma
+algorithms.ddpg.DDPG.action_noise = %action_noise
 
-basics.replay_buffer.ReplayBuffer.capacity = %buffer_size
+basics.replay_buffer.ReplayBuffer.capacity = %capacity
 basics.replay_buffer.ReplayBuffer.batch_size = %batch_size
 
 basics.run_fns.train.num_epochs = %num_epochs
