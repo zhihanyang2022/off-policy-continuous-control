@@ -1,0 +1,45 @@
+# ====================================================================================
+# gin macros
+# ====================================================================================
+
+hidden_dimensions = (400, 300)
+
+lr = 7.3e-4
+buffer_size = 300000
+batch_size = 256
+
+gamma = 0.98
+polyak = 0.98
+
+num_epochs = 100
+num_steps_per_epoch = 10000
+num_steps = 1000000
+update_every = 64
+update_after = 10000
+num_test_episodes_per_epoch = 5
+
+# ====================================================================================
+# applying the parameters above to our codebase
+# ====================================================================================
+
+import basics.actors_and_critics
+import basics.lr_schedules
+import algorithms.sac
+import basics.replay_buffer
+import basics.run_fns
+
+basics.actors_and_critics.make_MLP.hidden_dimensions = %hidden_dimensions
+algorithms.sac.SAC.lr = %lr
+basics.lr_schedules.linear_decay.num_updates = %num_steps
+algorithms.sac.SAC.lr_schedule = @basics.lr_schedules.linear_decay
+algorithms.sac.SAC.gamma = %gamma
+algorithms.sac.SAC.polyak = %polyak
+
+basics.replay_buffer.ReplayBuffer.capacity = %buffer_size
+basics.replay_buffer.ReplayBuffer.batch_size = %batch_size
+
+basics.run_fns.train.num_epochs = %num_epochs
+basics.run_fns.train.num_steps_per_epoch = %num_steps_per_epoch
+basics.run_fns.train.update_every = %update_every
+basics.run_fns.train.update_after = %update_after
+basics.run_fns.train.num_test_episodes_per_epoch = %num_test_episodes_per_epoch

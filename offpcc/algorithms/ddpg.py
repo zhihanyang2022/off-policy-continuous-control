@@ -8,6 +8,7 @@ from basics.abstract_algorithms import OffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPTanhActor, MLPCritic
 from basics.replay_buffer import Batch
 from basics.utils import get_device, create_target, polyak_update, save_net, load_net
+from basics.lr_scheduler import LRScheduler
 
 
 @gin.configurable(module=__name__)
@@ -19,6 +20,7 @@ class DDPG(OffPolicyRLAlgorithm):
         action_dim,
         gamma=0.99,
         lr=3e-4,
+        lr_schedule=lambda num_updates: 1,
         polyak=0.995,
         action_noise=0.1,
     ):
@@ -29,6 +31,7 @@ class DDPG(OffPolicyRLAlgorithm):
         self.action_dim = action_dim
         self.gamma = gamma
         self.lr = lr
+        self.lr_schedule = lr_schedule
         self.polyak = polyak
 
         self.action_noise = action_noise
@@ -45,6 +48,14 @@ class DDPG(OffPolicyRLAlgorithm):
 
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
         self.Q_optimizer = optim.Adam(self.Q.parameters(), lr=lr)
+
+        # lr scheduler
+
+        self.lr_scheduler = LRScheduler(
+            optimizers=[self.actor_optimizer, self.Q_optimizer],
+            init_lr=lr,
+            schedule=lr_schedule
+        )
 
     def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
@@ -106,6 +117,10 @@ class DDPG(OffPolicyRLAlgorithm):
 
         polyak_update(targ_net=self.actor_targ, pred_net=self.actor, polyak=self.polyak)
         polyak_update(targ_net=self.Q_targ, pred_net=self.Q, polyak=self.polyak)
+
+        # update learning rate
+
+        self.lr_scheduler.update_lr()
 
         return {
             # for learning the q functions
