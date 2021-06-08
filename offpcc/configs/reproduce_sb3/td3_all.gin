@@ -10,7 +10,7 @@ num_epochs = 100
 num_steps_per_epoch = 10000
 # action_noise, target_noise and target_noise_clip uses default in SB3 (0.1, 0.2, 0.5), same as our code
 hidden_dimensions = (400, 300)
-update_every = 1
+# update_every = 1, same as our code
 
 # batch_size and polyak uses default in SB3 (100, 0.995), same as our code
 
@@ -34,6 +34,5 @@ basics.replay_buffer.ReplayBuffer.capacity = %capacity
 
 basics.run_fns.train.num_epochs = %num_epochs
 basics.run_fns.train.num_steps_per_epoch = %num_steps_per_epoch
-basics.run_fns.train.update_every = %update_every
 basics.run_fns.train.update_after = %update_after
 basics.run_fns.train.num_test_episodes_per_epoch = %num_test_episodes_per_epoch
