@@ -31,7 +31,6 @@ algorithms.td3.TD3.lr = %lr
 algorithms.td3.TD3.gamma = %gamma
 
 basics.replay_buffer.ReplayBuffer.capacity = %capacity
-basics.replay_buffer.ReplayBuffer.batch_size = %batch_size
 
 basics.run_fns.train.num_epochs = %num_epochs
 basics.run_fns.train.num_steps_per_epoch = %num_steps_per_epoch
