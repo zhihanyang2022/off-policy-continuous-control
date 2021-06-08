@@ -3,8 +3,6 @@
 # ref: https://github.com/zhihanyang2022/rl-trained-agents/blob/master/ddpg/HalfCheetahBulletEnv-v0_1/HalfCheetahBulletEnv-v0/config.yml
 # ====================================================================================
 
-# specified in yaml
-
 capacity = 200000
 gamma = 0.98
 lr = 1e-3
@@ -16,8 +14,6 @@ hidden_dimensions = (400, 300)
 # update_every = 1, same as our code
 
 # batch_size and polyak uses default in SB3 (100, 0.995), same as our code
-
-# custom
 
 num_test_episodes_per_epoch = 5
 

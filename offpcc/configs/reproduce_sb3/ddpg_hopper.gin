@@ -3,8 +3,6 @@
 # ref: https://github.com/zhihanyang2022/rl-trained-agents/blob/master/ddpg/HopperBulletEnv-v0_1/HopperBulletEnv-v0/config.yml
 # ====================================================================================
 
-# specified in yaml
-
 batch_size = 256
 capacity = 1000000
 gamma = 0.98
@@ -17,8 +15,6 @@ hidden_dimensions = (400, 300)
 update_every = 64
 
 # polyak uses default in SB3 (0.995), same as our code
-
-# custom
 
 num_test_episodes_per_epoch = 5
 
