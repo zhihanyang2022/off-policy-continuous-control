@@ -264,7 +264,7 @@ class RecurrentReplayBufferLocal:
 
     def sample(self):
 
-        assert self.batch_size <= self.num_episodes
+        assert self.batch_size <= self.num_episodes, "Please increase update_after correspondingly."
 
         # sample could take place in the middle of an episode
         # therefore, a partial episode could be sampled
