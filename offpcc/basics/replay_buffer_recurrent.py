@@ -253,6 +253,9 @@ class RecurrentReplayBufferLocal:
             # update pointers
 
             self.time_ptr += 1
+    
+    def can_sample(self):
+        return self.episode_ptr >= self.batch_size
 
     def sample(self):
 

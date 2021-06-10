@@ -1,0 +1,34 @@
+# ====================================================================================
+# gin macros
+# ref: https://github.com/zhihanyang2022/rl-trained-agents/blob/master/ddpg/AntBulletEnv-v0_1/AntBulletEnv-v0/config.yml
+# ====================================================================================
+
+capacity = 1000
+gamma = 0.95
+lr = 3e-4
+update_after = 0
+num_epochs = 200
+num_steps_per_epoch = 1000
+hidden_dimensions = (256, 256)
+num_test_episodes_per_epoch = 100
+
+# ====================================================================================
+# applying the parameters above to our codebase
+# ====================================================================================
+
+import basics.run_fns
+import basics.actors_and_critics
+import algorithms.ddpg
+import basics.replay_buffer
+
+basics.actors_and_critics.make_MLP.hidden_dimensions = %hidden_dimensions
+
+algorithms.ddpg.DDPG.lr = %lr
+algorithms.ddpg.DDPG.gamma = %gamma
+
+basics.replay_buffer.ReplayBuffer.capacity = %capacity
+
+basics.run_fns.train.num_epochs = %num_epochs
+basics.run_fns.train.num_steps_per_epoch = %num_steps_per_epoch
+basics.run_fns.train.update_after = %update_after
+basics.run_fns.train.num_test_episodes_per_epoch = %num_test_episodes_per_epoch

@@ -4,7 +4,8 @@ import wandb
 import os
 
 import gym
-from domains import *
+# from domains import *
+from hac_pomdp_concat.domains import *
 import pybullet_envs
 from gym.wrappers import RescaleAction
 
@@ -76,9 +77,9 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
     else:
 
         run = wandb.init(
-            project=os.getenv('OFFPCC_WANDB_PROJECT'),
-            entity=os.getenv('OFFPCC_WANDB_ENTITY'),
-            group=f"{args.env} {args.algo} {args.config.split('configs/')[-1]} (ours)",
+            project="hierarchy_baselines",
+            entity='hainh22',
+            group=f"{args.env} {args.algo} {args.config.split('configs/')[-1]}",
             settings=wandb.Settings(_disable_stats=True),
             name=f'run_id={run_id}',
             reinit=True

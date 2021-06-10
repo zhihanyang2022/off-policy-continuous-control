@@ -203,7 +203,7 @@ def train(
                 # we keep it here for convenience
 
         # update handling
-        if t >= update_after and (t + 1) % update_every == 0:
+        if t >= update_after and (t + 1) % update_every == 0 and buffer.can_sample():
             for j in range(update_every):
 
                 batch = buffer.sample()
@@ -274,8 +274,7 @@ def train(
             # (wandb logging)
 
             dict_for_wandb = {
-                'epoch': epoch,
-                'timestep': t+1,
+                'hour': time_elapsed/3600,
                 'train_ep_len': mean_train_episode_len,
                 'train_ep_ret': mean_train_episode_ret,
                 'test_ep_len': mean_test_episode_len,
@@ -283,7 +282,7 @@ def train(
             }
             dict_for_wandb.update(algo_specific_stats_over_epoch)
 
-            wandb.log(dict_for_wandb)
+            wandb.log(dict_for_wandb, step=t+1)
 
             # (csv logging - will be uploaded to wandb at the very end)
 
