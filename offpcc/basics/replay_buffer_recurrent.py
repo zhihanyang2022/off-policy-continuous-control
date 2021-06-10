@@ -76,7 +76,6 @@ class RecurrentReplayBufferGlobal:
         self.m = np.zeros((capacity, max_episode_len, 1))
         self.ep_len = np.zeros((capacity,))
         self.ready_for_sampling = np.zeros((capacity,))
-        self.num_episodes = 0
 
         # pointers
 
@@ -86,6 +85,7 @@ class RecurrentReplayBufferGlobal:
         # trackers
 
         self.starting_new_episode = True
+        self.num_episodes = 0
 
         # hyper-parameters
 
@@ -147,7 +147,7 @@ class RecurrentReplayBufferGlobal:
 
     def sample(self):
 
-        assert self.batch_size >= self.num_episodes, "Please increase update_after correspondingly."
+        assert self.batch_size <= self.num_episodes, "Please increase update_after correspondingly."
 
         # sample episode indices
 
@@ -202,6 +202,7 @@ class RecurrentReplayBufferLocal:
         # trackers
 
         self.starting_new_episode = True
+        self.num_episodes = 0
 
         # hyper-parameters
 
@@ -252,6 +253,8 @@ class RecurrentReplayBufferLocal:
             # update trackers
 
             self.starting_new_episode = True
+            if self.num_episodes < self.capacity:
+                self.num_episodes += 1
 
         else:
 
@@ -260,6 +263,8 @@ class RecurrentReplayBufferLocal:
             self.time_ptr += 1
 
     def sample(self):
+
+        assert self.batch_size <= self.num_episodes
 
         # sample could take place in the middle of an episode
         # therefore, a partial episode could be sampled
