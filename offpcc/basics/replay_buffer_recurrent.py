@@ -206,6 +206,8 @@ class RecurrentReplayBufferLocal:
         self.num_bptt = num_bptt
         self.batch_size = batch_size
 
+        self.total_episodes = 0
+
     def push(self, o, a, r, no, d, cutoff):
 
         # zero-out current slot at the beginning of an episode
@@ -248,6 +250,8 @@ class RecurrentReplayBufferLocal:
 
             self.starting_new_episode = True
 
+            self.total_episodes += 1
+
         else:
 
             # update pointers
@@ -255,7 +259,7 @@ class RecurrentReplayBufferLocal:
             self.time_ptr += 1
     
     def can_sample(self):
-        return self.episode_ptr >= self.batch_size
+        return self.total_episodes >= self.batch_size
 
     def sample(self):
 

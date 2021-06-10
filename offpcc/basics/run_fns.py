@@ -10,7 +10,6 @@ from typing import Union
 from copy import deepcopy
 import numpy as np
 from gym.wrappers import Monitor
-from stable_baselines3.common.noise import OrnsteinUhlenbeckActionNoise
 
 from algorithms import *
 from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
