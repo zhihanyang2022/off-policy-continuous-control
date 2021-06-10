@@ -20,6 +20,9 @@ class ReplayBuffer:
     def push(self, s, a, r, ns, d) -> None:
         self.memory.appendleft(Transition(s, a, r, ns, d))
 
+    def can_sample(self):
+        return len(self.memory) >= self.batch_size
+
     def sample(self) -> Batch:
         assert len(self.memory) >= self.batch_size, "Please increase update_after to be >= batch_size"
         transitions = random.choices(self.memory, k=self.batch_size)  # sampling WITH replacement

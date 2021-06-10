@@ -1,0 +1,8 @@
+python launch.py --env car-flag-v0 --algo rtd3 --config configs/baselines/r_car_flag.gin --run_id 1 2 3 4
+python launch.py --env car-flag-v0 --algo rsac --config configs/baselines/r_car_flag.gin --run_id 1 2 3 4
+python launch.py --env car-flag-v0 --algo rdpg --config configs/baselines/r_car_flag.gin --run_id 1 2 3 4
+
+python launch.py --env car-flag-v0 --algo ddpg --config configs/baselines/car_flag.gin --run_id 1 2 3 4
+python launch.py --env car-flag-v0 --algo sac --config configs/baselines/car_flag.gin --run_id 1 2 3 4
+python launch.py --env car-flag-v0 --algo td3 --config configs/baselines/car_flag.gin --run_id 1 2 3 4
+
