@@ -76,6 +76,7 @@ class RecurrentReplayBufferGlobal:
         self.m = np.zeros((capacity, max_episode_len, 1))
         self.ep_len = np.zeros((capacity,))
         self.ready_for_sampling = np.zeros((capacity,))
+        self.num_episodes = 0
 
         # pointers
 
@@ -135,6 +136,8 @@ class RecurrentReplayBufferGlobal:
             # update trackers
 
             self.starting_new_episode = True
+            if self.num_episodes < self.capacity:
+                self.num_episodes += 1
 
         else:
 
@@ -143,6 +146,8 @@ class RecurrentReplayBufferGlobal:
             self.time_ptr += 1
 
     def sample(self):
+
+        assert self.batch_size >= self.num_episodes, "Please increase update_after correspondingly."
 
         # sample episode indices
 
