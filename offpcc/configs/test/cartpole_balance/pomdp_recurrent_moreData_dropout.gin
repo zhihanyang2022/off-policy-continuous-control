@@ -2,14 +2,14 @@
 # gin macros
 # ====================================================================================
 
+dropout = 0.2
+
 capacity = 5000  # 1M / 200 = 5000
 batch_size = 10
 
-num_epochs = 40000
-num_env_steps_per_epoch = 1000  # about 5 episodes near convergence
-num_grad_steps_per_epoch = 5  # collect 1 episode -> train on 1 batch (follows rdpg style)
-
-# in total, 40000 * 5 = 200000 grad steps = 200 * 1000
+num_epochs = 2000
+num_env_steps_per_epoch = 1000
+num_grad_steps_per_epoch = 100
 
 update_after = 10
 num_test_episodes_per_epoch = 5
@@ -20,6 +20,9 @@ num_test_episodes_per_epoch = 5
 
 import basics.replay_buffer_recurrent
 import basics.run_fns
+import basics.summarizer
+
+basics.summarizer.Summarizer.dropout = %dropout
 
 basics.replay_buffer_recurrent.RecurrentReplayBufferGlobal.capacity = %capacity
 basics.replay_buffer_recurrent.RecurrentReplayBufferGlobal.batch_size = %batch_size
