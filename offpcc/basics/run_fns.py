@@ -88,9 +88,9 @@ def train(
         algorithm: Union[OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm],
         buffer: Union[ReplayBuffer, RecurrentReplayBufferGlobal],
         num_epochs=gin.REQUIRED,
-        num_steps_per_epoch=gin.REQUIRED,
+        num_env_steps_per_epoch=gin.REQUIRED,
+        num_grad_steps_per_epoch=gin.REQUIRED,
         num_test_episodes_per_epoch=gin.REQUIRED,
-        update_every=1,  # number of env interactions between grad updates; but the ratio is locked to 1-to-1
         update_after=gin.REQUIRED,  # for exploration; no update & random action from action space
 ) -> None:
 
@@ -117,7 +117,7 @@ def train(
     train_episode_rets = []
     algo_specific_stats_tracker = []
 
-    total_steps = num_steps_per_epoch * num_epochs
+    total_env_steps = num_env_steps_per_epoch * num_epochs
 
     start_time = time.perf_counter()
 
@@ -138,7 +138,7 @@ def train(
         # while algorithm is not. Once an episode has finished, we do algorithm = deepcopy(algorithm_clone) to carry
         # over the changes.
 
-    for t in range(total_steps):
+    for t in range(total_env_steps):
 
         # action = algorithm.act(state, deterministic=False)
 
@@ -200,23 +200,25 @@ def train(
                 # reinitialize_hidden is no longer needed here because algorithm_clone's h_and_c is always None
                 # we keep it here for convenience
 
-        # update handling
-        if t >= update_after and (t + 1) % update_every == 0:
-            for j in range(update_every):
-
-                batch = buffer.sample()
-
-                if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
-                    algo_specific_stats = algorithm_clone.update_networks(batch)
-                elif isinstance(algorithm, OffPolicyRLAlgorithm):
-                    algo_specific_stats = algorithm.update_networks(batch)
-
-                algo_specific_stats_tracker.append(algo_specific_stats)
-
         # end of epoch handling
-        if (t + 1) % num_steps_per_epoch == 0:
+        if (t + 1) % num_env_steps_per_epoch == 0:
 
-            epoch = (t + 1) // num_steps_per_epoch
+            epoch = (t + 1) // num_env_steps_per_epoch
+
+            # update handling
+
+            if epoch > update_after:
+
+                for j in range(num_grad_steps_per_epoch):
+
+                    batch = buffer.sample()
+
+                    if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+                        algo_specific_stats = algorithm_clone.update_networks(batch)
+                    elif isinstance(algorithm, OffPolicyRLAlgorithm):
+                        algo_specific_stats = algorithm.update_networks(batch)
+
+                    algo_specific_stats_tracker.append(algo_specific_stats)
 
             # algo specific stats
 
