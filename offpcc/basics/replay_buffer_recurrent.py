@@ -119,18 +119,20 @@ class RecurrentReplayBufferGlobal:
         options = np.where(self.ready_for_sampling == 1)[0]
         ep_lens_of_options = self.ep_len[options]
         probas_of_options = as_probas(ep_lens_of_options)
-        ep_idxs = np.random.choice(options, p=probas_of_options, size=self.batch_size)
+        choices = np.random.choice(options, p=probas_of_options, size=self.batch_size)
+        ep_lens_of_choices = self.ep_len[choices]
 
         # grab the corresponding numpy array
         # and save computational effort for lstm
 
-        max_ep_len_in_batch = int(np.max(ep_lens_of_options))
+        print('Max ep len in batch: ', ep_lens_of_choices)
+        max_ep_len_in_batch = int(np.max(ep_lens_of_choices))
 
-        o = self.o[ep_idxs][:, :max_ep_len_in_batch+1, :]
-        a = self.a[ep_idxs][:, :max_ep_len_in_batch, :]
-        r = self.r[ep_idxs][:, :max_ep_len_in_batch, :]
-        d = self.d[ep_idxs][:, :max_ep_len_in_batch, :]
-        m = self.d[ep_idxs][:, :max_ep_len_in_batch, :]
+        o = self.o[choices][:, :max_ep_len_in_batch+1, :]
+        a = self.a[choices][:, :max_ep_len_in_batch, :]
+        r = self.r[choices][:, :max_ep_len_in_batch, :]
+        d = self.d[choices][:, :max_ep_len_in_batch, :]
+        m = self.m[choices][:, :max_ep_len_in_batch, :]
 
         # convert to tensors on the right device
 
