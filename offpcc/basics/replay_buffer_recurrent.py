@@ -120,12 +120,12 @@ class RecurrentReplayBufferGlobal:
         ep_lens_of_options = self.ep_len[options]
         probas_of_options = as_probas(ep_lens_of_options)
         choices = np.random.choice(options, p=probas_of_options, size=self.batch_size)
+
         ep_lens_of_choices = self.ep_len[choices]
 
         # grab the corresponding numpy array
         # and save computational effort for lstm
 
-        print('Max ep len in batch: ', ep_lens_of_choices)
         max_ep_len_in_batch = int(np.max(ep_lens_of_choices))
 
         o = self.o[choices][:, :max_ep_len_in_batch+1, :]
