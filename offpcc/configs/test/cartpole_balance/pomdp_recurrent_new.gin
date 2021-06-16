@@ -25,6 +25,7 @@ basics.replay_buffer_recurrent.RecurrentReplayBufferGlobal.capacity = %capacity
 basics.replay_buffer_recurrent.RecurrentReplayBufferGlobal.batch_size = %batch_size
 
 basics.run_fns.train.num_epochs = %num_epochs
-basics.run_fns.train.num_steps_per_epoch = %num_steps_per_epoch
+basics.run_fns.train.num_env_steps_per_epoch = %num_env_steps_per_epoch
+basics.run_fns.train.num_grad_steps_per_epoch = %num_grad_steps_per_epoch
 basics.run_fns.train.num_test_episodes_per_epoch = %num_test_episodes_per_epoch
 basics.run_fns.train.update_after = %update_after
