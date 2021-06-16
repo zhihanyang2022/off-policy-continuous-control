@@ -10,12 +10,10 @@ from typing import Union
 from copy import deepcopy
 import numpy as np
 from gym.wrappers import Monitor
-from stable_baselines3.common.noise import OrnsteinUhlenbeckActionNoise
 
-from algorithms import *
 from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from basics.replay_buffer import ReplayBuffer
-from basics.replay_buffer_recurrent import RecurrentReplayBufferGlobal, RecurrentReplayBufferLocal
+from basics.replay_buffer_recurrent import RecurrentReplayBufferGlobal
 
 BASE_LOG_DIR = '../results'
 
@@ -88,7 +86,7 @@ def load_and_visualize_policy(
 def train(
         env_fn,
         algorithm: Union[OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm],
-        buffer: Union[ReplayBuffer, RecurrentReplayBufferGlobal, RecurrentReplayBufferLocal],
+        buffer: Union[ReplayBuffer, RecurrentReplayBufferGlobal],
         num_epochs=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
         num_test_episodes_per_epoch=gin.REQUIRED,
