@@ -97,6 +97,28 @@ register(
 )
 
 # ============================================================================================
+# CartPole Balance (for testing recurrent agent with variable length episodes)
+# ============================================================================================
+
+register(
+    id='cartpole-balance-mdp-v0',
+    entry_point='domains.cartpole_balance:mdp',
+    max_episode_steps=200,
+)
+
+register(
+    id='cartpole-balance-pomdp-v0',
+    entry_point='domains.cartpole_balance:pomdp',
+    max_episode_steps=200,
+)
+
+register(
+    id='cartpole-balance-mdp-concat5-v0',
+    entry_point='domains.cartpole_balance:mdp_concat5',
+    max_episode_steps=200,
+)
+
+# ============================================================================================
 # CartPole Swing-up Variable Length (Sensor Integration + System Identification)
 # ============================================================================================
 
