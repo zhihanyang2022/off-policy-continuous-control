@@ -2,7 +2,7 @@
 # gin macros
 # ====================================================================================
 
-capacity = 5000  # 1M / 200 = 5000
+capacity = 10000  # store all episodes
 batch_size = 10
 
 num_epochs = 2000
