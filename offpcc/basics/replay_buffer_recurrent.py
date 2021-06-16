@@ -112,8 +112,6 @@ class RecurrentReplayBufferGlobal:
 
     def sample(self):
 
-        assert self.batch_size <= self.num_episodes, "Please increase update_after correspondingly."
-
         # sample episode indices
 
         options = np.where(self.ready_for_sampling == 1)[0]
@@ -124,7 +122,7 @@ class RecurrentReplayBufferGlobal:
         # grab the corresponding numpy array
         # and save computational effort for lstm
 
-        max_ep_len_in_batch = np.max(ep_lens_of_options)
+        max_ep_len_in_batch = int(np.max(ep_lens_of_options))
 
         o = self.o[ep_idxs][:, :max_ep_len_in_batch+1, :]
         a = self.a[ep_idxs][:, :max_ep_len_in_batch, :]
