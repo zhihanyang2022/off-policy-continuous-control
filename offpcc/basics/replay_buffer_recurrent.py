@@ -112,6 +112,8 @@ class RecurrentReplayBufferGlobal:
 
     def sample(self):
 
+        assert self.num_episodes >= self.batch_size
+
         # sample episode indices
 
         options = np.where(self.ready_for_sampling == 1)[0]
