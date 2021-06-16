@@ -28,8 +28,8 @@ class RecurrentReplayBufferGlobal:
         o_dim,
         a_dim,
         max_episode_len,  # this will also serve as num_bptt
-        capacity,
-        batch_size,
+        capacity=gin.REQUIRED,
+        batch_size=gin.REQUIRED,
     ):
 
         # placeholders

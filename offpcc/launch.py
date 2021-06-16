@@ -9,7 +9,7 @@ import pybullet_envs
 from gym.wrappers import RescaleAction
 
 from basics.replay_buffer import ReplayBuffer
-from basics.replay_buffer_recurrent import instantiate_recurrent_replay_buffer
+from basics.replay_buffer_recurrent import RecurrentReplayBufferGlobal
 from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from algorithms import *
 from algorithms_recurrent import *
@@ -86,15 +86,13 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
 
         # creating buffer based on the need of the algorithm
         if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):  # TODO(future): change if new algorithms are added
-            buffer = instantiate_recurrent_replay_buffer(
+            buffer = RecurrentReplayBufferGlobal(
                 o_dim=example_env.observation_space.shape[0],
                 a_dim=example_env.action_space.shape[0],
                 max_episode_len=example_env.spec.max_episode_steps
             )
         elif isinstance(algorithm, OffPolicyRLAlgorithm):
             buffer = ReplayBuffer()
-        else:
-            raise NotImplementedError
 
         train(
             env_fn=env_fn,
