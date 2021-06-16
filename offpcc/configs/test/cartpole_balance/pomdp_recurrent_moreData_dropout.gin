@@ -4,7 +4,7 @@
 
 dropout = 0.2
 
-capacity = 5000  # 1M / 200 = 5000
+capacity = 10000  # store all the episodes
 batch_size = 10
 
 num_epochs = 2000
