@@ -30,7 +30,7 @@ class CarEnv(gym.Env):
         'video.frames_per_second': 30
     }
 
-    def __init__(self, args=None, seed=0, max_actions=1200, num_frames_skip=10, rendering=False):
+    def __init__(self, args=None, max_actions=1200, rendering=False):
 
         #################### START CONFIGS #######################
         # TODO: Correct?
