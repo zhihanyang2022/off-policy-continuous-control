@@ -8,7 +8,7 @@ buffer = RecurrentReplayBufferGlobal(
     a_dim=1,
     max_episode_len=200,
     capacity=100,
-    batch_size=2
+    batch_size=1
 )
 
 env = gym.make("cartpole-balance-pomdp-v0")
