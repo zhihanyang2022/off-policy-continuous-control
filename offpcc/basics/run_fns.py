@@ -87,7 +87,7 @@ def load_and_visualize_policy(
             force=True
         )
 
-        assert env.spec.id.startswith("dmc"), "cannot record video for envs converted from dm_control, sorry!"
+        assert not env.spec.id.startswith("dmc"), "cannot record video for envs converted from dm_control, sorry!"
 
         for i in range(num_episodes):
             test_for_one_episode(env, algorithm, render=False)
