@@ -2,7 +2,9 @@ import numpy as np
 import gym
 from gym import spaces
 from gym.utils import seeding
-#from gym.envs.classic_control import rendering as visualize
+import socket
+if socket.gethostname() not in ['theseus', 'SXC-Wichita']:
+    from gym.envs.classic_control import rendering as visualize
 
 from domains.wrappers import FilterObsByIndex
 
