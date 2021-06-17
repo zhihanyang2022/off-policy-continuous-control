@@ -119,6 +119,28 @@ register(
 )
 
 # ============================================================================================
+# DMC CartPole Balance (dense reward, fixed episode length)
+# ============================================================================================
+
+# these envs are by default last for 1000 / frame_skip
+# we use frame_skip of 5, so timeout would be 200
+
+register(
+    id='dmc-cartpole-balance-mdp-v0',
+    entry_point='domains.dmc_cartpole_b:mdp',
+)
+
+register(
+    id='dmc-cartpole-balance-pomdp-v0',
+    entry_point='domains.dmc_cartpole_b:pomdp'
+)
+
+register(
+    id='dmc-cartpole-balance-mdp-concat5-v0',
+    entry_point='domains.dmc_cartpole_b:mdp_concat5'
+)
+
+# ============================================================================================
 # DMC CartPole Swing-up (dense reward, fixed episode length)
 # ============================================================================================
 
