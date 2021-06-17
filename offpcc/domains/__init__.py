@@ -123,6 +123,7 @@ register(
 # ============================================================================================
 
 # these envs are by default last for 1000 / frame_skip
+# we use frame_skip of 5, so timeout would be 200
 
 register(
     id='dmc-cartpole-swingup-mdp-v0',
