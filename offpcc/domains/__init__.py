@@ -204,7 +204,16 @@ register(
     max_episode_steps=200,
 )
 
+# ============================================================================================
+# Bumps normal (for HAC paper)
+# ============================================================================================
+
 register(
-    id='bumps-normal-v0',
-    entry_point='domains.robot_envs.bumps_norm:BumpsNormEnv',
+    id='bumps-normal-mdp-v0',
+    entry_point='domains.robot_envs.bumps_norm:mdp',
+)
+
+register(
+    id='bumps-normal-pomdp-v0',
+    entry_point='domains.robot_envs.bumps_norm:pomdp',
 )

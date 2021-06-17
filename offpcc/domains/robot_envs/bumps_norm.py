@@ -7,8 +7,10 @@ from domains.robot_envs.bumps_env import BumpsEnvBase
 BUMP1_URDF_PATH = ASSETS_PATH / 'bumps' / 'bump_40_red.urdf'
 BUMP2_URDF_PATH = ASSETS_PATH / 'bumps' / 'bump_40_blue.urdf'
 
+from domains.wrappers import FilterObsByIndex
 
-class BumpsNormEnv(BumpsEnvBase):
+
+class BumpsNormMdpEnv(BumpsEnvBase):
     """
     Description:
         The PyBullet simulation environment of a two-same-bump environment.
@@ -79,7 +81,7 @@ class BumpsNormEnv(BumpsEnvBase):
         self.pushing_done_threshold = 0.001
 
         # Obs: (y_g, y_bump1, y_bump2, theta)
-        self.observation_space = spaces.Box(low=-float('inf'), high=float('inf'), shape=(4,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=-float('inf'), high=float('inf'), shape=(5,), dtype=np.float32)
 
         # Declarations of the gripper's state
         self.y_g = 0
@@ -186,7 +188,8 @@ class BumpsNormEnv(BumpsEnvBase):
         return np.array([self.y_g / self.y_half_length,
                          self.y_bump1 / self.y_half_length,
                          self.y_bump2 / self.y_half_length,
-                         self.theta])
+                         self.theta,
+                         self.ori_y_bump2])
 
     def _update_state(self):
         """
@@ -199,3 +202,11 @@ class BumpsNormEnv(BumpsEnvBase):
         self.theta = self._get_theta()
 
         self.y_ur5 = self._get_raw_y_ur5()
+
+
+def mdp():
+    return BumpsNormMdpEnv()
+
+
+def pomdp():
+    return FilterObsByIndex(mdp(), indices_to_keep=[0, 1, 2, 3])
