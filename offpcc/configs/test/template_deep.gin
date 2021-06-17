@@ -2,7 +2,7 @@
 # gin macros
 # ====================================================================================
 
-hidden_sizes = (256, 256, 256, 256)
+hidden_dimensions = (256, 256, 256, 256)
 
 num_epochs = 200
 num_steps_per_epoch = 1000
@@ -17,7 +17,7 @@ import basics.actors_and_critics
 import basics.run_fns
 import basics_sb3.run_fns
 
-basics.actors_and_critics.make_MLP.hidden_sizes = %hidden_sizes
+basics.actors_and_critics.make_MLP.hidden_dimensions = %hidden_dimensions
 
 basics.run_fns.train.num_epochs = %num_epochs
 basics.run_fns.train.num_steps_per_epoch = %num_steps_per_epoch
