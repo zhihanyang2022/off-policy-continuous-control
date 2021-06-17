@@ -3,7 +3,7 @@ from domains.wrappers import ConcatObs
 
 
 def mdp():
-    return dmc2gym.make(domain_name="cartpole", task_name="balance", frame_skip=5)
+    return dmc2gym.make(domain_name="cartpole", task_name="balance", keys_to_exclude=[], frame_skip=5)
 
 
 def pomdp():
