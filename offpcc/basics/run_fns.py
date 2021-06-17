@@ -10,7 +10,6 @@ from typing import Union
 from copy import deepcopy
 import numpy as np
 from gym.wrappers import Monitor
-import matplotlib.pyplot as plt
 import cv2
 
 from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
