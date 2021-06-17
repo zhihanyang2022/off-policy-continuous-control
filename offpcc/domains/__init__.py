@@ -119,6 +119,25 @@ register(
 )
 
 # ============================================================================================
+# DMC CartPole Swing-up (dense reward, fixed episode length)
+# ============================================================================================
+
+register(
+    id='dmc-cartpole-swingup-mdp-v0',
+    entry_point='domains.dmc_cartpole_su:mdp'
+)
+
+register(
+    id='dmc-cartpole-swingup-pomdp-v0',
+    entry_point='domains.dmc_cartpole_su:pomdp'
+)
+
+register(
+    id='dmc-cartpole-swingup-mdp-concat5-v0',
+    entry_point='domains.dmc_cartpole_su:mdp_concat5'
+)
+
+# ============================================================================================
 # CartPole Swing-up Variable Length (Sensor Integration + System Identification)
 # ============================================================================================
 
@@ -174,7 +193,13 @@ register(
 )
 
 register(
-    id='water-maze-v0',
-    entry_point='domains.water_maze:WaterMazeEnv',
+    id='water-maze-mdp-v0',
+    entry_point='domains.water_maze:mdp',
+    max_episode_steps=200,
+)
+
+register(
+    id='water-maze-pomdp-v0',
+    entry_point='domains.water_maze:pomdp',
     max_episode_steps=200,
 )

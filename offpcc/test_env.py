@@ -19,9 +19,11 @@ state = env.reset()
 print(state)
 
 ret = 0
+cnt = 0
 while True:
     state, reward, done, info = env.step(env.action_space.sample())
     ret += reward
+    cnt += 1
     env.render()
     print(state, reward, done)
     if done:
@@ -29,4 +31,5 @@ while True:
 
 print(env.reset())
 
-print(ret)
+print('Return:', ret)
+print('Ep len:', cnt)
