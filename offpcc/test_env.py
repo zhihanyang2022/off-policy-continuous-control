@@ -24,7 +24,7 @@ while True:
     state, reward, done, info = env.step(env.action_space.sample())
     ret += reward
     cnt += 1
-    env.render()
+    #env.render()
     print(state, reward, done)
     if done:
         break
