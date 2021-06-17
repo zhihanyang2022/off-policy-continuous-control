@@ -122,16 +122,16 @@ register(
 # DMC CartPole Swing-up (dense reward, fixed episode length)
 # ============================================================================================
 
+# these envs are by default last for 1000 / frame_skip
+
 register(
     id='dmc-cartpole-swingup-mdp-v0',
     entry_point='domains.dmc_cartpole_su:mdp',
-    max_episode_steps=200
 )
 
 register(
     id='dmc-cartpole-swingup-pomdp-v0',
-    entry_point='domains.dmc_cartpole_su:pomdp',
-    max_episode_steps=200
+    entry_point='domains.dmc_cartpole_su:pomdp'
 )
 
 register(

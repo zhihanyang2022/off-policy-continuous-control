@@ -10,6 +10,8 @@ from typing import Union
 from copy import deepcopy
 import numpy as np
 from gym.wrappers import Monitor
+import matplotlib.pyplot as plt
+import cv2
 
 from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from basics.replay_buffer import ReplayBuffer
@@ -23,15 +25,38 @@ def make_log_dir(env_name, algo_name, run_id) -> str:
     return log_dir
 
 
-def test_for_one_episode(env, algorithm, render=False) -> tuple:
+def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False) -> tuple:
+
     state, done, episode_return, episode_len = env.reset(), False, 0, 0
+
     if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
         algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
+
+    if render and env_from_dmc:
+        cv2.namedWindow('img', cv2.WINDOW_NORMAL)
+
     while not done:
         action = algorithm.act(state, deterministic=True)
         state, reward, done, _ = env.step(action)
         if render:
-            env.render()
+            if env_from_dmc:
+
+                # thanks to Basj's answer from
+                # https://stackoverflow.com/questions/53324068/a-faster-refresh-rate-with-plt-imshow
+
+                image = np.uint8(env.render(mode='rgb_array'))
+                image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)  # cv2 uses BGR instead of RGB
+
+                image = cv2.resize(image, (300, 300))  # otherwise the window is so small
+
+                kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
+                image = cv2.filter2D(image, -1, kernel)  # sharpen the image for a little bit
+
+                cv2.imshow('img', image)
+                cv2.waitKey(1)
+
+            else:
+                env.render()
         episode_return += reward
         episode_len += 1
     return episode_len, episode_return
@@ -62,6 +87,8 @@ def load_and_visualize_policy(
             force=True
         )
 
+        assert env.spec.id.startswith("dmc"), "cannot record video for envs converted from dm_control, sorry!"
+
         for i in range(num_episodes):
             test_for_one_episode(env, algorithm, render=False)
 
@@ -73,7 +100,7 @@ def load_and_visualize_policy(
 
         ep_lens, ep_rets = [], []
         for i in range(num_episodes):
-            ep_len, ep_ret = test_for_one_episode(env, algorithm, render=True)
+            ep_len, ep_ret = test_for_one_episode(env, algorithm, render=True, env_from_dmc=env.spec.id.startswith("dmc"))
             ep_lens.append(ep_len)
             ep_rets.append(ep_ret)
 
