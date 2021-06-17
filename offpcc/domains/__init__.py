@@ -211,9 +211,11 @@ register(
 register(
     id='bumps-normal-mdp-v0',
     entry_point='domains.robot_envs.bumps_norm:mdp',
+    max_episode_steps=200
 )
 
 register(
     id='bumps-normal-pomdp-v0',
     entry_point='domains.robot_envs.bumps_norm:pomdp',
+    max_episode_steps=200
 )
