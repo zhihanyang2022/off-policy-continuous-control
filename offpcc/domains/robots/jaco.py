@@ -3,7 +3,7 @@ import time
 import numpy as np
 import pybullet as p
 
-from robots.robot import Robot, ASSETS_PATH
+from domains.robots.robot import Robot, ASSETS_PATH
 
 JACO_URDF_PATH = ASSETS_PATH / 'jaco' / 'j2s7s300_gym.urdf'
 

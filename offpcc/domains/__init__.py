@@ -203,3 +203,8 @@ register(
     entry_point='domains.water_maze:pomdp',
     max_episode_steps=200,
 )
+
+register(
+    id='bumps-normal-v0',
+    entry_point='domains.robot_envs.bumps_norm:BumpsNormEnv',
+)

@@ -2,8 +2,8 @@ from gym import spaces
 import numpy as np
 import pybullet as p
 
-from envs.env import EnvObject, ASSETS_PATH
-from envs.bumps_env import BumpsEnvBase
+from domains.robot_envs.env import EnvObject, ASSETS_PATH
+from domains.robot_envs.bumps_env import BumpsEnvBase
 
 BUMP_S_URDF_PATH = ASSETS_PATH / 'bumps' / 'bump_40_red.urdf'
 BUMP_L_URDF_PATH = ASSETS_PATH / 'bumps' / 'bump_50.urdf'

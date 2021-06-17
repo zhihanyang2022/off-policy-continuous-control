@@ -1,7 +1,7 @@
 import numpy as np
 import pybullet as p
 
-from robots.gripper import Gripper, ASSETS_PATH
+from domains.robots.gripper import Gripper, ASSETS_PATH
 
 RDDA_URDF_PATH = ASSETS_PATH / 'rdda' / 'rdda.urdf'
 

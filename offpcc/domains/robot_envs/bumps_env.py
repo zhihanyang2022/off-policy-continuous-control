@@ -2,9 +2,9 @@ from gym import spaces
 import numpy as np
 import pybullet as p
 
-from envs.env import PomdpRobotEnv, ASSETS_PATH
-from robots.ur5 import Ur5
-from robots.shovel import Shovel
+from domains.robot_envs.env import PomdpRobotEnv, ASSETS_PATH
+from domains.robots.ur5 import Ur5
+from domains.robots.shovel import Shovel
 
 UR5_WORKSPACE_URDF_PATH = ASSETS_PATH / 'workspace' / 'workspace.urdf'
 GRID_MARK_URDF_PATH = ASSETS_PATH / 'workspace' / 'grid_mark.urdf'

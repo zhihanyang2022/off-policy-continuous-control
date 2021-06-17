@@ -1,7 +1,7 @@
 import numpy as np
 import pybullet as p
 
-from robots.end_effector import EndEffector, ASSETS_PATH
+from domains.robots.end_effector import EndEffector, ASSETS_PATH
 
 RDDA_URDF_PATH = ASSETS_PATH / 'rdda' / 'rdda.urdf'
 

@@ -1,6 +1,6 @@
 import numpy as np
 import pybullet as p
-from robots.end_effector import EndEffector, ASSETS_PATH
+from domains.robots.end_effector import EndEffector, ASSETS_PATH
 
 SUCTION_BASE_URDF_PATH = ASSETS_PATH / 'suction' / 'suction-base.urdf'
 SUCTION_HEAD_URDF_PATH = ASSETS_PATH / 'suction' / 'suction-head.urdf'

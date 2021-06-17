@@ -1,28 +1,25 @@
-import pybullet as p
 from gym import spaces
 import numpy as np
 
-from envs.env import EnvObject, ASSETS_PATH
-from envs.bumps_env import BumpsEnvBase
+from domains.robot_envs.env import EnvObject, ASSETS_PATH
+from domains.robot_envs.bumps_env import BumpsEnvBase
 
-BUMP_URDF_PATH = ASSETS_PATH / 'bumps' / 'bump_40_red.urdf'
-TARGET_URDF_PATH = ASSETS_PATH / 'bumps' / 'bump_40_virtual.urdf'
-RAIL_URDF_PATH = ASSETS_PATH / 'workspace' / 'rail.urdf'
+BUMP1_URDF_PATH = ASSETS_PATH / 'bumps' / 'bump_40_red.urdf'
+BUMP2_URDF_PATH = ASSETS_PATH / 'bumps' / 'bump_40_blue.urdf'
 
 
-class BumpTargetEnv(BumpsEnvBase):
+class BumpsNormEnv(BumpsEnvBase):
     """
     Description:
-        The PyBullet simulation environment of a single bump environment.
-        The target is to move the bump to a random target position.
+        The PyBullet simulation environment of a two-same-bump environment.
 
     Observation:
-         Type: Box(3)
+         Type: Box(4)
          Num    Observation               Min                        Max
          0      Finger Tip Position Y     self.y_left_limit          self.y_right_limit
-         1      Bump Position Y           self.y_bump_limit_min      self.y_bump_limit_max
-         2      Finger Angle              - pi / 3                   pi / 3
-         3      Target Position Y         self.y_bump_limit_min      self.y_bump_limit_max
+         1      Bump #1 Position Y        self.y_bump1_limit_min     self.y_bump1_limit_max
+         2      Bump #2 Position Y        self.y_bump2_limit_min     self.y_bump2_limit_max
+         3      Finger Angle              - pi / 3                   pi / 3
 
     Actions (discrete mode):
         Type: Discrete(4)
@@ -39,13 +36,13 @@ class BumpTargetEnv(BumpsEnvBase):
         1      stiffness ratio    [-1, 1]
 
     Reward:
-        Reward of 1 for successfully push the bump to the target position.
+        Reward of 1 for successfully push bump #2 to the right sufficiently far.
 
     Starting State:
         The starting state of the gripper is assigned to y_g = random and theta = 0
 
     Episode Termination:
-        The bump reaches the target position.
+        Either bump is pushed.
     """
 
     def __init__(self, rendering=False, hz=240, seed=None, discrete=False, action_failure_prob=-1.0):
@@ -61,38 +58,32 @@ class BumpTargetEnv(BumpsEnvBase):
 
         super().__init__(rendering, hz, seed, discrete, action_failure_prob)
 
-        # Gripper parameters
-        # Thresholds for stably pushing a 40mm bump: 0.032
-        self.low_stiffness = 0.007
-        self.high_stiffness = 0.057
-
-        # Flags to determine if the target has been reached
-        self.target_reached = False
-        self.target_at_right = False
-
         # Bumps parameters
-        self.bump = None  # Placeholder for declaration
-        self.y_bump = 0
+        self.bump1 = None  # Placeholder for declaration
+        self.bump2 = None  # Placeholder for declaration
+        self.y_bump1 = 0
+        self.y_bump2 = 0
+        self.ori_y_bump1 = -0.2
+        self.ori_y_bump2 = 0.2
         self.bump_diameter = 0.04
+        self.min_bump_distance = 0.6 * self.y_half_length
+        self.max_bump_distance = self.y_half_length
         self.min_y_g_bump_distance = self.bump_diameter
-        self.y_bump_limit_min = 0.6 * self.y_left_limit
-        self.y_bump_limit_max = 0.6 * self.y_right_limit
+        self.y_bump1_limit_min = 0.6 * self.y_left_limit
+        self.y_bump2_limit_min = self.y_bump1_limit_min + self.min_bump_distance
+        self.y_bump2_limit_max = 0.6 * self.y_right_limit
+        self.y_bump1_limit_max = self.y_bump2_limit_max - self.min_bump_distance
 
-        # Loads two hidden boundary rails to limit the x range of the bump
-        bumps_radius = self.bump_diameter / 2
-        EnvObject(str(RAIL_URDF_PATH), (self.working_x_g - bumps_radius - 0.001, 0, bumps_radius), fixed=True)
-        EnvObject(str(RAIL_URDF_PATH), (self.working_x_g + bumps_radius + 0.001, 0, bumps_radius), fixed=True)
+        # Reward/done thresholds
+        self.pushing_reward_threshold = 0.01
+        self.pushing_done_threshold = 0.001
 
-        # Target highlighted mark
-        self.target_mark = None  # Placeholder for declaration
-
-        # Obs: (y_g, y_bump, theta, y_target)
+        # Obs: (y_g, y_bump1, y_bump2, theta)
         self.observation_space = spaces.Box(low=-float('inf'), high=float('inf'), shape=(4,), dtype=np.float32)
 
         # Declarations of the gripper's state
         self.y_g = 0
         self.theta = 0
-        self.y_target = 0
 
         # Declarations of the auxiliary internal state parameters.
         self.y_ur5 = 0
@@ -103,42 +94,40 @@ class BumpTargetEnv(BumpsEnvBase):
         """
 
         # Resets the robot to the home position.
-
         self.robot.reset()
         self.robot.ee.set_joints(self.default_angles, velocities=[0.1, ],
                                  forces=[self.low_stiffness, ])
 
-        # y_bump
-        ori_y_bump = self.np_random.uniform(low=self.y_bump_limit_min,
-                                            high=self.y_bump_limit_max)
+        # y_bump1
+        self.ori_y_bump1 = self.np_random.uniform(low=self.y_bump1_limit_min,
+                                                  high=self.y_bump1_limit_max)
+
+        # y_bump2
+        self.ori_y_bump2 = self.np_random.uniform(low=self.ori_y_bump1 + self.min_bump_distance,
+                                                  high=min(self.ori_y_bump1 + self.max_bump_distance,
+                                                           self.y_bump2_limit_max))
+
         # y_ur5
-        y_ur5_range1 = [self.y_bump_limit_min, ori_y_bump - self.min_y_g_bump_distance]
-        y_ur5_range2 = [ori_y_bump + self.min_y_g_bump_distance, self.y_bump_limit_max]
-        y_ur5 = self._uniform_ranges([y_ur5_range1, y_ur5_range2])
+        y_ur5_range1 = [self.y_g_left_limit, self.ori_y_bump1 - self.min_y_g_bump_distance]
+        y_ur5_range2 = [self.ori_y_bump1 + self.min_y_g_bump_distance, self.ori_y_bump2 - self.min_y_g_bump_distance]
+        y_ur5_range3 = [self.ori_y_bump2 + self.min_y_g_bump_distance, self.y_g_right_limit]
+        y_ur5 = self._uniform_ranges([y_ur5_range1, y_ur5_range2, y_ur5_range3])
 
-        # y_target
-        self.y_target = self._uniform_ranges([y_ur5_range1, y_ur5_range2])
-
-        # Loads the bump.
-        if self.bump is None:
-            self.bump = EnvObject(str(BUMP_URDF_PATH), (self.working_x_g, ori_y_bump, 0))
+        # Loads the bumps.
+        if self.bump1 is None:
+            self.bump1 = EnvObject(str(BUMP1_URDF_PATH), (self.working_x_g, self.ori_y_bump1, 0))
         else:
-            self.bump.reset((self.working_x_g, ori_y_bump, 0))
+            self.bump1.reset((self.working_x_g, self.ori_y_bump1, 0))
 
-        # Loads the target mark
-        if self.target_mark is None:
-            self.target_mark = EnvObject(str(TARGET_URDF_PATH), (self.working_x_g, self.y_target, 0), fixed=True)
+        if self.bump2 is None:
+            self.bump2 = EnvObject(str(BUMP2_URDF_PATH), (self.working_x_g, self.ori_y_bump2, 0))
         else:
-            self.target_mark.reset((self.working_x_g, self.y_target, 0))
+            self.bump2.reset((self.working_x_g, self.ori_y_bump2, 0))
 
         # Moves the gripper to the start position.
         # It has to pass by a safe waypoint to avoid any possible collision.
         self.robot.move_pose(target_position=[self.working_x_g, y_ur5, self.lifting_z_g])
         self.robot.move_pose(target_position=[self.working_x_g, y_ur5, self.working_z_g])
-
-        # Resets the target-reached flag
-        self.target_reached = False
-        self.target_at_right = (self.y_target > ori_y_bump)
 
         # Resets the state.
         self._update_state()
@@ -173,21 +162,31 @@ class BumpTargetEnv(BumpsEnvBase):
             # Reward condition:
             #   when bump #2 is moving with an expected distance in the right direction
             #   and the gripper is pushing bump #2 from its left (for avoiding some tricky unexpected cases).
-            if self.target_reached:
+            if self.y_bump2 - self.ori_y_bump2 > self.pushing_reward_threshold \
+                    and self.y_g < self.y_bump2:
                 reward = 1.0
-                done = True
+
+            # Episode Termination:
+            #   bump #1 is pushed in either direction
+            #   or when bump #2 is pushed in wrong direction beyond the done limit
+            #   or when reward == 1
+            done = bool(
+                abs(self.y_bump1 - self.ori_y_bump1) > self.pushing_done_threshold
+                or self.y_bump2 - self.ori_y_bump2 < -self.pushing_done_threshold
+                or reward == 1.0
+            )
 
         return self._get_obs(), reward, done, {}
 
     def _get_obs(self):
         """
-        Gets the observation (y_g, y_bump, y_bump2, theta).
+        Gets the observation (y_g, y_bump1, y_bump2, theta).
         """
 
         return np.array([self.y_g / self.y_half_length,
-                         self.y_bump / self.y_half_length,
-                         self.theta,
-                         self.y_target / self.y_half_length])
+                         self.y_bump1 / self.y_half_length,
+                         self.y_bump2 / self.y_half_length,
+                         self.theta])
 
     def _update_state(self):
         """
@@ -195,17 +194,8 @@ class BumpTargetEnv(BumpsEnvBase):
         """
 
         self.y_g = self._get_raw_y_g()
-        self.y_bump = self.bump.get_base_pose()[0][1]
+        self.y_bump1 = self.bump1.get_base_pose()[0][1]
+        self.y_bump2 = self.bump2.get_base_pose()[0][1]
         self.theta = self._get_theta()
 
         self.y_ur5 = self._get_raw_y_ur5()
-
-    def _observation(self):
-        """
-        Called by self._move_gripper() for observing the given states during simulation.
-        """
-
-        y_bump = self.bump.get_base_pose()[0][1]
-
-        if not self.target_reached:
-            self.target_reached = (y_bump >= self.y_target) if self.target_at_right else (y_bump <= self.y_target)
