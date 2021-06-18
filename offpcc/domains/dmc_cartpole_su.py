@@ -1,5 +1,6 @@
 import dmc2gym
 from domains.wrappers import ConcatObs
+import numpy as np
 
 
 def mdp():
@@ -7,7 +8,7 @@ def mdp():
 
 
 def pomdp():
-    return dmc2gym.make(domain_name="cartpole", task_name="swingup", keys_to_exclude=['velocity'], frame_skip=5)
+    return dmc2gym.make(domain_name="cartpole", task_name="swingup", keys_to_exclude=['velocity'], frame_skip=5, seed=np.random.randint(1000))
 
 
 def mdp_concat5():
