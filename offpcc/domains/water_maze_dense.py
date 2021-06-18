@@ -112,7 +112,7 @@ class WaterMazeMdpEnv(gym.Env):
             self.step_in_platform = 0
 
         # Only terminate due to the TimeLimit Wrapper
-        return self._get_obs(), distance_to_go, False, {}
+        return self._get_obs(), reward, False, {}
 
     # The agent knows its position and whether it is inside the platform or not
     def _get_obs(self):
