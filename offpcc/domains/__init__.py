@@ -235,6 +235,18 @@ register(
     max_episode_steps=200,
 )
 
+register(
+    id='water-maze-dense-mdp-v0',
+    entry_point='domains.water_maze_dense:mdp',
+    max_episode_steps=200,
+)
+
+register(
+    id='water-maze-dense-pomdp-v0',
+    entry_point='domains.water_maze_dense:pomdp',
+    max_episode_steps=200,
+)
+
 # ============================================================================================
 # Bumps normal (for HAC paper)
 # ============================================================================================

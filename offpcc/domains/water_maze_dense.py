@@ -40,6 +40,8 @@ class WaterMazeMdpEnv(gym.Env):
 
         self.seed()
 
+        self.agent_pos = None
+
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
@@ -93,14 +95,18 @@ class WaterMazeMdpEnv(gym.Env):
         if not self.is_agent_inside_world():
             self.agent_pos = previous_pos
 
-        # The agent is rewarded if it is inside the platform
-        reward = 0
-        self.inside_platform = 0.0
-        if self._is_within_circle(self.agent_pos, self.platform_center, self.platform_radius):
-            # counting the number of timesteps inside the platform
-            self.step_in_platform += 1
-            self.inside_platform = 1.0
-            reward = 1
+        # # The agent is rewarded if it is inside the platform
+        # reward = 0
+        # self.inside_platform = 0.0
+        # if self._is_within_circle(self.agent_pos, self.platform_center, self.platform_radius):
+        #     # counting the number of timesteps inside the platform
+        #     self.step_in_platform += 1
+        #     self.inside_platform = 1.0
+        #     reward = 1
+
+        vec = self.agent_pos - self.platform_center
+        distance_to_go = np.linalg.norm(vec)
+        reward = - distance_to_go
 
         # Randomize the agent again when it stays within the platform for 5 consecutive timesteps
         if self.step_in_platform % 5 == 0 and self.step_in_platform > 0 and reward == 1:
@@ -108,7 +114,7 @@ class WaterMazeMdpEnv(gym.Env):
             self.step_in_platform = 0
 
         # Only terminate due to the TimeLimit Wrapper
-        return self._get_obs(), reward, False, {}
+        return self._get_obs(), distance_to_go, False, {}
 
     # The agent knows its position and whether it is inside the platform or not
     def _get_obs(self):
