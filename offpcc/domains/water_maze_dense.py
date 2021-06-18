@@ -85,8 +85,6 @@ class WaterMazeMdpEnv(gym.Env):
 
     def step(self, action):
 
-        print(action)
-
         previous_pos = copy.deepcopy(self.agent_pos)
         action = action * self.max_action_value
         self.agent_pos += np.array(action)
