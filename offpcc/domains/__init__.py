@@ -128,16 +128,19 @@ register(
 register(
     id='dmc-cartpole-balance-mdp-v0',
     entry_point='domains.dmc_cartpole_b:mdp',
+    max_episode_steps=200
 )
 
 register(
     id='dmc-cartpole-balance-pomdp-v0',
-    entry_point='domains.dmc_cartpole_b:pomdp'
+    entry_point='domains.dmc_cartpole_b:pomdp',
+    max_episode_steps=200
 )
 
 register(
     id='dmc-cartpole-balance-mdp-concat5-v0',
-    entry_point='domains.dmc_cartpole_b:mdp_concat5'
+    entry_point='domains.dmc_cartpole_b:mdp_concat5',
+    max_episode_steps=200
 )
 
 # ============================================================================================
@@ -150,16 +153,19 @@ register(
 register(
     id='dmc-cartpole-swingup-mdp-v0',
     entry_point='domains.dmc_cartpole_su:mdp',
+    max_episode_steps=200
 )
 
 register(
     id='dmc-cartpole-swingup-pomdp-v0',
-    entry_point='domains.dmc_cartpole_su:pomdp'
+    entry_point='domains.dmc_cartpole_su:pomdp',
+    max_episode_steps=200
 )
 
 register(
     id='dmc-cartpole-swingup-mdp-concat5-v0',
-    entry_point='domains.dmc_cartpole_su:mdp_concat5'
+    entry_point='domains.dmc_cartpole_su:mdp_concat5',
+    max_episode_steps=200
 )
 
 # ============================================================================================
