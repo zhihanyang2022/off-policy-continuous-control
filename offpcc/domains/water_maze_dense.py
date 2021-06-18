@@ -106,8 +106,11 @@ class WaterMazeMdpEnv(gym.Env):
         distance_to_go = np.linalg.norm(vec)
         reward = - distance_to_go
 
+        if self._is_within_circle(self.agent_pos, self.platform_center, self.platform_radius):
+            self.step_in_platform += 1
+
         # Randomize the agent again when it stays within the platform for 5 consecutive timesteps
-        if self.step_in_platform % 5 == 0 and self.step_in_platform > 0 and reward == 1:
+        if self.step_in_platform % 5 == 0 and self.step_in_platform > 0:
             self.agent_pos = self._randomize_agent()
             self.step_in_platform = 0
 
