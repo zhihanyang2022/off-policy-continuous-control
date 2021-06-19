@@ -70,7 +70,9 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
     def act(self, observation: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
             observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
+            print('In (act):', self.hidden.shape if self.hidden is not None else "None")
             summary, self.hidden = self.actor_summarizer(observation, self.hidden, return_hidden=True)
+            print('Out (act):', self.hidden.shape if self.hidden is not None else "None")
             greedy_action = self.actor(summary).view(-1).cpu().numpy()  # view as 1d -> to cpu -> to numpy
             if deterministic:
                 return greedy_action
