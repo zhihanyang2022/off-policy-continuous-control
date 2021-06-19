@@ -28,7 +28,6 @@ class Summarizer(nn.Module):
         print('In', hidden.shape if hidden is not None else 'None')
         summary, hidden = self.rnn(observations, hidden)
         print('Out', hidden.shape)
-        hidden = torch.swapaxes(observations, 0, 1)  # seq_len_first -> batch_first
         if return_hidden:
             return summary, hidden
         else:
