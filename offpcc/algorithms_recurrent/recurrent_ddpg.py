@@ -25,6 +25,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         lr=3e-4,
         polyak=0.995,
         action_noise=0.1,
+        exploration_mode="addition"  # or "switch"
     ):
 
         # hyperparameters
@@ -37,6 +38,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         self.polyak = polyak
 
         self.action_noise = action_noise
+        self.exploration_mode = exploration_mode
 
         # trackers
 
@@ -75,7 +77,13 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
             if deterministic:
                 return greedy_action
             else:
-                return np.clip(greedy_action + self.action_noise * np.random.randn(self.action_dim), -1.0, 1.0)
+                if self.exploration_mode == "addition":
+                    return np.clip(greedy_action + self.action_noise * np.random.randn(self.action_dim), -1.0, 1.0)
+                elif self.exploration_mode == "switch":
+                    if np.random.uniform() > self.action_noise:
+                        return greedy_action
+                    else:
+                        return np.random.uniform(-1.0, 1.0)
 
     def update_networks(self, b: RecurrentBatch):
 
