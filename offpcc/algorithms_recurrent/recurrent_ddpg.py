@@ -24,8 +24,8 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         gamma=0.99,
         lr=3e-4,
         polyak=0.995,
-        action_noise=0.1,
-        exploration_mode="addition"  # or "switch"
+        action_noise=0.15,
+        exploration_mode="switch"  # or "switch"
     ):
 
         # hyperparameters
