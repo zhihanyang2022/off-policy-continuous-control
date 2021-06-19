@@ -12,7 +12,9 @@ class Summarizer(nn.Module):
 
         super().__init__()
 
-        if use_sru:
+        self.use_sru = use_sru
+
+        if self.use_sru:
             rnn_klass = SRU  # should make training a little faster
         else:
             rnn_klass = nn.LSTM
@@ -20,7 +22,8 @@ class Summarizer(nn.Module):
         self.rnn = rnn_klass(input_dim, hidden_dim, num_layers=num_rnn_layers)
 
     def forward(self, observations, hidden=None, return_hidden=False):
-        self.rnn.flatten_parameters()
+        if not self.use_sru:
+            self.rnn.flatten_parameters()
         observations = torch.swapaxes(observations, 0, 1)  # batch_first -> seq_len_first
         summary, hidden = self.rnn(observations, hidden)
         hidden = torch.swapaxes(observations, 0, 1)  # seq_len_first -> batch_first
