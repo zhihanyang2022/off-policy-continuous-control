@@ -2,7 +2,6 @@ import gin
 
 import torch
 import torch.nn as nn
-from sru import SRU
 
 
 @gin.configurable(module=__name__)
@@ -15,11 +14,12 @@ class Summarizer(nn.Module):
         self.use_sru = use_sru
 
         if self.use_sru:
+            from sru import SRU
             rnn_klass = SRU  # should make training a little faster
         else:
             rnn_klass = nn.LSTM
 
-        self.rnn = rnn_klass(input_dim, hidden_dim, num_layers=num_rnn_layers)
+        self.rnn = rnn_klass(input_dim, hidden_dim, num_layers=num_rnn_layers)  # SRU does not have batch_first option
 
     def forward(self, observations, hidden=None, return_hidden=False):
         if not self.use_sru:
