@@ -25,9 +25,9 @@ class Summarizer(nn.Module):
         if not self.use_sru:
             self.rnn.flatten_parameters()
         observations = torch.swapaxes(observations, 0, 1)  # batch_first -> seq_len_first
-        summary, hidden = self.rnn(observations, hidden)
         print('======', observations.shape)
-        print(hidden.shape)
+        print(hidden)
+        summary, hidden = self.rnn(observations, hidden)
         hidden = torch.swapaxes(observations, 0, 1)  # seq_len_first -> batch_first
         if return_hidden:
             return summary, hidden
