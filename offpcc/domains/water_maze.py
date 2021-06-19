@@ -22,7 +22,7 @@ class WaterMazeMdpEnv(gym.Env):
 
         self.observation_space = spaces.Box(-1., 1., shape=(5,))
 
-        self.platform_radius = 0.2
+        self.platform_radius = 0.33
         self.world_radius = 1.0
 
         self.viewer = None
