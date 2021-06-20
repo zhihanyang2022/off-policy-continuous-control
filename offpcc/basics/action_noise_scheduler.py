@@ -1,14 +1,10 @@
 from typing import Callable
 
-import numpy as np
-
 
 class ActionNoiseScheduler:
 
     def __init__(self, schedule: Callable):
-
         self.schedule = schedule  # a function of num_updates
-
         self.for_which_update = 1
 
     def get_new_action_noise(self) -> float:
