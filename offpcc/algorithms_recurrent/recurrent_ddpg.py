@@ -78,7 +78,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
 
     def act(self, observation: np.array, deterministic: bool) -> np.array:
 
-        if deterministic is False:
+        if deterministic is False:  # don't update action noise during testing
             self.action_noise = self.action_noise_scheduler.get_new_action_noise()
             print(self.action_noise)
 
