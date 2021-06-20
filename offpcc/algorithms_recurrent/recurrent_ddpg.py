@@ -10,6 +10,7 @@ from basics.actors_and_critics import MLPTanhActor, MLPCritic
 from basics.replay_buffer_recurrent import RecurrentBatch
 from basics.utils import get_device, create_target, mean_of_unmasked_elements, polyak_update, save_net, load_net
 from basics.action_noise_scheduler import ActionNoiseScheduler
+from basics.schedules import linear_decay
 
 
 @gin.configurable(module=__name__)
@@ -26,7 +27,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         lr=3e-4,
         polyak=0.995,
         action_noise=1.0,
-        action_noise_schedule=None,
+        action_noise_schedule=linear_decay,
         exploration_mode="dqn_style",  # or "standard"
     ):
 
