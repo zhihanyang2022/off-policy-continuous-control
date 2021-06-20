@@ -23,9 +23,9 @@ import basics.run_fns
 import algorithms_recurrent
 import basics.action_noise_schedules
 
-basics.schedules.linear_decay.start_val = %start_val
-basics.schedules.linear_decay.end_val = %end_val
-basics.schedules.linear_decay.num_updates = %decay_num_updates
+basics.action_noise_schedules.linear_decay.start_val = %start_val
+basics.action_noise_schedules.linear_decay.end_val = %end_val
+basics.action_noise_schedules.linear_decay.num_updates = %decay_num_updates
 
 algorithms_recurrent.RecurrentDDPG.action_noise_schedule = @basics.schedules.linear_decay
 algorithms_recurrent.RecurrentDDPG.exploration_mode = "dqn_style"
