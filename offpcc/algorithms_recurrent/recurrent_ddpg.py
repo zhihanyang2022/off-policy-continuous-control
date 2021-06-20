@@ -26,9 +26,9 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         gamma=0.99,
         lr=3e-4,
         polyak=0.995,
-        action_noise=1.0,
-        action_noise_schedule=linear_decay,
-        exploration_mode="dqn_style",  # or "standard"
+        action_noise=0.1,
+        action_noise_schedule=None,
+        exploration_mode="standard",  # or "dqn_style"
     ):
 
         # hyperparameters
