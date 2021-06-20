@@ -20,15 +20,15 @@ num_test_episodes_per_epoch = 5
 
 import basics.replay_buffer_recurrent
 import basics.run_fns
-import algorithms_recurrent
+import algorithms_recurrent.recurrent_ddpg
 import basics.action_noise_schedules
 
 basics.action_noise_schedules.linear_decay_with_lower_bound.start_val = %start_val
 basics.action_noise_schedules.linear_decay_with_lower_bound.end_val = %end_val
 basics.action_noise_schedules.linear_decay_with_lower_bound.num_updates = %decay_num_updates
 
-algorithms_recurrent.RecurrentDDPG.action_noise_schedule = @basics.action_noise_schedules.linear_decay_with_lower_bound
-algorithms_recurrent.RecurrentDDPG.exploration_mode = "dqn_style"
+algorithms_recurrent.recurrent_ddpg.RecurrentDDPG.action_noise_schedule = @basics.action_noise_schedules.linear_decay_with_lower_bound
+algorithms_recurrent.recurrent_ddpg.RecurrentDDPG.exploration_mode = "dqn_style"
 
 basics.replay_buffer_recurrent.RecurrentReplayBufferGlobal.capacity = %capacity
 basics.replay_buffer_recurrent.RecurrentReplayBufferGlobal.batch_size = %batch_size
