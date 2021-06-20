@@ -14,7 +14,7 @@ class ActionNoiseScheduler:
 
         self.for_which_update = 1
 
-    def get_new_action_noise(self) -> None:
+    def get_new_action_noise(self) -> float:
         new_action_noise = self.init_action_noise * self.schedule(self.for_which_update)
         self.for_which_update += 1
         return new_action_noise

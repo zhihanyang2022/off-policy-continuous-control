@@ -96,6 +96,11 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
 
     def update_networks(self, b: RecurrentBatch):
 
+        # update action noise
+
+        if self.action_noise_schedule is not None:
+            self.action_noise = self.action_noise_scheduler.get_new_action_noise()
+
         bs, num_bptt = b.r.shape[0], b.r.shape[1]
 
         # compute summary
@@ -172,11 +177,6 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
 
         polyak_update(targ_net=self.actor_summarizer_targ, pred_net=self.actor_summarizer, polyak=self.polyak)
         polyak_update(targ_net=self.critic_summarizer_targ, pred_net=self.critic_summarizer, polyak=self.polyak)
-
-        # update action noise
-
-        if self.action_noise_scheduler is not None:
-            self.action_noise = self.action_noise_scheduler.get_new_action_noise()
 
         return {
             # for learning the q functions
