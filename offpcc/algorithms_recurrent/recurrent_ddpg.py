@@ -203,5 +203,5 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         self.actor.load_state_dict(another_recurrent_ddpg.actor.state_dict())
         self.actor_targ.load_state_dict(another_recurrent_ddpg.actor_targ.state_dict())
 
-        self.critic.load_state_dict(another_recurrent_ddpg.critic.state_dict())
-        self.critic_targ.load_state_dict(another_recurrent_ddpg.critic_targ.state_dict())
+        self.Q.load_state_dict(another_recurrent_ddpg.Q.state_dict())
+        self.Q_targ.load_state_dict(another_recurrent_ddpg.Q_targ.state_dict())
