@@ -82,6 +82,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
 
         if self.action_noise_schedule is not None:
             self.action_noise = self.action_noise_scheduler.get_new_action_noise()
+        print(self.action_noise)
 
         with torch.no_grad():
             observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
