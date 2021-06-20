@@ -9,6 +9,7 @@ from basics.summarizer import Summarizer
 from basics.actors_and_critics import MLPTanhActor, MLPCritic
 from basics.replay_buffer_recurrent import RecurrentBatch
 from basics.utils import get_device, create_target, mean_of_unmasked_elements, polyak_update, save_net, load_net
+from basics.action_noise_scheduler import ActionNoiseScheduler
 
 
 @gin.configurable(module=__name__)
@@ -24,8 +25,9 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         gamma=0.99,
         lr=3e-4,
         polyak=0.995,
-        action_noise=0.15,
-        exploration_mode="switch"  # or "addition"
+        action_noise=1.0,
+        action_noise_schedule=None,
+        exploration_mode="dqn_style",  # or "standard"
     ):
 
         # hyperparameters
@@ -38,7 +40,14 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         self.polyak = polyak
 
         self.action_noise = action_noise
+        self.action_noise_schedule = action_noise_schedule
         self.exploration_mode = exploration_mode
+
+        assert self.exploration_mode in ["dqn_style", "standard"], f"{exploration_mode} is not a valid exploration mode"
+
+        if self.action_noise_schedule is not None:
+            self.action_noise_scheduler = ActionNoiseScheduler(init_action_noise=action_noise,
+                                                               schedule=action_noise_schedule)
 
         # trackers
 
@@ -77,9 +86,9 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
             if deterministic:
                 return greedy_action
             else:
-                if self.exploration_mode == "addition":
+                if self.exploration_mode == "standard":
                     return np.clip(greedy_action + self.action_noise * np.random.randn(self.action_dim), -1.0, 1.0)
-                elif self.exploration_mode == "switch":
+                elif self.exploration_mode == "dqn_style":
                     if np.random.uniform() > self.action_noise:
                         return greedy_action
                     else:
@@ -163,6 +172,11 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
 
         polyak_update(targ_net=self.actor_summarizer_targ, pred_net=self.actor_summarizer, polyak=self.polyak)
         polyak_update(targ_net=self.critic_summarizer_targ, pred_net=self.critic_summarizer, polyak=self.polyak)
+
+        # update action noise
+
+        if self.action_noise_scheduler is not None:
+            self.action_noise = self.action_noise_scheduler.get_new_action_noise()
 
         return {
             # for learning the q functions

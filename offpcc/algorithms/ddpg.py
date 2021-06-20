@@ -69,6 +69,11 @@ class DDPG(OffPolicyRLAlgorithm):
 
     def update_networks(self, b: Batch):
 
+        # update learning rate
+
+        if self.lr_schedule is not None:
+            self.lr_scheduler.get_new_lr()
+
         bs = len(b.ns)  # for shape checking
 
         # compute predictions
@@ -118,11 +123,6 @@ class DDPG(OffPolicyRLAlgorithm):
 
         polyak_update(targ_net=self.actor_targ, pred_net=self.actor, polyak=self.polyak)
         polyak_update(targ_net=self.Q_targ, pred_net=self.Q, polyak=self.polyak)
-
-        # update learning rate
-
-        if self.lr_schedule is not None:
-            self.lr_scheduler.update_lr()
 
         return {
             # for learning the q functions

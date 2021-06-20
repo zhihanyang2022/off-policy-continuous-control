@@ -136,6 +136,11 @@ class SAC(OffPolicyRLAlgorithm):
 
     def update_networks(self, b: Batch) -> dict:
 
+        # update learning rate
+
+        if self.lr_schedule is not None:
+            self.lr_scheduler.get_new_lr()
+
         bs = len(b.ns)  # for shape checking
 
         # compute predictions
@@ -245,11 +250,6 @@ class SAC(OffPolicyRLAlgorithm):
 
         polyak_update(targ_net=self.Q1_targ, pred_net=self.Q1, polyak=self.polyak)
         polyak_update(targ_net=self.Q2_targ, pred_net=self.Q2, polyak=self.polyak)
-
-        # update learning rate
-
-        if self.lr_schedule is not None:
-            self.lr_scheduler.update_lr()
 
         return {
             # for learning the q functions
