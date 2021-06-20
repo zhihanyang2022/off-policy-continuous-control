@@ -21,7 +21,7 @@ num_test_episodes_per_epoch = 5
 import basics.replay_buffer_recurrent
 import basics.run_fns
 import algorithms_recurrent
-import basics.schedules
+import basics.action_noise_schedules
 
 basics.schedules.linear_decay.start_val = %start_val
 basics.schedules.linear_decay.end_val = %end_val
