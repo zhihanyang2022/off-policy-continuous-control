@@ -1,7 +1,5 @@
 import gin
 
-import numpy as np
-
 
 @gin.configurable(module=__name__)
 def linear_decay_with_lower_bound(for_which_update: int, num_updates: int = gin.REQUIRED,
