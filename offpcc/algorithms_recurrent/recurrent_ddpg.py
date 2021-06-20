@@ -25,7 +25,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         gamma=0.99,
         lr=3e-4,
         polyak=0.995,
-        action_noise_schedule=lambda: 0.1,
+        action_noise_schedule=lambda for_which_update: 0.1,
         exploration_mode="standard",  # or "dqn_style"
     ):
 
