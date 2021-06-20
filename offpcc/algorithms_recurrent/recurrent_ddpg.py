@@ -79,6 +79,10 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         self.hidden = None
 
     def act(self, observation: np.array, deterministic: bool) -> np.array:
+
+        if self.action_noise_schedule is not None:
+            self.action_noise = self.action_noise_scheduler.get_new_action_noise()
+
         with torch.no_grad():
             observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
             summary, self.hidden = self.actor_summarizer(observation, self.hidden, return_hidden=True)
@@ -95,11 +99,6 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
                         return np.random.uniform(-1.0, 1.0)
 
     def update_networks(self, b: RecurrentBatch):
-
-        # update action noise
-
-        if self.action_noise_schedule is not None:
-            self.action_noise = self.action_noise_scheduler.get_new_action_noise()
 
         bs, num_bptt = b.r.shape[0], b.r.shape[1]
 
