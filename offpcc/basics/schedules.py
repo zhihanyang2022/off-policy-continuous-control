@@ -19,5 +19,5 @@ def linear_decay(for_which_update: int, num_updates: int = gin.REQUIRED):
         1 + (5 - 1) * (-1/5) = 1 - 4/5 = 1/5 if for_which_update == 5
     """
     slope = - 1 / num_updates
-    lr_multiplier = 1 + (for_which_update - 1) * slope
-    return lr_multiplier
+    multiplier = 1 + (for_which_update - 1) * slope
+    return multiplier
