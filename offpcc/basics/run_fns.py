@@ -218,7 +218,7 @@ def train(
 
             if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
 
-                algorithm.copy_networks_from(algorithm_clone)
+                algorithm.copy_networks_from(algorithm_clone)  # doing a deepcopy will ruin the action noise schedule
                 algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
 
         # update handling

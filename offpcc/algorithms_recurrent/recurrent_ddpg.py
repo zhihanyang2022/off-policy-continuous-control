@@ -80,7 +80,6 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
 
         if deterministic is False:  # don't update action noise during testing
             self.action_noise = self.action_noise_scheduler.get_new_action_noise()
-            print(self.action_noise)
 
         with torch.no_grad():
             observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
