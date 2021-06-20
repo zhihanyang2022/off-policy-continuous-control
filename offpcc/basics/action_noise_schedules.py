@@ -13,5 +13,5 @@ def linear_decay_with_lower_bound(for_which_update: int, num_updates: int = gin.
     (end_val - start_val) / ((T+1) - 1) = (end_val - start_val) / T
     """
     slope = (end_val - start_val) / num_updates  # negative if end_val < start_val, which is usually the case
-    action_noise = start_val + (np.min(for_which_update, num_updates) - 1) * slope
+    action_noise = start_val + (min(for_which_update, num_updates) - 1) * slope
     return action_noise
