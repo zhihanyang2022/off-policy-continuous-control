@@ -38,6 +38,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         self.lr = lr
         self.polyak = polyak
 
+        self.action_noise = None
         self.action_noise_schedule = action_noise_schedule
         self.exploration_mode = exploration_mode
 
