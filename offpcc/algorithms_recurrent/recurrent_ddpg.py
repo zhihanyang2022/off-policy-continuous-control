@@ -191,3 +191,17 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
     def load_actor(self, save_dir: str) -> None:
         load_net(net=self.actor_summarizer, save_dir=save_dir, save_name="actor_summarizer.pth")
         load_net(net=self.actor, save_dir=save_dir, save_name="actor.pth")
+
+    def copy_networks_from(self, another_recurrent_ddpg):
+
+        self.actor_summarizer.load_state_dict(another_recurrent_ddpg.actor_summarizer.state_dict())
+        self.actor_summarizer_targ.load_state_dict(another_recurrent_ddpg.actor_summarizer_targ.state_dict())
+
+        self.critic_summarizer.load_state_dict(another_recurrent_ddpg.critic_summarizer.state_dict())
+        self.critic_summarizer_targ.load_state_dict(another_recurrent_ddpg.critic_summarizer_targ.state_dict())
+
+        self.actor.load_state_dict(another_recurrent_ddpg.actor.state_dict())
+        self.actor_targ.load_state_dict(another_recurrent_ddpg.actor_targ.state_dict())
+
+        self.critic.load_state_dict(another_recurrent_ddpg.critic.state_dict())
+        self.critic_targ.load_state_dict(another_recurrent_ddpg.critic_targ.state_dict())

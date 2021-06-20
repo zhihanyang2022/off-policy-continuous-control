@@ -218,13 +218,8 @@ def train(
 
             if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
 
-                # this deepcopy takes roughly 7e-3 seconds; * 10 episodes per epoch * 1000 epochs = 70 seconds (not bad)
-
-                algorithm = deepcopy(algorithm_clone)
+                algorithm.copy_networks_from(algorithm_clone)
                 algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
-
-                # reinitialize_hidden is no longer needed here because algorithm_clone's h_and_c is always None
-                # we keep it here for convenience
 
         # update handling
         if t >= update_after and (t + 1) % update_every == 0:
