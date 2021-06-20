@@ -78,7 +78,8 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
 
     def act(self, observation: np.array, deterministic: bool) -> np.array:
 
-        if deterministic is False:  # don't update action noise during testing
+        # don't update action noise during testing, only during rollouts that get stored in buffer
+        if deterministic is False:
             self.action_noise = self.action_noise_scheduler.get_new_action_noise()
 
         with torch.no_grad():
