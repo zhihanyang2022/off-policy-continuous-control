@@ -1,0 +1,37 @@
+# ====================================================================================
+# gin macros
+# ====================================================================================
+
+decay_num_updates=
+
+capacity = 5000  # 1M / 200 = 5000
+batch_size = 10
+
+num_epochs = 200
+num_steps_per_epoch = 1000
+update_after = 10000
+num_test_episodes_per_epoch = 5
+
+# ====================================================================================
+# applying the parameters
+# ====================================================================================
+
+import basics.replay_buffer_recurrent
+import basics.run_fns
+import algorithms_recurrent
+import basics.schedules
+
+basics.schedules.linear_decay.num_updates = %decay_num_updates
+
+algorithms_recurrent.RecurrentDDPG.action_noise = %action_noise
+algorithms_recurrent.RecurrentDDPG.action_noise_schedule = @basics.schedules.linear_decay
+
+algorithms_recurrent.RecurrentDDPG.exploration_mode = "dqn_style"
+
+basics.replay_buffer_recurrent.RecurrentReplayBufferGlobal.capacity = %capacity
+basics.replay_buffer_recurrent.RecurrentReplayBufferGlobal.batch_size = %batch_size
+
+basics.run_fns.train.num_epochs = %num_epochs
+basics.run_fns.train.num_steps_per_epoch = %num_steps_per_epoch
+basics.run_fns.train.num_test_episodes_per_epoch = %num_test_episodes_per_epoch
+basics.run_fns.train.update_after = %update_after

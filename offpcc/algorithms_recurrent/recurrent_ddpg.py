@@ -10,7 +10,6 @@ from basics.actors_and_critics import MLPTanhActor, MLPCritic
 from basics.replay_buffer_recurrent import RecurrentBatch
 from basics.utils import get_device, create_target, mean_of_unmasked_elements, polyak_update, save_net, load_net
 from basics.action_noise_scheduler import ActionNoiseScheduler
-from basics.schedules import linear_decay
 
 
 @gin.configurable(module=__name__)
@@ -26,8 +25,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         gamma=0.99,
         lr=3e-4,
         polyak=0.995,
-        action_noise=0.1,
-        action_noise_schedule=None,
+        action_noise_schedule=lambda: 0.1,
         exploration_mode="standard",  # or "dqn_style"
     ):
 
@@ -40,15 +38,13 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         self.lr = lr
         self.polyak = polyak
 
-        self.action_noise = action_noise
         self.action_noise_schedule = action_noise_schedule
         self.exploration_mode = exploration_mode
 
         assert self.exploration_mode in ["dqn_style", "standard"], f"{exploration_mode} is not a valid exploration mode"
 
         if self.action_noise_schedule is not None:
-            self.action_noise_scheduler = ActionNoiseScheduler(init_action_noise=action_noise,
-                                                               schedule=action_noise_schedule)
+            self.action_noise_scheduler = ActionNoiseScheduler(schedule=action_noise_schedule)
 
         # trackers
 
