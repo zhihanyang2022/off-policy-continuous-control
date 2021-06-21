@@ -266,3 +266,15 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
     def load_actor(self, save_dir: str) -> None:
         load_net(net=self.actor_summarizer, save_dir=save_dir, save_name="actor_summarizer.pth")
         load_net(net=self.actor, save_dir=save_dir, save_name="actor.pth")
+
+    def copy_networks_from(self, algorithm) -> None:
+        self.actor_summarizer.load_state_dict(algorithm.actor_summarizer.state_dict())
+        self.Q1_summarizer.load_state_dict(algorithm.Q1_summarizer.state_dict())
+        self.Q1_summarizer_targ.load_state_dict(algorithm.Q1_summarizer_targ.state_dict())
+        self.Q2_summarizer.load_state_dict(algorithm.Q2_summarizer.state_dict())
+        self.Q2_summarizer_targ.load_state_dict(algorithm.Q2_summarizer_targ.state_dict())
+        self.actor.load_state_dict(algorithm.actor.state_dict())
+        self.Q1.load_state_dict(algorithm.Q1.state_dict())
+        self.Q1_targ.load_state_dict(algorithm.Q1_targ.state_dict())
+        self.Q2.load_state_dict(algorithm.Q2.state_dict())
+        self.Q2_targ.load_state_dict(algorithm.Q2_targ.state_dict())
