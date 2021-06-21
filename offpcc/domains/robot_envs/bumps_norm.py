@@ -188,8 +188,7 @@ class BumpsNormMdpEnv(BumpsEnvBase):
         return np.array([self.y_g / self.y_half_length,
                          self.y_bump1 / self.y_half_length,
                          self.y_bump2 / self.y_half_length,
-                         self.theta,
-                         self.ori_y_bump2])
+                         self.theta])
 
     def _update_state(self):
         """
@@ -205,8 +204,8 @@ class BumpsNormMdpEnv(BumpsEnvBase):
 
 
 def mdp():
-    return BumpsNormMdpEnv(rendering=True)
+    return BumpsNormMdpEnv(rendering=False)
 
 
 def pomdp():
-    return FilterObsByIndex(mdp(), indices_to_keep=[0, 1, 2, 3])
+    return FilterObsByIndex(mdp(), indices_to_keep=[0, 3])
