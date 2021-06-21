@@ -81,7 +81,7 @@ class BumpsNormMdpEnv(BumpsEnvBase):
         self.pushing_done_threshold = 0.001
 
         # Obs: (y_g, y_bump1, y_bump2, theta)
-        self.observation_space = spaces.Box(low=-float('inf'), high=float('inf'), shape=(5,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=-float('inf'), high=float('inf'), shape=(4,), dtype=np.float32)
 
         # Declarations of the gripper's state
         self.y_g = 0
