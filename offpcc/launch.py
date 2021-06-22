@@ -48,6 +48,9 @@ def env_fn():
 
 
 example_env = env_fn()
+env2 = gym.make('bumps-normal-mdp-v0', rendering=False)
+env2.reset()
+
 
 for run_id in args.run_id:  # args.run_id is a list of ints; could contain more than one run_ids
 
