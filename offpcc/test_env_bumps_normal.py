@@ -19,7 +19,7 @@ ret = 0
 cnt = 0
 while True:
     state, reward, done, info = env.step(env.action_space.sample())
-    _ = env2.step(env2.action_space.sample())
+    #_ = env2.step(env2.action_space.sample())
     ret += reward
     cnt += 1
     env.render()
