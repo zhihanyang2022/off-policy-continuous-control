@@ -35,7 +35,7 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False) -> tu
         cv2.namedWindow('img', cv2.WINDOW_NORMAL)
 
     while not done:
-        action = algorithm.act(state, deterministic=False)
+        action = algorithm.act(state, deterministic=True)
         state, reward, done, _ = env.step(action)
         if render:
             if env_from_dmc:
