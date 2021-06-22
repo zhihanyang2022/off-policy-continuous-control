@@ -68,7 +68,7 @@ def remove_jsons_from_dir(directory):
 
 
 def load_and_visualize_policy(
-        env_fn,
+        env,
         algorithm,
         log_dir,
         num_episodes,
@@ -80,7 +80,7 @@ def load_and_visualize_policy(
     if save_videos:  # no rendering in this case for speed
 
         env = Monitor(
-            env_fn(),
+            env,
             directory=f'{log_dir}/videos/',
             video_callable=lambda episode_id: True,  # record every single episode
             force=True
@@ -94,8 +94,6 @@ def load_and_visualize_policy(
         remove_jsons_from_dir(f'{log_dir}/videos/')
 
     else:
-
-        env = env_fn()
 
         ep_lens, ep_rets = [], []
         for i in range(num_episodes):

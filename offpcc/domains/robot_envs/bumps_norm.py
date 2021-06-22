@@ -204,7 +204,7 @@ class BumpsNormMdpEnv(BumpsEnvBase):
 
 
 def mdp():
-    return BumpsNormMdpEnv(rendering=False)
+    return BumpsNormMdpEnv(rendering=True)
 
 
 def pomdp():

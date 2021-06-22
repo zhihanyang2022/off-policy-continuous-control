@@ -56,7 +56,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
     if args.render:
 
         load_and_visualize_policy(
-            env_fn=env_fn,
+            env=example_env,
             algorithm=algorithm,
             log_dir=make_log_dir(args.env, args.algo, run_id),  # trained model will be loaded from here
             num_episodes=10,
@@ -66,7 +66,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
     elif args.record:
 
         load_and_visualize_policy(
-            env_fn=env_fn,
+            env=example_env,
             algorithm=algorithm,
             log_dir=make_log_dir(args.env, args.algo, run_id),  # trained model will be loaded from here
             num_episodes=10,
