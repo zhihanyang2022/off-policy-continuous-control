@@ -203,8 +203,8 @@ class BumpsNormMdpEnv(BumpsEnvBase):
         self.y_ur5 = self._get_raw_y_ur5()
 
 
-def mdp():
-    return BumpsNormMdpEnv(rendering=True)
+def mdp(rendering=False):
+    return BumpsNormMdpEnv(rendering=rendering)
 
 
 def pomdp():

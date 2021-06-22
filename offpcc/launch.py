@@ -41,7 +41,7 @@ gin.parse_config_file(args.config)
 
 def env_fn():
     """Any wrapper by default copies the observation and action space of its wrappee."""
-    return RescaleAction(gym.make(args.env), -1, 1)
+    return RescaleAction(gym.make(args.env, rendering=args.render), -1, 1)
 
 
 example_env = env_fn()
