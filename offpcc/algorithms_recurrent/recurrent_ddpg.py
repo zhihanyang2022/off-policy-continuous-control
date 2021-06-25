@@ -202,10 +202,11 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
             # for learning the actor
             '(actor) Q value': float(mean_of_unmasked_elements(Q_values, b.m)),
             # time allocation
+            '(time) total': total_time,
             '(time) summary': prop_for_computing_summary,
             '(time) qfunc': prop_for_learning_qfunc,
             '(time) actor': prop_for_learning_actor,
-            '(time) polyak': prop_for_polyak_update
+            '(time) polyak': prop_for_polyak_update,
         }
 
     def save_actor(self, save_dir: str) -> None:
