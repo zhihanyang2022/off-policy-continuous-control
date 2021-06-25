@@ -1,4 +1,5 @@
 import gin
+import time
 
 import numpy as np
 import torch
@@ -101,6 +102,8 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
 
         bs, num_bptt = b.r.shape[0], b.r.shape[1]
 
+        start = time.perf_counter()
+
         # compute summary
 
         actor_summary = self.actor_summarizer(b.o)
@@ -113,6 +116,8 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         critic_summary_1_T, critic_summary_2_Tplus1 = critic_summary[:, :-1, :], critic_summary_targ[:, 1:, :]
 
         assert actor_summary.shape == (bs, num_bptt+1, self.hidden_dim)
+
+        checkpoint1 = time.perf_counter()
 
         # compute predictions
 
@@ -147,6 +152,8 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         self.critic_summarizer_optimizer.step()
         self.Q_optimizer.step()
 
+        checkpoint2 = time.perf_counter()
+
         # compute policy loss
 
         a = self.actor(actor_summary_1_T)
@@ -168,6 +175,8 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         self.actor_summarizer_optimizer.step()
         self.actor_optimizer.step()
 
+        checkpoint3 = time.perf_counter()
+
         # update target networks
 
         polyak_update(targ_net=self.actor_targ, pred_net=self.actor, polyak=self.polyak)
@@ -176,12 +185,27 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         polyak_update(targ_net=self.actor_summarizer_targ, pred_net=self.actor_summarizer, polyak=self.polyak)
         polyak_update(targ_net=self.critic_summarizer_targ, pred_net=self.critic_summarizer, polyak=self.polyak)
 
+        checkpoint4 = time.perf_counter()
+
+        # compute time allocation
+
+        total_time = checkpoint4 - start
+        prop_for_computing_summary = (checkpoint1 - start) / total_time * 100
+        prop_for_learning_qfunc = (checkpoint2 - checkpoint1) / total_time * 100
+        prop_for_learning_actor = (checkpoint3 - checkpoint2) / total_time * 100
+        prop_for_polyak_update = (checkpoint4 - checkpoint3) / total_time * 100
+
         return {
             # for learning the q functions
             '(qfunc) Q pred': float(mean_of_unmasked_elements(predictions, b.m)),
             '(qfunc) Q loss': float(Q_loss),
             # for learning the actor
             '(actor) Q value': float(mean_of_unmasked_elements(Q_values, b.m)),
+            # time allocation
+            '(time) summary': prop_for_computing_summary,
+            '(time) qfunc': prop_for_learning_qfunc,
+            '(time) actor': prop_for_learning_actor,
+            '(time) polyak': prop_for_polyak_update
         }
 
     def save_actor(self, save_dir: str) -> None:
