@@ -22,7 +22,8 @@ algo_name2class = {
     'sac': SAC,
     'rdpg': RecurrentDDPG,
     'rtd3': RecurrentTD3,
-    'rsac': RecurrentSAC
+    'rsac': RecurrentSAC,
+    'rsac_s': RecurrentSACSharing
 }
 
 parser = argparse.ArgumentParser()
