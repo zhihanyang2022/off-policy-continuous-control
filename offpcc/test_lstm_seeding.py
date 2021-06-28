@@ -1,7 +1,7 @@
 import torch
 
 input = torch.randn(32, 100, 8)
-target = torch.randn(32, 100, 8)
+target = torch.randn(32, 100, 256)
 
 
 def trial():
