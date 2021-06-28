@@ -103,7 +103,7 @@ class BumpsNormMdpEnv(BumpsEnvBase):
         self.robot.ee.set_joints(self.default_angles, velocities=[0.1, ],
                                  forces=[self.low_stiffness, ])
 
-        determine_bump_1_first = np.random.choice([True, False])
+        determine_bump_1_first = self.np_random.choice([True, False])
 
         if determine_bump_1_first:
 
