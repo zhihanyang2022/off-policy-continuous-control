@@ -68,9 +68,12 @@ class BumpsNormMdpEnv(BumpsEnvBase):
         self.ori_y_bump1 = -0.2
         self.ori_y_bump2 = 0.2
         self.bump_diameter = 0.04
-        self.min_bump_distance = 0.6 * self.y_half_length
-        self.max_bump_distance = self.y_half_length
+        # self.min_bump_distance = 0.6 * self.y_half_length
+        # self.max_bump_distance = self.y_half_length
+        self.min_bump_distance = 0.3 * self.y_half_length
+        self.max_bump_distance = 0.8 * self.y_half_length
         self.min_y_g_bump_distance = self.bump_diameter
+
         self.y_bump1_limit_min = 0.6 * self.y_left_limit
         self.y_bump2_limit_min = self.y_bump1_limit_min + self.min_bump_distance
         self.y_bump2_limit_max = 0.6 * self.y_right_limit
