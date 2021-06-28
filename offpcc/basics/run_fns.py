@@ -148,7 +148,12 @@ def train(
     # prepare environments
 
     env = env_fn()
-    test_env = env_fn()
+
+    # pbc stands for pybullet custom (e.g., bumps normal, top plate)
+    # when env is pbc, then we avoid testing entirely
+
+    if env.spec.id.startswith("pbc") is False:
+        test_env = env_fn()
 
     state = env.reset()
 
@@ -261,21 +266,28 @@ def train(
 
             # testing stats
 
-            test_episode_lens, test_episode_returns = [], []
+            if env.spec.id.startswith("pbc"):
 
-            for j in range(num_test_episodes_per_epoch):
+                mean_test_episode_len = -999  # just ignore this value
+                mean_test_episode_ret = -999
 
-                if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
-                    test_algorithm = deepcopy(algorithm_clone)
-                elif isinstance(algorithm, OffPolicyRLAlgorithm):
-                    test_algorithm = deepcopy(algorithm)
+            else:
 
-                test_episode_len, test_episode_return = test_for_one_episode(test_env, test_algorithm)
-                test_episode_lens.append(test_episode_len)
-                test_episode_returns.append(test_episode_return)
+                test_episode_lens, test_episode_returns = [], []
 
-            mean_test_episode_len = np.mean(test_episode_lens)
-            mean_test_episode_ret = np.mean(test_episode_returns)
+                for j in range(num_test_episodes_per_epoch):
+
+                    if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+                        test_algorithm = deepcopy(algorithm_clone)
+                    elif isinstance(algorithm, OffPolicyRLAlgorithm):
+                        test_algorithm = deepcopy(algorithm)
+
+                    test_episode_len, test_episode_return = test_for_one_episode(test_env, test_algorithm)
+                    test_episode_lens.append(test_episode_len)
+                    test_episode_returns.append(test_episode_return)
+
+                mean_test_episode_len = np.mean(test_episode_lens)
+                mean_test_episode_ret = np.mean(test_episode_returns)
 
             # time-related stats
 
