@@ -15,10 +15,16 @@ print('=> Observation space low:', env.observation_space.low)
 print('=> Observation space high:', env.observation_space.high)
 print('=> Random trajectory:')
 
-cnt = 0
+left = 0
+middle = 0
+right = 0
 for i in tqdm(range(100)):
     state = env.reset()
     if (env.ori_y_bump1 < 0) and (env.ori_y_bump2 > 0):
-        cnt += 1
+        middle += 1
+    if (env.ori_y_bump1 < 0) and (env.ori_y_bump2 < 0):
+        left += 1
+    if (env.ori_y_bump1 > 0) and (env.ori_y_bump2 > 0):
+        right += 1
 
-print(cnt)
+print(left, middle, right)

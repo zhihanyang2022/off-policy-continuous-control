@@ -103,14 +103,27 @@ class BumpsNormMdpEnv(BumpsEnvBase):
         self.robot.ee.set_joints(self.default_angles, velocities=[0.1, ],
                                  forces=[self.low_stiffness, ])
 
-        # y_bump1
-        self.ori_y_bump1 = self.np_random.uniform(low=self.y_bump1_limit_min,
-                                                  high=self.y_bump1_limit_max)
+        determine_bump_1_first = np.random.choice([True, False])
 
-        # y_bump2
-        self.ori_y_bump2 = self.np_random.uniform(low=self.ori_y_bump1 + self.min_bump_distance,
-                                                  high=min(self.ori_y_bump1 + self.max_bump_distance,
-                                                           self.y_bump2_limit_max))
+        if determine_bump_1_first:
+
+            # y_bump1
+            self.ori_y_bump1 = self.np_random.uniform(low=self.y_bump1_limit_min,
+                                                      high=self.y_bump1_limit_max)
+
+            # y_bump2
+            self.ori_y_bump2 = self.np_random.uniform(low=self.ori_y_bump1 + self.min_bump_distance,
+                                                      high=min(self.ori_y_bump1 + self.max_bump_distance,
+                                                               self.y_bump2_limit_max))
+
+        else:
+
+            self.ori_y_bump2 = self.np_random.uniform(low=self.y_bump2_limit_min,
+                                                      high=self.y_bump2_limit_max)
+
+            self.ori_y_bump1 = self.np_random.uniform(low=max(self.ori_y_bump2 - self.max_bump_distance,
+                                                              self.y_bump1_limit_min),
+                                                      high=self.ori_y_bump2 - self.min_bump_distance)
 
         # y_ur5
         y_ur5_range1 = [self.y_g_left_limit, self.ori_y_bump1 - self.min_y_g_bump_distance]
