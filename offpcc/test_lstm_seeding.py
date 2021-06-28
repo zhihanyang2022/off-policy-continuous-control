@@ -28,5 +28,5 @@ for p1, p2 in zip(trial1_layer.parameters(), trial2_layer.parameters()):
         gradient_identical = False
 
 print('Output identical?', torch.all(torch.eq(trial1_output, trial2_output)))
-print('Parameter identical', parameter_identical)
-print('Gradient identical', gradient_identical)
+print('Parameter identical?', parameter_identical)
+print('Gradient identical?', gradient_identical)
