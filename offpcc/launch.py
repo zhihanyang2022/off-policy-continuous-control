@@ -14,6 +14,7 @@ from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyR
 from algorithms import *
 from algorithms_recurrent import *
 
+# from basics.utils import get_device, set_random_seed
 from basics.run_fns import train, make_log_dir, load_and_visualize_policy
 
 algo_name2class = {
@@ -52,6 +53,8 @@ example_env = env_fn()
 
 
 for run_id in args.run_id:  # args.run_id is a list of ints; could contain more than one run_ids
+
+    # set_random_seed(seed=run_id, device=get_device())
 
     algorithm = algo_name2class[args.algo](
         input_dim=example_env.observation_space.shape[0],

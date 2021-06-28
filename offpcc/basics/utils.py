@@ -11,26 +11,26 @@ def get_device():
     return 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
-def set_random_seed(seed: int, device: str) -> None:
-    """
-    Adapted from stable-baselines3
-    https://stable-baselines3.readthedocs.io/en/latest/_modules/stable_baselines3/common/utils.html
-
-    Seed the different random generators
-    :param seed: (int)
-    :param device: (str)
-    """
-    # Seed python RNG
-    random.seed(seed)
-    # Seed numpy RNG
-    np.random.seed(seed)
-    # seed the RNG for all devices (both CPU and CUDA)
-    torch.manual_seed(seed)
-
-    if device == 'cuda':
-        # Deterministic operations for CuDNN, it may impact performances
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
+# def set_random_seed(seed: int, device: str) -> None:
+#     """
+#     Adapted from stable-baselines3
+#     https://stable-baselines3.readthedocs.io/en/latest/_modules/stable_baselines3/common/utils.html
+#
+#     Seed the different random generators
+#     :param seed: (int)
+#     :param device: (str)
+#     """
+#     # Seed python RNG
+#     random.seed(seed)
+#     # Seed numpy RNG
+#     np.random.seed(seed)
+#     # seed the RNG for all devices (both CPU and CUDA)
+#     torch.manual_seed(seed)
+#
+#     if device == 'cuda':
+#         # Deterministic operations for CuDNN, it may impact performances
+#         torch.backends.cudnn.deterministic = True
+#         torch.backends.cudnn.benchmark = False
 
 
 def polyak_update(targ_net: nn.Module, pred_net: nn.Module, polyak: float) -> None:
