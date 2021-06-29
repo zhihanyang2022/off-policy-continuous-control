@@ -57,10 +57,16 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
 
     # set_random_seed(seed=run_id, device=get_device())
 
-    algorithm = algo_name2class[args.algo](
-        input_dim=example_env.observation_space.shape[0],
-        action_dim=example_env.action_space.shape[0],
-    )
+    if args.algo.endswith('cnn'):
+        algorithm = algo_name2class[args.algo](
+            input_shape=example_env.observation_space.shape,
+            action_dim=example_env.action_space.shape[0],
+        )
+    else:
+        algorithm = algo_name2class[args.algo](
+            input_dim=example_env.observation_space.shape[0],
+            action_dim=example_env.action_space.shape[0],
+        )
 
     if args.render:
 
