@@ -33,7 +33,7 @@ class Normalize255Image(gym.ObservationWrapper):
         )
 
     def observation(self, observation):
-        return observation / 255
+        return observation / 255  # uint8 automatically get converts to float64
 
 
 class ConcatImages(gym.ObservationWrapper):
