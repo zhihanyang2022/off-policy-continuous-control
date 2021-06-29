@@ -206,7 +206,7 @@ class ConvolutionalSAC(OffPolicyRLAlgorithm):
 
         # compute policy loss
 
-        a, log_pi_a_given_s = self.sample_action_from_distribution(embedding.detach(),
+        a, log_pi_a_given_s = self.sample_action_from_distribution(embedding.detach(),  # actor cannot update cnn
                                                                    deterministic=False, return_log_prob=True)
 
         min_Q = torch.min(self.Q1(embedding.detach(), a), self.Q2(embedding.detach(), a))
