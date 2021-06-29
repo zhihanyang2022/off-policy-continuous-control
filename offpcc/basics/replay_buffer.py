@@ -73,7 +73,8 @@ class ReplayBuffer:
 
             # docs:
             # - https://pytorch.org/docs/stable/generated/torch.nn.ReplicationPad2d.html
-            # - https://kornia.readthedocs.io/en/latest/augmentation.module.html?highlight=randomcrop#kornia.augmentation.RandomCrop
+            # - https://kornia.readthedocs.io/en/latest/augmentation.module.html?highlight=
+            #   randomcrop#kornia.augmentation.RandomCrop
 
             self.augmentator = nn.Sequential(
                 nn.ReplicationPad2d(4),
