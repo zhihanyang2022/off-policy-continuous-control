@@ -44,6 +44,7 @@ class ReplayBuffer:
     """
     Replay buffer that works for both vector and image observations.
     Inspired by Spinning Up's buffer style.
+    Augmentation modified from DrQ's style: https://github.com/denisyarats/drq/blob/master/replay_buffer.py.
 
     For future reference, note that in pytorch images are usually stored as (bs, depth, height, width).
     Therefore, we recommend that you store channel-first images rather than channel-last images.
@@ -104,7 +105,7 @@ class ReplayBuffer:
         ns = as_tensor_on_device(self.ns[indices]).view(self.batch_size, *self.input_shape)
         d = as_tensor_on_device(self.d[indices]).view(self.batch_size, 1)
 
-        if len(self.input_shape) == 3:
+        if len(self.input_shape) == 3:  # automatically apply augmentation if buffer is storing image
             with torch.no_grad():
                 s = self.augmentator(s)
                 ns = self.augmentator(ns)
