@@ -12,11 +12,11 @@ class ConvNet(nn.Module):
         self.layers = nn.Sequential(
             nn.Conv2d(input_depth, out_channels=32, kernel_size=3, stride=2),
             nn.ReLU(),
-            nn.Conv2d(32, out_channels=32, kernel_size=3, stride=2),
+            nn.Conv2d(32, out_channels=32, kernel_size=3, stride=1),
             nn.ReLU(),
-            nn.Conv2d(32, out_channels=32, kernel_size=3, stride=2),
+            nn.Conv2d(32, out_channels=32, kernel_size=3, stride=1),
             nn.ReLU(),
-            nn.Conv2d(32, out_channels=32, kernel_size=3, stride=2),
+            nn.Conv2d(32, out_channels=32, kernel_size=3, stride=1),
             nn.ReLU(),
             nn.Flatten(),
             nn.Linear(32 * 35 * 35, embedding_dim),  # 35 x 35 is the shape of 84 x 84 images after processing
