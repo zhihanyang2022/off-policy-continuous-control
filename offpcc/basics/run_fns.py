@@ -24,7 +24,30 @@ def make_log_dir(env_name, algo_name, run_id) -> str:
     return log_dir
 
 
-def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False) -> tuple:
+def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, render_pixel_state=False) -> tuple:
+
+    """
+    This function is too versatile, so it deserves some good documentation.
+
+    There are 3 usages of this function:
+
+    (1) During training. After each epoch, the algorithm is tested using this function.
+        render, env_from_dmc and render_pixel_state are set to False.
+
+    (2) Visualizing learned policy.
+        render is set to True, env_from_dmc can be True or False (determined automatically from env name),
+        render_pixel_state is set to False
+
+    (3) Used in dmc_render_pixel_state.py.
+        render, env_from_dmc and render_pixel_state are all set to True
+
+    @param env:
+    @param algorithm:
+    @param render:
+    @param env_from_dmc: if True, rely on opencv for rendering
+    @param render_pixel_state: if True, display an image made up of 3 concatenated greyscale images
+    @return:
+    """
 
     state, done, episode_return, episode_len = env.reset(), False, 0, 0
 
@@ -43,7 +66,16 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False) -> tu
                 # thanks to Basj's answer from
                 # https://stackoverflow.com/questions/53324068/a-faster-refresh-rate-with-plt-imshow
 
-                image = np.uint8(env.render(mode='rgb_array'))
+                # from opencv doc:
+                # - If the image is 8-bit unsigned, it is displayed as is.
+                # - If the image is 16-bit unsigned or 32-bit integer, the pixels are divided by 256. That is, the value range [0,255*256] is mapped to [0,255].
+                # - If the image is 32-bit or 64-bit floating-point, the pixel values are multiplied by 255. That is, the value range [0,1] is mapped to [0,255].
+
+                if render_pixel_state:
+                    image = np.moveaxis(np.float32(state), 0, -1)  # state is already normalized to [0, 1], so we convert to 32-bit floating point
+                else:
+                    image = np.uint8(env.render(mode='rgb_array'))  # state is not normalized, so we convert to 8-bit unsigned
+
                 image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)  # cv2 uses BGR instead of RGB
 
                 image = cv2.resize(image, (300, 300))  # otherwise the window is so small
