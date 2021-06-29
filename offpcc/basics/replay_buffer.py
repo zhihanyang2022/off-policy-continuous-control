@@ -106,7 +106,7 @@ class ReplayBuffer:
         ns = as_tensor_on_device(self.ns[indices]).view(self.batch_size, *self.input_shape)
         d = as_tensor_on_device(self.d[indices]).view(self.batch_size, 1)
 
-        if len(self.input_shape) == 3 and self.use_aug_for_img:  # automatically apply augmentation if buffer is storing image
+        if len(self.input_shape) == 3 and self.use_aug_for_img:
             with torch.no_grad():
                 s = self.augmentator(s)
                 ns = self.augmentator(ns)
