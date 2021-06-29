@@ -76,6 +76,8 @@ class ReplayBuffer:
             # - https://kornia.readthedocs.io/en/latest/augmentation.module.html?highlight=
             #   randomcrop#kornia.augmentation.RandomCrop
 
+            # by default, the augmentation is different for each item in batch (of course, we would want this)
+
             self.augmentator = nn.Sequential(
                 nn.ReplicationPad2d(4),
                 kornia.augmentation.RandomCrop((self.input_shape[1], self.input_shape[2]))
