@@ -67,7 +67,7 @@ class ConvolutionalSAC(OffPolicyRLAlgorithm):
 
         # networks
 
-        self.cnn = ConvNet(input_depth=input_shape[0], embedding_dim=embedding_dim)
+        self.cnn = ConvNet(input_depth=input_shape[0], embedding_dim=embedding_dim).to(get_device())
         self.cnn_targ = create_target(self.cnn)
 
         self.actor = MLPGaussianActor(input_dim=embedding_dim, action_dim=action_dim).to(get_device())
