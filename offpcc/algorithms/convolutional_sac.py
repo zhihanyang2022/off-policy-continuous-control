@@ -9,6 +9,7 @@ from torch.distributions import Normal, Independent
 
 from basics.abstract_algorithms import OffPolicyRLAlgorithm
 from basics.actors_and_critics import MLPGaussianActor, MLPCritic
+from basics.convnet import ConvNet
 from basics.replay_buffer import Batch
 from basics.utils import get_device, create_target, polyak_update, save_net, load_net
 from basics.lr_scheduler import LRScheduler
@@ -28,8 +29,9 @@ class ConvolutionalSAC(OffPolicyRLAlgorithm):
 
     def __init__(
         self,
-        input_dim,
+        input_shape,
         action_dim,
+        embedding_dim=50,
         gamma=0.99,
         lr=3e-4,
         lr_schedule=None,
@@ -40,7 +42,7 @@ class ConvolutionalSAC(OffPolicyRLAlgorithm):
 
         # hyperparameters
 
-        self.input_dim = input_dim
+        self.input_shape = input_shape
         self.action_dim = action_dim
         self.gamma = gamma
         self.lr = lr
@@ -65,15 +67,20 @@ class ConvolutionalSAC(OffPolicyRLAlgorithm):
 
         # networks
 
-        self.actor = MLPGaussianActor(input_dim=input_dim, action_dim=action_dim).to(get_device())
+        self.cnn = ConvNet(input_depth=input_shape[0], embedding_dim=embedding_dim)
+        self.cnn_targ = create_target(self.cnn)
 
-        self.Q1 = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
+        self.actor = MLPGaussianActor(input_dim=embedding_dim, action_dim=action_dim).to(get_device())
+
+        self.Q1 = MLPCritic(input_dim=embedding_dim, action_dim=action_dim).to(get_device())
         self.Q1_targ = create_target(self.Q1)
 
-        self.Q2 = MLPCritic(input_dim=input_dim, action_dim=action_dim).to(get_device())
+        self.Q2 = MLPCritic(input_dim=embedding_dim, action_dim=action_dim).to(get_device())
         self.Q2_targ = create_target(self.Q2)
 
         # optimizers
+
+        self.cnn_optimizer = optim.Adam(self.cnn.parameters(), lr=lr)
 
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
         self.Q1_optimizer = optim.Adam(self.Q1.parameters(), lr=lr)
@@ -125,7 +132,8 @@ class ConvolutionalSAC(OffPolicyRLAlgorithm):
     def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
             state = torch.tensor(state).unsqueeze(0).float().to(get_device())
-            action = self.sample_action_from_distribution(state, deterministic=deterministic, return_log_prob=False)
+            embedding = self.cnn(state)
+            action = self.sample_action_from_distribution(embedding, deterministic=deterministic, return_log_prob=False)
             return action.view(-1).cpu().numpy()  # view as 1d -> to cpu -> to numpy
 
     def get_current_alpha(self):
@@ -143,10 +151,13 @@ class ConvolutionalSAC(OffPolicyRLAlgorithm):
 
         bs = len(b.ns)  # for shape checking
 
+        embedding = self.cnn(b.s)
+        n_embedding = self.cnn_targ(b.ns)
+
         # compute predictions
 
-        Q1_predictions = self.Q1(b.s, b.a)
-        Q2_predictions = self.Q2(b.s, b.a)
+        Q1_predictions = self.Q1(embedding, b.a)
+        Q2_predictions = self.Q2(embedding, b.a)
 
         assert Q1_predictions.shape == (bs, 1)
         assert Q2_predictions.shape == (bs, 1)
@@ -155,10 +166,10 @@ class ConvolutionalSAC(OffPolicyRLAlgorithm):
 
         with torch.no_grad():
 
-            na, log_pi_na_given_ns = self.sample_action_from_distribution(b.ns, deterministic=False,
+            na, log_pi_na_given_ns = self.sample_action_from_distribution(n_embedding, deterministic=False,
                                                                           return_log_prob=True)
 
-            n_min_Q_targ = torch.min(self.Q1_targ(b.ns, na), self.Q2_targ(b.ns, na))
+            n_min_Q_targ = torch.min(self.Q1_targ(n_embedding, na), self.Q2_targ(n_embedding, na))
             n_sample_entropy = - log_pi_na_given_ns
 
             targets = b.r + self.gamma * (1 - b.d) * (n_min_Q_targ + self.get_current_alpha() * n_sample_entropy)
@@ -178,19 +189,24 @@ class ConvolutionalSAC(OffPolicyRLAlgorithm):
 
         # reduce td error
 
+        self.cnn_optimizer.zero_grad()
+
         self.Q1_optimizer.zero_grad()
-        Q1_loss.backward()
+        Q1_loss.backward(retain_graph=True)
         self.Q1_optimizer.step()
 
         self.Q2_optimizer.zero_grad()
         Q2_loss.backward()
         self.Q2_optimizer.step()
 
+        self.cnn_optimizer.step()
+
         # compute policy loss
 
-        a, log_pi_a_given_s = self.sample_action_from_distribution(b.s, deterministic=False, return_log_prob=True)
+        a, log_pi_a_given_s = self.sample_action_from_distribution(embedding.detach(),
+                                                                   deterministic=False, return_log_prob=True)
 
-        min_Q = torch.min(self.Q1(b.s, a), self.Q2(b.s, a))
+        min_Q = torch.min(self.Q1(embedding.detach(), a), self.Q2(embedding.detach(), a))
         sample_entropy = - log_pi_a_given_s
 
         policy_loss = - torch.mean(min_Q + self.get_current_alpha() * sample_entropy)
@@ -248,6 +264,7 @@ class ConvolutionalSAC(OffPolicyRLAlgorithm):
 
         # update target networks
 
+        polyak_update(targ_net=self.cnn_targ, pred_net=self.cnn, polyak=self.polyak)
         polyak_update(targ_net=self.Q1_targ, pred_net=self.Q1, polyak=self.polyak)
         polyak_update(targ_net=self.Q2_targ, pred_net=self.Q2, polyak=self.polyak)
 
@@ -266,7 +283,9 @@ class ConvolutionalSAC(OffPolicyRLAlgorithm):
         }
 
     def save_actor(self, save_dir: str) -> None:
+        save_net(net=self.cnn, save_dir=save_dir, save_name="cnn.pth")
         save_net(net=self.actor, save_dir=save_dir, save_name="actor.pth")
 
     def load_actor(self, save_dir: str) -> None:
+        load_net(net=self.cnn, save_dir=save_dir, save_name="cnn.pth")
         load_net(net=self.actor, save_dir=save_dir, save_name="actor.pth")
