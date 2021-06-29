@@ -132,7 +132,6 @@ class ConvolutionalSAC(OffPolicyRLAlgorithm):
     def act(self, state: np.array, deterministic: bool) -> np.array:
         with torch.no_grad():
             state = torch.tensor(state).unsqueeze(0).float().to(get_device())
-            print('llllll:', state.shape)
             embedding = self.cnn(state)
             action = self.sample_action_from_distribution(embedding, deterministic=deterministic, return_log_prob=False)
             return action.view(-1).cpu().numpy()  # view as 1d -> to cpu -> to numpy
