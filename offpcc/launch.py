@@ -100,7 +100,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
         )
 
         # creating buffer based on the need of the algorithm
-        if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):  # TODO(future): change if new algorithms are added
+        if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
             buffer = RecurrentReplayBufferGlobal(
                 o_dim=example_env.observation_space.shape[0],
                 a_dim=example_env.action_space.shape[0],

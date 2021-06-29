@@ -50,12 +50,13 @@ class ReplayBuffer:
     Therefore, we recommend that you store channel-first images rather than channel-last images.
     """
 
-    def __init__(self, input_shape, action_dim, capacity=int(1e6), batch_size=100):
+    def __init__(self, input_shape, action_dim, capacity=int(1e6), batch_size=100, use_aug_for_img=True):
 
         self.input_shape = input_shape
         self.action_dim = action_dim
         self.capacity = capacity
         self.batch_size = batch_size
+        self.use_aug_for_img = use_aug_for_img
 
         assert len(self.input_shape) == 1 or len(self.input_shape) == 3  # vector or image (nothing else)
 
@@ -68,7 +69,7 @@ class ReplayBuffer:
         self.ptr = 0
         self.num_transitions = 0
 
-        if len(self.input_shape) == 3:
+        if len(self.input_shape) == 3 and self.use_aug_for_img:
 
             # docs:
             # - https://pytorch.org/docs/stable/generated/torch.nn.ReplicationPad2d.html
@@ -105,7 +106,7 @@ class ReplayBuffer:
         ns = as_tensor_on_device(self.ns[indices]).view(self.batch_size, *self.input_shape)
         d = as_tensor_on_device(self.d[indices]).view(self.batch_size, 1)
 
-        if len(self.input_shape) == 3:  # automatically apply augmentation if buffer is storing image
+        if len(self.input_shape) == 3 and self.use_aug_for_img:  # automatically apply augmentation if buffer is storing image
             with torch.no_grad():
                 s = self.augmentator(s)
                 ns = self.augmentator(ns)
