@@ -151,8 +151,8 @@ class ConvolutionalSAC(OffPolicyRLAlgorithm):
 
         bs = len(b.ns)  # for shape checking
 
-        # by def, "an embedding is a relatively lower-dimensional space into which you can translate high-dimensional
-        # vectors" (from google)
+        # By def, "an embedding is a relatively lower-dimensional space into which you can translate high-dimensional
+        # vectors" (from google).
 
         embedding = self.cnn(b.s)
         n_embedding = self.cnn_targ(b.ns)
