@@ -38,7 +38,7 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
         render is set to True, env_from_dmc can be True or False (determined automatically from env name),
         render_pixel_state is set to False
 
-    (3) Used in dmc_render_pixel_state.py.
+    (3) Used in render_pixel_state_for_dmc_img_envs.py.
         render, env_from_dmc and render_pixel_state are all set to True
 
     @param env:

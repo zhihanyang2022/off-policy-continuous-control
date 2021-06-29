@@ -146,7 +146,7 @@ register(
 register(
     id='dmc-cartpole-balance-mdp-img-concat3-v0',
     entry_point='domains.dmc_cartpole_b:mdp_img_concat3',
-    max_episode_steps=200
+    max_episode_steps=500
 )
 
 # ============================================================================================

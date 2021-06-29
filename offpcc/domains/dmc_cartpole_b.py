@@ -16,13 +16,14 @@ def mdp_concat5():
 
 
 def pomdp_img():
+    """frame skip follows from the Dreamer benchmark"""
     raw_env = dmc2gym.make(
         domain_name="cartpole",
         task_name="balance",
         keys_to_exclude=[],
         visualize_reward=False,
         from_pixels=True,
-        frame_skip=5
+        frame_skip=2
     )
     return GrayscaleImage(Normalize255Image(raw_env))
 
