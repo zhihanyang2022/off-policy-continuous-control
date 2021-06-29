@@ -17,7 +17,7 @@ import basics.run_fns
 import basics_sb3.run_fns
 import basics.replay_buffer
 
-basics.replay_buffer.capacity = %capacity
+basics.replay_buffer.ReplayBuffer.capacity = %capacity
 
 basics.run_fns.train.num_epochs = %num_epochs
 basics.run_fns.train.num_steps_per_epoch = %num_steps_per_epoch
