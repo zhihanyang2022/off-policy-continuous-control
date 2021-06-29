@@ -59,11 +59,11 @@ class ReplayBuffer:
 
         assert len(self.input_shape) == 1 or len(self.input_shape) == 3  # vector or image (nothing else)
 
-        self.s = np.zeros((capacity, *input_shape))
-        self.a = np.zeros((capacity, action_dim))
-        self.r = np.zeros((capacity, 1))
-        self.ns = np.zeros((capacity, *input_shape))
-        self.d = np.zeros((capacity, 1))
+        self.s = np.empty((capacity, *input_shape), dtype=np.float32)
+        self.a = np.empty((capacity, action_dim), dtype=np.float32)
+        self.r = np.empty((capacity, 1), dtype=np.float32)
+        self.ns = np.empty((capacity, *input_shape), dtype=np.float32)
+        self.d = np.empty((capacity, 1), dtype=np.float32)
 
         self.ptr = 0
         self.num_transitions = 0
