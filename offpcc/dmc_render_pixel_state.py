@@ -12,7 +12,7 @@ args = parser.parse_args()
 env = gym.wrappers.RescaleAction(gym.make(args.env), -1, 1)
 
 
-class Algorithm:
+class RandomAlgorithm:
 
     def __init__(self, env):
         self.env = env
@@ -21,4 +21,4 @@ class Algorithm:
         return self.env.action_space.sample()
 
 
-test_for_one_episode(env, Algorithm(env), render=True, env_from_dmc=True, render_pixel_state=True)
+test_for_one_episode(env, RandomAlgorithm(env), render=True, env_from_dmc=True, render_pixel_state=True)
