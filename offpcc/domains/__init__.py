@@ -268,3 +268,10 @@ register(
     entry_point='domains.robot_envs.bumps_norm:pomdp',
     max_episode_steps=50
 )
+
+
+register(
+    id='dmc-walker-walk-mdp-img-concat3-v0',
+    entry_point='domains.dmc_walker_walk:mdp_img_concat3',
+    max_episode_steps=500
+)
