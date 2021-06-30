@@ -4,7 +4,7 @@
 
 capacity = 100000
 
-num_epochs = 200
+num_epochs = 1000
 num_steps_per_epoch = 1000
 num_test_episodes_per_epoch = 5
 update_after = 1000
