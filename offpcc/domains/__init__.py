@@ -143,12 +143,6 @@ register(
     max_episode_steps=200
 )
 
-register(
-    id='dmc-cartpole-balance-mdp-img-concat3-v0',
-    entry_point='domains.dmc_cartpole_b:mdp_img_concat3',
-    max_episode_steps=500
-)
-
 # ============================================================================================
 # DMC CartPole Swing-up (dense reward, fixed episode length)
 # ============================================================================================
@@ -269,6 +263,15 @@ register(
     max_episode_steps=50
 )
 
+# ============================================================================================
+# dm control's image-based envs (for verifying our convolutional sac implementation)
+# ============================================================================================
+
+register(
+    id='dmc-cartpole-balance-mdp-img-concat3-v0',
+    entry_point='domains.dmc_cartpole_b:mdp_img_concat3',
+    max_episode_steps=500
+)
 
 register(
     id='dmc-walker-walk-mdp-img-concat3-v0',
