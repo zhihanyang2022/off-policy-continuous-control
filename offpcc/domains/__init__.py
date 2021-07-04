@@ -248,13 +248,25 @@ register(
 )
 
 register(
-    id='cartpole-continuous-long-pomdp-v0',
-    entry_point='domains.cartpole_balance:pomdp',
+    id='cartpole-continuous-long-p-v0',
+    entry_point='domains.cartpole_balance:p',
     max_episode_steps=1000
 )
 
 register(
-    id='cartpole-continuous-long-mdp-concat5-v0',
-    entry_point='domains.cartpole_balance:mdp_concat5',
+    id='cartpole-continuous-long-v-v0',
+    entry_point='domains.cartpole_balance:v',
+    max_episode_steps=1000
+)
+
+register(
+    id='cartpole-continuous-long-p-concat5-v0',
+    entry_point='domains.cartpole_balance:p_concat5',
+    max_episode_steps=1000
+)
+
+register(
+    id='cartpole-continuous-long-v-concat10-v0',
+    entry_point='domains.cartpole_balance:v_concat10',
     max_episode_steps=1000
 )

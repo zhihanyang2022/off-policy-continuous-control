@@ -167,9 +167,17 @@ def mdp():
     return ContinuousCartPoleEnv()
 
 
-def pomdp():
+def p():
     return FilterObsByIndex(mdp(), indices_to_keep=[0, 2])
 
 
-def mdp_concat5():
-    return ConcatObs(pomdp(), window_size=5)
+def v():
+    return FilterObsByIndex(mdp(), indices_to_keep=[1, 3])
+
+
+def p_concat5():
+    return ConcatObs(p(), window_size=5)
+
+
+def v_concat10():
+    return ConcatObs(v(), window_size=10)
