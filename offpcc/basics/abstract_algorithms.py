@@ -50,3 +50,7 @@ class RecurrentOffPolicyRLAlgorithm(ABC):
     @abstractmethod
     def load_actor(self, save_dir: str) -> None:
         pass
+
+    @abstractmethod
+    def copy_networks_from(self, algorithm) -> None:
+        pass

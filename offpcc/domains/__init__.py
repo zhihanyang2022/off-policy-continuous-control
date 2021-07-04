@@ -97,6 +97,78 @@ register(
 )
 
 # ============================================================================================
+# CartPole Balance (for testing recurrent agent with variable length episodes)
+# ============================================================================================
+
+register(
+    id='cartpole-balance-mdp-v0',
+    entry_point='domains.cartpole_balance:mdp',
+    max_episode_steps=200,
+)
+
+register(
+    id='cartpole-balance-pomdp-v0',
+    entry_point='domains.cartpole_balance:pomdp',
+    max_episode_steps=200,
+)
+
+register(
+    id='cartpole-balance-mdp-concat5-v0',
+    entry_point='domains.cartpole_balance:mdp_concat5',
+    max_episode_steps=200,
+)
+
+# ============================================================================================
+# DMC CartPole Balance (dense reward, fixed episode length)
+# ============================================================================================
+
+# these envs are by default last for 1000 / frame_skip
+# we use frame_skip of 5, so timeout would be 200
+
+register(
+    id='dmc-cartpole-balance-mdp-v0',
+    entry_point='domains.dmc_cartpole_b:mdp',
+    max_episode_steps=200
+)
+
+register(
+    id='dmc-cartpole-balance-pomdp-v0',
+    entry_point='domains.dmc_cartpole_b:pomdp',
+    max_episode_steps=200
+)
+
+register(
+    id='dmc-cartpole-balance-mdp-concat5-v0',
+    entry_point='domains.dmc_cartpole_b:mdp_concat5',
+    max_episode_steps=200
+)
+
+# ============================================================================================
+# DMC CartPole Swing-up (dense reward, fixed episode length)
+# ============================================================================================
+
+# these envs are by default last for 1000 / frame_skip
+# we use frame_skip of 5, so timeout would be 200
+
+register(
+    id='dmc-cartpole-swingup-mdp-v0',
+    entry_point='domains.dmc_cartpole_su:mdp',
+    max_episode_steps=200
+)
+
+register(
+    id='dmc-cartpole-swingup-pomdp-v0',
+    entry_point='domains.dmc_cartpole_su:pomdp',
+    max_episode_steps=200
+)
+
+register(
+    id='dmc-cartpole-swingup-mdp-concat5-v0',
+    entry_point='domains.dmc_cartpole_su:mdp_concat5',
+    max_episode_steps=200
+)
+
+# ============================================================================================
 # CartPole Swing-up Variable Length (Sensor Integration + System Identification)
 # ============================================================================================
 
@@ -152,7 +224,57 @@ register(
 )
 
 register(
-    id='water-maze-v0',
-    entry_point='domains.water_maze:WaterMazeEnv',
+    id='water-maze-mdp-v0',
+    entry_point='domains.water_maze:mdp',
     max_episode_steps=200,
+)
+
+register(
+    id='water-maze-pomdp-v0',
+    entry_point='domains.water_maze:pomdp',
+    max_episode_steps=200,
+)
+
+register(
+    id='water-maze-dense-mdp-v0',
+    entry_point='domains.water_maze_dense:mdp',
+    max_episode_steps=200,
+)
+
+register(
+    id='water-maze-dense-pomdp-v0',
+    entry_point='domains.water_maze_dense:pomdp',
+    max_episode_steps=200,
+)
+
+# ============================================================================================
+# Bumps normal (for HAC paper)
+# ============================================================================================
+
+register(
+    id='bumps-normal-mdp-v0',
+    entry_point='domains.robot_envs.bumps_norm:mdp',
+    max_episode_steps=50
+)
+
+register(
+    id='bumps-normal-pomdp-v0',
+    entry_point='domains.robot_envs.bumps_norm:pomdp',
+    max_episode_steps=50
+)
+
+# ============================================================================================
+# dm control's image-based envs (for verifying our convolutional sac implementation)
+# ============================================================================================
+
+register(
+    id='dmc-cartpole-balance-mdp-img-concat3-v0',
+    entry_point='domains.dmc_cartpole_b:mdp_img_concat3',
+    max_episode_steps=500
+)
+
+register(
+    id='dmc-walker-walk-mdp-img-concat3-v0',
+    entry_point='domains.dmc_walker_walk:mdp_img_concat3',
+    max_episode_steps=500
 )

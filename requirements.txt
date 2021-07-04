@@ -1,5 +1,5 @@
 # please use python 3.6 (otherwise can't install tensorflow < 2.0.0)
-torch==1.7.0
+torch==1.8.0
 numpy==1.19.5
 gym==0.15.7
 mujoco-py==2.0.2.13
@@ -19,3 +19,8 @@ tqdm
 joblib
 pybullet
 # stable-baselines3 (plz install this on your own, i.e., via pip install)
+# mjlib
+# dm_control
+# our own dmc2gym wrapper
+# sru
+# pybullet

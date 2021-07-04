@@ -10,11 +10,11 @@ from typing import Union
 from copy import deepcopy
 import numpy as np
 from gym.wrappers import Monitor
+import cv2
 
-from algorithms import *
 from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from basics.replay_buffer import ReplayBuffer
-from basics.replay_buffer_recurrent import RecurrentReplayBufferGlobal, RecurrentReplayBufferLocal
+from basics.replay_buffer_recurrent import RecurrentReplayBufferGlobal
 
 BASE_LOG_DIR = '../results'
 
@@ -24,15 +24,70 @@ def make_log_dir(env_name, algo_name, run_id) -> str:
     return log_dir
 
 
-def test_for_one_episode(env, algorithm, render=False) -> tuple:
+def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, render_pixel_state=False) -> tuple:
+
+    """
+    This function is too versatile, so it deserves some good documentation.
+
+    There are 3 usages of this function:
+
+    (1) During training. After each epoch, the algorithm is tested using this function.
+        render, env_from_dmc and render_pixel_state are set to False.
+
+    (2) Visualizing learned policy.
+        render is set to True, env_from_dmc can be True or False (determined automatically from env name),
+        render_pixel_state is set to False
+
+    (3) Used in render_pixel_state_for_dmc_img_envs.py.
+        render, env_from_dmc and render_pixel_state are all set to True
+
+    @param env:
+    @param algorithm:
+    @param render:
+    @param env_from_dmc: if True, rely on opencv for rendering
+    @param render_pixel_state: if True, display an image made up of 3 concatenated greyscale images
+    @return:
+    """
+
     state, done, episode_return, episode_len = env.reset(), False, 0, 0
+
     if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
         algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
+
+    if render and env_from_dmc:
+        cv2.namedWindow('img', cv2.WINDOW_NORMAL)
+
     while not done:
         action = algorithm.act(state, deterministic=True)
         state, reward, done, _ = env.step(action)
         if render:
-            env.render()
+            if env_from_dmc:
+
+                # thanks to Basj's answer from
+                # https://stackoverflow.com/questions/53324068/a-faster-refresh-rate-with-plt-imshow
+
+                # from opencv doc:
+                # - If the image is 8-bit unsigned, it is displayed as is.
+                # - If the image is 16-bit unsigned or 32-bit integer, the pixels are divided by 256. That is, the value range [0,255*256] is mapped to [0,255].
+                # - If the image is 32-bit or 64-bit floating-point, the pixel values are multiplied by 255. That is, the value range [0,1] is mapped to [0,255].
+
+                if render_pixel_state:
+                    image = np.moveaxis(np.float32(state), 0, -1)  # state is already normalized to [0, 1], so we convert to 32-bit floating point
+                else:
+                    image = np.uint8(env.render(mode='rgb_array'))  # state is not normalized, so we convert to 8-bit unsigned
+
+                image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)  # cv2 uses BGR instead of RGB
+
+                image = cv2.resize(image, (300, 300))  # otherwise the window is so small
+
+                kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
+                image = cv2.filter2D(image, -1, kernel)  # sharpen the image for a little bit
+
+                cv2.imshow('img', image)
+                cv2.waitKey(1)
+
+            else:
+                env.render()
         episode_return += reward
         episode_len += 1
     return episode_len, episode_return
@@ -45,7 +100,7 @@ def remove_jsons_from_dir(directory):
 
 
 def load_and_visualize_policy(
-        env_fn,
+        env,
         algorithm,
         log_dir,
         num_episodes,
@@ -57,11 +112,13 @@ def load_and_visualize_policy(
     if save_videos:  # no rendering in this case for speed
 
         env = Monitor(
-            env_fn(),
+            env,
             directory=f'{log_dir}/videos/',
             video_callable=lambda episode_id: True,  # record every single episode
             force=True
         )
+
+        assert not env.spec.id.startswith("dmc"), "cannot record video for envs converted from dm_control, sorry!"
 
         for i in range(num_episodes):
             test_for_one_episode(env, algorithm, render=False)
@@ -70,11 +127,9 @@ def load_and_visualize_policy(
 
     else:
 
-        env = env_fn()
-
         ep_lens, ep_rets = [], []
         for i in range(num_episodes):
-            ep_len, ep_ret = test_for_one_episode(env, algorithm, render=True)
+            ep_len, ep_ret = test_for_one_episode(env, algorithm, render=True, env_from_dmc=env.spec.id.startswith("dmc"))
             ep_lens.append(ep_len)
             ep_rets.append(ep_ret)
 
@@ -87,7 +142,7 @@ def load_and_visualize_policy(
 def train(
         env_fn,
         algorithm: Union[OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm],
-        buffer: Union[ReplayBuffer, RecurrentReplayBufferGlobal, RecurrentReplayBufferLocal],
+        buffer: Union[ReplayBuffer, RecurrentReplayBufferGlobal],
         num_epochs=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
         num_test_episodes_per_epoch=gin.REQUIRED,
@@ -125,7 +180,12 @@ def train(
     # prepare environments
 
     env = env_fn()
-    test_env = env_fn()
+
+    # pbc stands for pybullet custom (e.g., bumps normal, top plate)
+    # when env is pbc, then we avoid testing entirely
+
+    if env.spec.id.startswith("pbc") is False:
+        test_env = env_fn()
 
     state = env.reset()
 
@@ -193,13 +253,8 @@ def train(
 
             if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
 
-                # this deepcopy takes roughly 7e-3 seconds; * 10 episodes per epoch * 1000 epochs = 70 seconds (not bad)
-
-                algorithm = deepcopy(algorithm_clone)
+                algorithm.copy_networks_from(algorithm_clone)  # doing a deepcopy will ruin the action noise schedule
                 algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
-
-                # reinitialize_hidden is no longer needed here because algorithm_clone's h_and_c is always None
-                # we keep it here for convenience
 
         # update handling
         if t >= update_after and (t + 1) % update_every == 0 and buffer.can_sample():
@@ -243,21 +298,28 @@ def train(
 
             # testing stats
 
-            test_episode_lens, test_episode_returns = [], []
+            if env.spec.id.startswith("pbc"):
 
-            for j in range(num_test_episodes_per_epoch):
+                mean_test_episode_len = -999  # just ignore this value
+                mean_test_episode_ret = -999
 
-                if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
-                    test_algorithm = deepcopy(algorithm_clone)
-                elif isinstance(algorithm, OffPolicyRLAlgorithm):
-                    test_algorithm = deepcopy(algorithm)
+            else:
 
-                test_episode_len, test_episode_return = test_for_one_episode(test_env, test_algorithm)
-                test_episode_lens.append(test_episode_len)
-                test_episode_returns.append(test_episode_return)
+                test_episode_lens, test_episode_returns = [], []
 
-            mean_test_episode_len = np.mean(test_episode_lens)
-            mean_test_episode_ret = np.mean(test_episode_returns)
+                for j in range(num_test_episodes_per_epoch):
+
+                    if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+                        test_algorithm = deepcopy(algorithm_clone)
+                    elif isinstance(algorithm, OffPolicyRLAlgorithm):
+                        test_algorithm = deepcopy(algorithm)
+
+                    test_episode_len, test_episode_return = test_for_one_episode(test_env, test_algorithm)
+                    test_episode_lens.append(test_episode_len)
+                    test_episode_returns.append(test_episode_return)
+
+                mean_test_episode_len = np.mean(test_episode_lens)
+                mean_test_episode_ret = np.mean(test_episode_returns)
 
             # time-related stats
 

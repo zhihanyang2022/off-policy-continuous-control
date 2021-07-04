@@ -1,0 +1,79 @@
+<?xml version="0.0" ?>
+<!--PyBullet does not support concave objects, so we make a special plate model,
+    where the collision is only detected for the upper half of the plate.-->
+<robot name="plate.urdf">
+    <link name="plate_lower_half_link">
+        <inertial>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <mass value="0"/>
+            <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+        </inertial>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="plate_lower_half.stl"/>
+            </geometry>
+            <material name="white">
+                <color rgba="1 1 1 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <link name="plate_upper_half_link">
+        <contact>
+            <lateral_friction value="0.1"/>
+            <rolling_friction value="0.0001"/>
+            <inertia_scaling value="3.0"/>
+        </contact>
+        <inertial>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <mass value="10"/>
+            <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="plate_upper_half.stl"/>
+            </geometry>
+            <material name="white">
+                <color rgba="1 1 1 1"/>
+            </material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="plate_upper_half.stl"/>
+            </geometry>
+        </collision>
+    </link>
+    <joint name="plate_upper_half_joint" type="fixed">
+        <axis xyz="0 0 1"/>
+        <origin xyz="0 0 0"/>
+        <parent link="plate_lower_half_link"/>
+        <child link="plate_upper_half_link"/>
+    </joint>
+
+    <link name="plate_edge_link">
+        <inertial>
+            <mass value="0.0"/>
+            <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+            <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+        </inertial>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <sphere radius="0.001"/>
+            </geometry>
+            <material name="white">
+                <color rgba="1.0 1.0 1.0 1.0"/>
+            </material>
+        </visual>
+    </link>
+    <joint name="plate_edge_joint" type="fixed">
+        <axis xyz="0 0 1"/>
+        <origin xyz="0 -0.098 0.04687"/>
+        <parent link="plate_lower_half_link"/>
+        <child link="plate_edge_link"/>
+    </joint>
+
+</robot>

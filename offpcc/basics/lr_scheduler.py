@@ -19,7 +19,7 @@ class LRScheduler:
 
         self.for_which_update = 1
 
-    def update_lr(self) -> None:
+    def get_new_lr(self) -> None:
         for optimizer in self.optimizers:
             for g in optimizer.param_groups:
                 g['lr'] = self.init_lr * self.schedule(self.for_which_update)

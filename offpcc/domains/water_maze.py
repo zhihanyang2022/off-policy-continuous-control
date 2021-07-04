@@ -2,10 +2,15 @@ import numpy as np
 import gym
 from gym import spaces
 from gym.utils import seeding
-from gym.envs.classic_control import rendering as visualize
+import copy
+import socket
+if socket.gethostname() not in ['theseus', 'SXC-Wichita']:
+    from gym.envs.classic_control import rendering as visualize
+
+from domains.wrappers import FilterObsByIndex
 
 
-class WaterMazeEnv(gym.Env):
+class WaterMazeMdpEnv(gym.Env):
 
     def __init__(self, max_action_value=0.2):
 
@@ -15,9 +20,9 @@ class WaterMazeEnv(gym.Env):
                                        high=max_action_value,
                                        shape=(2,))
 
-        self.observation_space = spaces.Box(-1., 1., shape=(2,))
+        self.observation_space = spaces.Box(-1., 1., shape=(5,))
 
-        self.platform_radius = 0.2
+        self.platform_radius = 0.33
         self.world_radius = 1.0
 
         self.viewer = None
@@ -77,7 +82,8 @@ class WaterMazeEnv(gym.Env):
                 return agent_pos
 
     def step(self, action):
-        previous_pos = np.copy(self.agent_pos)
+
+        previous_pos = copy.deepcopy(self.agent_pos)
         action = action * self.max_action_value
         self.agent_pos += np.array(action)
 
@@ -104,7 +110,7 @@ class WaterMazeEnv(gym.Env):
 
     # The agent knows its position and whether it is inside the platform or not
     def _get_obs(self):
-        return np.array([self.agent_pos[0], self.agent_pos[1], self.inside_platform])
+        return np.array([self.agent_pos[0], self.agent_pos[1], self.inside_platform, *list(self.platform_center)])
 
     def render(self, mode='human'):
         self._setup_view()
@@ -160,3 +166,12 @@ class WaterMazeEnv(gym.Env):
         if self.viewer:
             self.viewer.close()
             self.viewer = None
+
+
+def mdp():
+    return WaterMazeMdpEnv()
+
+
+def pomdp():
+    return FilterObsByIndex(mdp(), indices_to_keep=[0, 1, 2])
+

@@ -8,6 +8,7 @@ parser.add_argument('--use_random_policy', action="store_true")
 args = parser.parse_args()
 
 env = gym.wrappers.RescaleAction(gym.make(args.env), -1, 1)
+
 print('=> Env:', env)
 print('=> Timeout:', env.spec.max_episode_steps)
 print('=> Observation space:', env.observation_space)
@@ -19,14 +20,16 @@ state = env.reset()
 print(state)
 
 ret = 0
+cnt = 0
 while True:
     state, reward, done, info = env.step(env.action_space.sample())
     ret += reward
-    env.render()
-    print(state)
+    cnt += 1
+    print(state, reward, done)
     if done:
         break
 
 print(env.reset())
 
-print(ret)
+print('Return:', ret)
+print('Ep len:', cnt)

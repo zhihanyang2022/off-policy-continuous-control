@@ -10,21 +10,22 @@ import pybullet_envs
 from gym.wrappers import RescaleAction
 
 from basics.replay_buffer import ReplayBuffer
-from basics.replay_buffer_recurrent import instantiate_recurrent_replay_buffer
+from basics.replay_buffer_recurrent import RecurrentReplayBufferGlobal
 from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from algorithms import *
 from algorithms_recurrent import *
 
+# from basics.utils import get_device, set_random_seed
 from basics.run_fns import train, make_log_dir, load_and_visualize_policy
 
 algo_name2class = {
     'ddpg': DDPG,
     'td3': TD3,
     'sac': SAC,
+    'sac_cnn': ConvolutionalSAC,
     'rdpg': RecurrentDDPG,
     'rtd3': RecurrentTD3,
     'rsac': RecurrentSAC,
-    'rsac-shared': RecurrentSAC,
 }
 
 parser = argparse.ArgumentParser()
@@ -43,22 +44,34 @@ gin.parse_config_file(args.config)
 
 def env_fn():
     """Any wrapper by default copies the observation and action space of its wrappee."""
-    return RescaleAction(gym.make(args.env), -1, 1)
+    if args.env.startswith("bumps"):  # some of our custom envs require special treatment
+        return RescaleAction(gym.make(args.env, rendering=args.render), -1, 1)
+    else:
+        return RescaleAction(gym.make(args.env), -1, 1)
 
 
 example_env = env_fn()
 
+
 for run_id in args.run_id:  # args.run_id is a list of ints; could contain more than one run_ids
 
-    algorithm = algo_name2class[args.algo](
-        input_dim=example_env.observation_space.shape[0],
-        action_dim=example_env.action_space.shape[0],
-    )
+    # set_random_seed(seed=run_id, device=get_device())
+
+    if args.algo.endswith('cnn'):
+        algorithm = algo_name2class[args.algo](
+            input_shape=example_env.observation_space.shape,
+            action_dim=example_env.action_space.shape[0],
+        )
+    else:
+        algorithm = algo_name2class[args.algo](
+            input_dim=example_env.observation_space.shape[0],
+            action_dim=example_env.action_space.shape[0],
+        )
 
     if args.render:
 
         load_and_visualize_policy(
-            env_fn=env_fn,
+            env=example_env,
             algorithm=algorithm,
             log_dir=make_log_dir(args.env, args.algo, run_id),  # trained model will be loaded from here
             num_episodes=10,
@@ -68,7 +81,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
     elif args.record:
 
         load_and_visualize_policy(
-            env_fn=env_fn,
+            env=example_env,
             algorithm=algorithm,
             log_dir=make_log_dir(args.env, args.algo, run_id),  # trained model will be loaded from here
             num_episodes=10,
@@ -87,16 +100,17 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
         )
 
         # creating buffer based on the need of the algorithm
-        if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):  # TODO(future): change if new algorithms are added
-            buffer = instantiate_recurrent_replay_buffer(
+        if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+            buffer = RecurrentReplayBufferGlobal(
                 o_dim=example_env.observation_space.shape[0],
                 a_dim=example_env.action_space.shape[0],
                 max_episode_len=example_env.spec.max_episode_steps
             )
         elif isinstance(algorithm, OffPolicyRLAlgorithm):
-            buffer = ReplayBuffer()
-        else:
-            raise NotImplementedError
+            buffer = ReplayBuffer(
+                input_shape=example_env.observation_space.shape,
+                action_dim=example_env.action_space.shape[0]
+            )
 
         train(
             env_fn=env_fn,

@@ -1,0 +1,21 @@
+<?xml version="0.0" ?>
+<robot name="bump_40_virtual.urdf">
+    <link name="baseLink">
+        <inertial>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <mass value="0"/>
+            <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="bump_40.stl"/>
+            </geometry>
+            <material name="green">
+                <color rgba="0 1 0 0.1"/>
+            </material>
+        </visual>
+    </link>
+</robot>
+

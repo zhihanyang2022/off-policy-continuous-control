@@ -1,0 +1,32 @@
+<?xml version="0.0" ?>
+<robot name="cup.urdf">
+  <link name="baseLink">
+    <contact>
+      <lateral_friction value="0.2"/>
+      <rolling_friction value="0.0001"/>
+      <inertia_scaling value="3.0"/>
+    </contact>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value="0.1"/>
+       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="cup.stl"/>
+      </geometry>
+      <material name="clear_thick_glass">
+        <color rgba="0.5 0.5 0.5 0.75"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="cup.stl"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>
+

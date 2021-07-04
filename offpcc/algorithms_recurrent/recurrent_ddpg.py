@@ -1,4 +1,5 @@
 import gin
+import time
 
 import numpy as np
 import torch
@@ -9,6 +10,7 @@ from basics.summarizer import Summarizer
 from basics.actors_and_critics import MLPTanhActor, MLPCritic
 from basics.replay_buffer_recurrent import RecurrentBatch
 from basics.utils import get_device, create_target, mean_of_unmasked_elements, polyak_update, save_net, load_net
+from basics.action_noise_scheduler import ActionNoiseScheduler
 
 
 @gin.configurable(module=__name__)
@@ -24,7 +26,8 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         gamma=0.99,
         lr=3e-4,
         polyak=0.995,
-        action_noise=0.1,
+        action_noise_schedule=lambda for_which_update: 0.1,
+        exploration_mode="standard",  # or "dqn_style"
     ):
 
         # hyperparameters
@@ -36,7 +39,14 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         self.lr = lr
         self.polyak = polyak
 
-        self.action_noise = action_noise
+        self.action_noise = None
+        self.action_noise_schedule = action_noise_schedule
+        self.exploration_mode = exploration_mode
+
+        assert self.exploration_mode in ["dqn_style", "standard"], f"{exploration_mode} is not a valid exploration mode"
+
+        if self.action_noise_schedule is not None:
+            self.action_noise_scheduler = ActionNoiseScheduler(schedule=action_noise_schedule)
 
         # trackers
 
@@ -68,6 +78,11 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         self.hidden = None
 
     def act(self, observation: np.array, deterministic: bool) -> np.array:
+
+        # don't update action noise during testing, only during rollouts that get stored in buffer
+        if deterministic is False:
+            self.action_noise = self.action_noise_scheduler.get_new_action_noise()
+
         with torch.no_grad():
             observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
             summary, self.hidden = self.actor_summarizer(observation, self.hidden, return_hidden=True)
@@ -75,11 +90,19 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
             if deterministic:
                 return greedy_action
             else:
-                return np.clip(greedy_action + self.action_noise * np.random.randn(self.action_dim), -1.0, 1.0)
+                if self.exploration_mode == "standard":
+                    return np.clip(greedy_action + self.action_noise * np.random.randn(self.action_dim), -1.0, 1.0)
+                elif self.exploration_mode == "dqn_style":
+                    if np.random.uniform() > self.action_noise:
+                        return greedy_action
+                    else:
+                        return np.random.uniform(-1.0, 1.0)
 
     def update_networks(self, b: RecurrentBatch):
 
         bs, num_bptt = b.r.shape[0], b.r.shape[1]
+
+        start = time.perf_counter()
 
         # compute summary
 
@@ -93,6 +116,8 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         critic_summary_1_T, critic_summary_2_Tplus1 = critic_summary[:, :-1, :], critic_summary_targ[:, 1:, :]
 
         assert actor_summary.shape == (bs, num_bptt+1, self.hidden_dim)
+
+        checkpoint1 = time.perf_counter()
 
         # compute predictions
 
@@ -127,6 +152,8 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         self.critic_summarizer_optimizer.step()
         self.Q_optimizer.step()
 
+        checkpoint2 = time.perf_counter()
+
         # compute policy loss
 
         a = self.actor(actor_summary_1_T)
@@ -148,6 +175,8 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         self.actor_summarizer_optimizer.step()
         self.actor_optimizer.step()
 
+        checkpoint3 = time.perf_counter()
+
         # update target networks
 
         polyak_update(targ_net=self.actor_targ, pred_net=self.actor, polyak=self.polyak)
@@ -156,12 +185,28 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         polyak_update(targ_net=self.actor_summarizer_targ, pred_net=self.actor_summarizer, polyak=self.polyak)
         polyak_update(targ_net=self.critic_summarizer_targ, pred_net=self.critic_summarizer, polyak=self.polyak)
 
+        checkpoint4 = time.perf_counter()
+
+        # compute time allocation
+
+        total_time = checkpoint4 - start
+        prop_for_computing_summary = (checkpoint1 - start) / total_time * 100
+        prop_for_learning_qfunc = (checkpoint2 - checkpoint1) / total_time * 100
+        prop_for_learning_actor = (checkpoint3 - checkpoint2) / total_time * 100
+        prop_for_polyak_update = (checkpoint4 - checkpoint3) / total_time * 100
+
         return {
             # for learning the q functions
             '(qfunc) Q pred': float(mean_of_unmasked_elements(predictions, b.m)),
             '(qfunc) Q loss': float(Q_loss),
             # for learning the actor
             '(actor) Q value': float(mean_of_unmasked_elements(Q_values, b.m)),
+            # time allocation
+            '(time) total': total_time,
+            '(time) summary': prop_for_computing_summary,
+            '(time) qfunc': prop_for_learning_qfunc,
+            '(time) actor': prop_for_learning_actor,
+            '(time) polyak': prop_for_polyak_update,
         }
 
     def save_actor(self, save_dir: str) -> None:
@@ -171,3 +216,17 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
     def load_actor(self, save_dir: str) -> None:
         load_net(net=self.actor_summarizer, save_dir=save_dir, save_name="actor_summarizer.pth")
         load_net(net=self.actor, save_dir=save_dir, save_name="actor.pth")
+
+    def copy_networks_from(self, another_recurrent_ddpg):
+
+        self.actor_summarizer.load_state_dict(another_recurrent_ddpg.actor_summarizer.state_dict())
+        self.actor_summarizer_targ.load_state_dict(another_recurrent_ddpg.actor_summarizer_targ.state_dict())
+
+        self.critic_summarizer.load_state_dict(another_recurrent_ddpg.critic_summarizer.state_dict())
+        self.critic_summarizer_targ.load_state_dict(another_recurrent_ddpg.critic_summarizer_targ.state_dict())
+
+        self.actor.load_state_dict(another_recurrent_ddpg.actor.state_dict())
+        self.actor_targ.load_state_dict(another_recurrent_ddpg.actor_targ.state_dict())
+
+        self.Q.load_state_dict(another_recurrent_ddpg.Q.state_dict())
+        self.Q_targ.load_state_dict(another_recurrent_ddpg.Q_targ.state_dict())
