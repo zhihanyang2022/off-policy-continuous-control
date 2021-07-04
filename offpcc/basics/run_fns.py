@@ -257,7 +257,7 @@ def train(
                 algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
 
         # update handling
-        if t >= update_after and (t + 1) % update_every == 0 and buffer.can_sample():
+        if t >= update_after and (t + 1) % update_every == 0:
             for j in range(update_every):
 
                 batch = buffer.sample()

@@ -2,25 +2,25 @@
 # gin macros
 # ====================================================================================
 
-num_epochs = 1000
-num_steps_per_epoch = 1000
-update_after = 0
-num_test_episodes_per_epoch = 100
+capacity = 5000  # 1M / 200 = 5000
+batch_size = 10
 
-batch_size = 100
-num_bptt = 50
+num_epochs = 400
+num_steps_per_epoch = 1000
+update_after = 10000
+num_test_episodes_per_epoch = 5
 
 # ====================================================================================
-# applying the parameters above to our codebase
+# applying the parameters
 # ====================================================================================
 
 import basics.replay_buffer_recurrent
 import basics.run_fns
 
-basics.replay_buffer_recurrent.instantiate_recurrent_replay_buffer.num_bptt = %num_bptt
-basics.replay_buffer_recurrent.instantiate_recurrent_replay_buffer.batch_size = %batch_size
+basics.replay_buffer_recurrent.RecurrentReplayBufferGlobal.capacity = %capacity
+basics.replay_buffer_recurrent.RecurrentReplayBufferGlobal.batch_size = %batch_size
 
 basics.run_fns.train.num_epochs = %num_epochs
 basics.run_fns.train.num_steps_per_epoch = %num_steps_per_epoch
-basics.run_fns.train.update_after = %update_after
 basics.run_fns.train.num_test_episodes_per_epoch = %num_test_episodes_per_epoch
+basics.run_fns.train.update_after = %update_after

@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from collections import namedtuple
 from basics.utils import get_device
-import kornia
+# import kornia
 
 Transition = namedtuple('Transition', 's a r ns d')
 Batch = namedtuple('Batch', 's a r ns d')
