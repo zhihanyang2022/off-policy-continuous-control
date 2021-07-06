@@ -242,6 +242,36 @@ register(
 # ============================================================================================
 
 register(
+    id='pendulum-v0',
+    entry_point='domains.pendulum_swingup_from_vrm:mdp',
+    max_episode_steps=200
+)
+
+register(
+    id='pendulum-p-v0',
+    entry_point='domains.pendulum_swingup_from_vrm:p',
+    max_episode_steps=200
+)
+
+register(
+    id='pendulum-v-v0',
+    entry_point='domains.pendulum_swingup_from_vrm:v',
+    max_episode_steps=200
+)
+
+register(
+    id='pendulum-p-concat5-v0',
+    entry_point='domains.pendulum_swingup_from_vrm:p_concat5',
+    max_episode_steps=200
+)
+
+register(
+    id='pendulum-v-concat10-v0',
+    entry_point='domains.pendulum_swingup_from_vrm:v_concat10',
+    max_episode_steps=200
+)
+
+register(
     id='cartpole-continuous-long-v0',
     entry_point='domains.cartpole_balance:mdp',
     max_episode_steps=1000
