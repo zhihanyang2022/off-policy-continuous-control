@@ -260,6 +260,12 @@ register(
 )
 
 register(
+    id='pendulum-va-v0',
+    entry_point='domains.pendulum_swingup_from_vrm:va',
+    max_episode_steps=200
+)
+
+register(
     id='pendulum-p-concat5-v0',
     entry_point='domains.pendulum_swingup_from_vrm:p_concat5',
     max_episode_steps=200
@@ -268,6 +274,12 @@ register(
 register(
     id='pendulum-v-concat10-v0',
     entry_point='domains.pendulum_swingup_from_vrm:v_concat10',
+    max_episode_steps=200
+)
+
+register(
+    id='pendulum-va-concat10-v0',
+    entry_point='domains.pendulum_swingup_from_vrm:va_concat10',
     max_episode_steps=200
 )
 
