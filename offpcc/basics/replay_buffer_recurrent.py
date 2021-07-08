@@ -28,6 +28,7 @@ class RecurrentReplayBufferGlobal:
         o_dim,
         a_dim,
         max_episode_len,  # this will also serve as num_bptt
+        segment_len=None,  # for non-overlapping truncated bptt, need a large batch size
         capacity=gin.REQUIRED,
         batch_size=gin.REQUIRED,
     ):
@@ -60,6 +61,11 @@ class RecurrentReplayBufferGlobal:
         self.batch_size = batch_size
 
         self.max_episode_len = max_episode_len
+
+        if segment_len is not None:
+            assert max_episode_len % segment_len == 0  # e.g., if max_episode_len = 1000, then segment_len = 100 is ok
+
+        self.segment_len = segment_len
 
     def push(self, o, a, r, no, d, cutoff):
 
@@ -123,23 +129,57 @@ class RecurrentReplayBufferGlobal:
 
         ep_lens_of_choices = self.ep_len[choices]
 
-        # grab the corresponding numpy array
-        # and save computational effort for lstm
+        if self.segment_len is None:
 
-        max_ep_len_in_batch = int(np.max(ep_lens_of_choices))
+            # grab the corresponding numpy array
+            # and save computational effort for lstm
 
-        o = self.o[choices][:, :max_ep_len_in_batch+1, :]
-        a = self.a[choices][:, :max_ep_len_in_batch, :]
-        r = self.r[choices][:, :max_ep_len_in_batch, :]
-        d = self.d[choices][:, :max_ep_len_in_batch, :]
-        m = self.m[choices][:, :max_ep_len_in_batch, :]
+            max_ep_len_in_batch = int(np.max(ep_lens_of_choices))
 
-        # convert to tensors on the right device
+            o = self.o[choices][:, :max_ep_len_in_batch+1, :]
+            a = self.a[choices][:, :max_ep_len_in_batch, :]
+            r = self.r[choices][:, :max_ep_len_in_batch, :]
+            d = self.d[choices][:, :max_ep_len_in_batch, :]
+            m = self.m[choices][:, :max_ep_len_in_batch, :]
 
-        o = as_tensor_on_device(o).view(self.batch_size, max_ep_len_in_batch+1, self.o_dim)
-        a = as_tensor_on_device(a).view(self.batch_size, max_ep_len_in_batch, self.a_dim)
-        r = as_tensor_on_device(r).view(self.batch_size, max_ep_len_in_batch, 1)
-        d = as_tensor_on_device(d).view(self.batch_size, max_ep_len_in_batch, 1)
-        m = as_tensor_on_device(m).view(self.batch_size, max_ep_len_in_batch, 1)
+            # convert to tensors on the right device
 
-        return RecurrentBatch(o, a, r, d, m)
+            o = as_tensor_on_device(o).view(self.batch_size, max_ep_len_in_batch+1, self.o_dim)
+            a = as_tensor_on_device(a).view(self.batch_size, max_ep_len_in_batch, self.a_dim)
+            r = as_tensor_on_device(r).view(self.batch_size, max_ep_len_in_batch, 1)
+            d = as_tensor_on_device(d).view(self.batch_size, max_ep_len_in_batch, 1)
+            m = as_tensor_on_device(m).view(self.batch_size, max_ep_len_in_batch, 1)
+
+            return RecurrentBatch(o, a, r, d, m)
+
+        else:
+
+            num_segments_for_each_item = np.ceil(ep_lens_of_choices / self.segment_len).astype(int)
+
+            o = self.o[choices]
+            a = self.a[choices]
+            r = self.r[choices]
+            d = self.d[choices]
+            m = self.m[choices]
+
+            o_seg = np.zeros((self.batch_size, self.segment_len + 1, self.o_dim))
+            a_seg = np.zeros((self.batch_size, self.segment_len, self.a_dim))
+            r_seg = np.zeros((self.batch_size, self.segment_len, 1))
+            d_seg = np.zeros((self.batch_size, self.segment_len, 1))
+            m_seg = np.zeros((self.batch_size, self.segment_len, 1))
+
+            for i in range(self.batch_size):
+                start_idx = np.random.randint(num_segments_for_each_item[i]) * self.segment_len
+                o_seg[i] = o[i][start_idx:start_idx + self.segment_len + 1]
+                a_seg[i] = a[i][start_idx:start_idx + self.segment_len]
+                r_seg[i] = r[i][start_idx:start_idx + self.segment_len]
+                d_seg[i] = d[i][start_idx:start_idx + self.segment_len]
+                m_seg[i] = m[i][start_idx:start_idx + self.segment_len]
+
+            o_seg = as_tensor_on_device(o_seg)
+            a_seg = as_tensor_on_device(a_seg)
+            r_seg = as_tensor_on_device(r_seg)
+            d_seg = as_tensor_on_device(d_seg)
+            m_seg = as_tensor_on_device(m_seg)
+
+            return RecurrentBatch(o_seg, a_seg, r_seg, d_seg, m_seg)
