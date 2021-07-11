@@ -6,6 +6,7 @@ import os
 import gym
 from domains import *
 import pybullet_envs
+from pomdp_robot_domains import *
 from gym.wrappers import RescaleAction
 
 from basics.replay_buffer import ReplayBuffer
