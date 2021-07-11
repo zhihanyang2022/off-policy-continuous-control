@@ -22,5 +22,6 @@ pybullet
 # mjlib
 # dm_control
 # our own dmc2gym wrapper
-# sru
 # pybullet
+# kornia
+# pomdp-robot-domains
