@@ -206,7 +206,7 @@ register(
 )
 
 # ============================================================================================
-# Bumps normal (for HAC paper)
+# robot envs (for HAC paper)
 # ============================================================================================
 
 register(
@@ -218,6 +218,12 @@ register(
 register(
     id='bumps-normal-pomdp-v0',
     entry_point='domains.robot_envs.bumps_norm:pomdp',
+    max_episode_steps=50
+)
+
+register(
+    id='top-plate-v0',
+    entry_point='domains.robot_envs.top_plate:TopPlateEnv',
     max_episode_steps=50
 )
 

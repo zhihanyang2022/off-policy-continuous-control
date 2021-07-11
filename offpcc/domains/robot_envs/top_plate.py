@@ -19,47 +19,38 @@ PLATE_HALF_URDF_PATH = ASSETS_PATH / 'plate' / 'plate_half.urdf'
 class TopPlateEnv(PomdpRobotEnv):
     """
     Description:
-
     The PyBullet simulation environment of a top-plate environment.
-
     Observation:
         Type: Box(3)
         Num    Observation            Min                     Max
         0      Gripper Position       self.z_down_limit       self.z_up_limit
         1      Top plate Position     z_plate0                z_plate_max
         2      Gripper Angle          - pi / 3                pi / 3
-
     Actions (discrete mode):
         Type: Discrete(3)
         Num    Action
         0      moving down
         1      Moving up
         2      Grasp
-
     Actions (continuous mode):
         Type: Box(2)
         Num    Action             Range
         0      step length ratio  [-1, 1]
         1      grasp boolean      [-1, 1]
-
         When the grasp boolean < 0, the gripper is in moving mode. Otherwise, it will stop
         and grasp.
-
     Reward:
         Reward of 1 for successfully grasp the top plate
-
     Starting State:
         The starting state of the gripper is assigned to z_g = [z_g_down_limit, z_plate_base]
         and theta = 0
-
     Episode Termination:
         The gripper tries to grasp.
     """
 
-    def __init__(self, rendering=False, hz=240, seed=None, discrete=False, action_failure_prob=-1.0):
+    def __init__(self, rendering=True, hz=24, seed=None, discrete=False, action_failure_prob=-1.0):
         """
         The initialization of the PyBullet simulation environment.
-
         :param rendering: True if rendering, False otherwise
         :param hz: Hz for p.setTimeStep
         :param seed: the random seed
@@ -178,9 +169,9 @@ class TopPlateEnv(PomdpRobotEnv):
 
         # Moves the gripper to the start position.
         # It has to pass by a safe waypoint to avoid any possible collision.
-        self.robot.move_pose(target_position=[self.working_x_g, self.working_y_g, self.lifting_z_g])
-        self.robot.move_pose(target_position=[self.working_x_g, self.working_y_g, z_ur5],
-                             target_orientation=p.getQuaternionFromEuler((0, np.pi / 2, 0)))
+        self.robot.set_pose(target_position=[self.working_x_g, self.working_y_g, self.lifting_z_g])
+        self.robot.set_pose(target_position=[self.working_x_g, self.working_y_g, z_ur5],
+                            target_orientation=p.getQuaternionFromEuler((0, np.pi / 2, 0)))
 
         # Resets the state.
         self._update_state()
@@ -190,7 +181,6 @@ class TopPlateEnv(PomdpRobotEnv):
     def step(self, action=None):
         """
         Execute action with specified primitive.
-
         :param action: the action to execute
         :return: (obs, reward, done, info) tuple containing MDP step data.
         """
@@ -264,7 +254,6 @@ class TopPlateEnv(PomdpRobotEnv):
     def _move_gripper(self, step_length_ratio):
         """
         Moves the gripper with the given ratios of step length in the allowed range.
-
         :param step_length_ratio: the ratio of step length [-1, 1]
         """
 
@@ -296,7 +285,6 @@ class TopPlateEnv(PomdpRobotEnv):
     def _grasp(self):
         """
         Does a grasp.
-
         :return: True if the grasp succeed, False otherwise
         """
 
@@ -324,7 +312,6 @@ class TopPlateEnv(PomdpRobotEnv):
     def _get_theta(self):
         """
         Gets the current angle of the probe finger.
-
         :return: the current angle of the probe finger
         """
 
@@ -333,7 +320,6 @@ class TopPlateEnv(PomdpRobotEnv):
     def _get_raw_z_g(self):
         """
         Gets the raw value of z_g in PyBullet.
-
         :return: the raw value of z_g
         """
 
@@ -342,7 +328,6 @@ class TopPlateEnv(PomdpRobotEnv):
     def _get_raw_z_ur5(self):
         """
         Gets the raw value of z_ur5 in PyBullet.
-
         :return: the raw value of z_ur5
         """
 

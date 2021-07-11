@@ -1,6 +1,7 @@
 import argparse
 import gym
 from domains import *
+from pomdp_robot_domains import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--env', required=True, type=str)
