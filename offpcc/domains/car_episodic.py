@@ -32,6 +32,8 @@ class CarEnv(gym.Env):
 
     def __init__(self, args=None, max_actions=1200, rendering=False):
 
+        self.track_success = True
+
         #################### START CONFIGS #######################
         # TODO: Correct?
         if args is not None:
@@ -190,10 +192,16 @@ class CarEnv(gym.Env):
 
         if self.heaven_position > self.hell_position:
 
+            if position >= self.heaven_position:
+                self.solved = True
+
             if position <= self.hell_position:
                 reward -= self.num_timesteps_remaining
 
         if self.heaven_position < self.hell_position:
+
+            if position <= self.heaven_position:
+                self.solved = True
 
             if position >= self.hell_position:
                 reward -= self.num_timesteps_remaining
@@ -212,7 +220,7 @@ class CarEnv(gym.Env):
         if self.show:
             self.render()
 
-        return self.state, reward, done, {}
+        return self.state, reward, done, {'success': int(self.solved)}
 
     def render(self, mode='human'):
         self._setup_view()

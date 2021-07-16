@@ -49,7 +49,7 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
     @return:
     """
 
-    state, done, episode_return, episode_len = env.reset(), False, 0, 0
+    state, done, episode_return, episode_len, episode_success = env.reset(), False, 0, 0, None
 
     if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
         algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
@@ -59,7 +59,10 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
 
     while not done:
         action = algorithm.act(state, deterministic=True)
-        state, reward, done, _ = env.step(action)
+        state, reward, done, info = env.step(action)
+        if done:
+            if hasattr(env, "track_success"):
+                success = info['success']
         if render:
             if env_from_dmc:
 
@@ -90,7 +93,7 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
                 env.render()
         episode_return += reward
         episode_len += 1
-    return episode_len, episode_return
+    return episode_len, episode_return, success
 
 
 def remove_jsons_from_dir(directory):
@@ -180,6 +183,9 @@ def train(
     # prepare environments
 
     env = env_fn()
+    if hasattr(env, "track_success"):
+        track_success = True
+        train_episode_successes = []
 
     # pbc stands for pybullet custom (e.g., bumps normal, top plate)
     # when env is pbc, then we avoid testing entirely
@@ -211,6 +217,10 @@ def train(
         next_state, reward, done, info = env.step(action)
         episode_len += 1
         episode_ret += reward
+
+        if done:
+            if track_success:
+                train_episode_successes.append(info['success'])
 
         # carefully decide what "done" should be at max_episode_steps
 
@@ -292,9 +302,13 @@ def train(
 
             mean_train_episode_len = np.mean(train_episode_lens)
             mean_train_episode_ret = np.mean(train_episode_rets)
+            if track_success:
+                mean_train_success = np.mean(train_episode_successes)
 
             train_episode_lens = []
             train_episode_rets = []
+            if track_success:
+                train_episode_successes = []
 
             # testing stats
 
@@ -306,6 +320,8 @@ def train(
             else:
 
                 test_episode_lens, test_episode_returns = [], []
+                if track_success:
+                    test_successes = []
 
                 for j in range(num_test_episodes_per_epoch):
 
@@ -314,12 +330,16 @@ def train(
                     elif isinstance(algorithm, OffPolicyRLAlgorithm):
                         test_algorithm = deepcopy(algorithm)
 
-                    test_episode_len, test_episode_return = test_for_one_episode(test_env, test_algorithm)
+                    # test_success will be none if env doesn't have track_success attribute
+                    test_episode_len, test_episode_return, test_success = test_for_one_episode(test_env, test_algorithm)
                     test_episode_lens.append(test_episode_len)
                     test_episode_returns.append(test_episode_return)
+                    test_successes.append(test_success)
 
                 mean_test_episode_len = np.mean(test_episode_lens)
                 mean_test_episode_ret = np.mean(test_episode_returns)
+                if track_success:
+                    mean_test_success = np.mean(test_successes)
 
             # time-related stats
 
@@ -342,6 +362,12 @@ def train(
                 'test_ep_len': mean_test_episode_len,
                 'test_ep_ret': mean_test_episode_ret,
             }
+            if track_success:
+                dict_for_wandb.update({
+                    'train_success': mean_train_success,
+                    'test_success': mean_test_success
+                })
+
             dict_for_wandb.update(algo_specific_stats_over_epoch)
 
             wandb.log(dict_for_wandb)
