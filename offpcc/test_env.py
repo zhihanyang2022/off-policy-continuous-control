@@ -24,14 +24,18 @@ ret = 0
 cnt = 0
 while True:
     state, reward, done, info = env.step(env.action_space.sample())
+    # state, reward, done, info = env.step([0])
     env.render()
     ret += reward
     cnt += 1
-    print(state, reward, done)
+    if not (cnt == env.spec.max_episode_steps):
+        print(state, reward, done)
+    else:
+        print(state, reward, done, info['TimeLimit.truncated'])
     if done:
         break
 
-print(env.reset())
+print('Reset:', env.reset())
 
 print('Return:', ret)
 print('Ep len:', cnt)

@@ -8,9 +8,22 @@ register(
     max_episode_steps=160
 )
 
+
+register(
+    id='car-episodic-v0',
+    entry_point='domains.car_episodic:CarEnv',
+    max_episode_steps=160
+)
+
 register(
     id='car-concat20-v0',
     entry_point='domains.car:concat20',
+    max_episode_steps=160
+)
+
+register(
+    id='car-episodic-concat20-v0',
+    entry_point='domains.car_episodic:concat20',
     max_episode_steps=160
 )
 
