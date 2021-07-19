@@ -340,7 +340,7 @@ def train(
                 # 'train_ep_len': mean_train_episode_len,
                 # 'train_ep_ret': mean_train_episode_ret,
                 # 'test_ep_len': mean_test_episode_len,
-                'Sucess Rate': mean_test_episode_ret,
+                'Success Rate': mean_test_episode_ret,
             }
             dict_for_wandb.update(algo_specific_stats_over_epoch)
 
