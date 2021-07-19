@@ -5,7 +5,7 @@ import os
 
 import gym
 # from domains import *
-from hac_pomdp_concat.domains import *
+from hac_pomdp_recurrent.domains import *
 import pybullet_envs
 from gym.wrappers import RescaleAction
 
@@ -47,7 +47,7 @@ def env_fn():
     if args.env.startswith("bumps"):  # some of our custom envs require special treatment
         return RescaleAction(gym.make(args.env, rendering=args.render), -1, 1)
     else:
-        return RescaleAction(gym.make(args.env), -1, 1)
+        return RescaleAction(gym.make(args.env, rendering=args.render), -1, 1)
 
 
 example_env = env_fn()
@@ -74,7 +74,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
             env=example_env,
             algorithm=algorithm,
             log_dir=make_log_dir(args.env, args.algo, run_id),  # trained model will be loaded from here
-            num_episodes=10,
+            num_episodes=50,
             save_videos=False
         )
 
@@ -91,9 +91,9 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
     else:
 
         run = wandb.init(
-            project="hierarchy_baselines",
-            entity='hainh22',
-            group=f"{args.env} {args.algo} {args.config.split('configs/')[-1]}",
+            project="car-flag-recurrent",
+            # entity='hainh22',
+            group=f"{args.algo} {args.env}",
             settings=wandb.Settings(_disable_stats=True),
             name=f'run_id={run_id}',
             reinit=True

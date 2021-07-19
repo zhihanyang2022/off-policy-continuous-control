@@ -1,3 +1,3 @@
-python launch.py --env pomdp-reacher-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1
+# python launch.py --env pomdp-reacher-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1
 python launch.py --env pomdp-reacher-v-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1
-python launch.py --env pomdp-pick-place-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1
+# python launch.py --env pomdp-pick-place-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1

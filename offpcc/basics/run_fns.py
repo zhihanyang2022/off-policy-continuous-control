@@ -88,9 +88,10 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
 
             else:
                 env.render()
-        episode_return += reward
+        # episode_return += reward
+        episode_successs = (int)(reward == 0.0)
         episode_len += 1
-    return episode_len, episode_return
+    return episode_len, episode_successs
 
 
 def remove_jsons_from_dir(directory):
@@ -300,8 +301,8 @@ def train(
 
             if env.spec.id.startswith("pbc"):
 
-                mean_test_episode_len = -999  # just ignore this value
-                mean_test_episode_ret = -999
+                mean_test_episode_len = 0 # just ignore this value
+                mean_test_episode_ret = 0
 
             else:
 
@@ -336,10 +337,10 @@ def train(
 
             dict_for_wandb = {
                 'hour': time_elapsed/3600,
-                'train_ep_len': mean_train_episode_len,
-                'train_ep_ret': mean_train_episode_ret,
-                'test_ep_len': mean_test_episode_len,
-                'test_ep_ret': mean_test_episode_ret,
+                # 'train_ep_len': mean_train_episode_len,
+                # 'train_ep_ret': mean_train_episode_ret,
+                # 'test_ep_len': mean_test_episode_len,
+                'Sucess Rate': mean_test_episode_ret,
             }
             dict_for_wandb.update(algo_specific_stats_over_epoch)
 
@@ -365,7 +366,7 @@ def train(
                 f"| Train ep len | {round(mean_train_episode_len, 2)}\n"
                 f"| Train ep ret | {round(mean_train_episode_ret, 2)}\n"
                 f"| Test ep len  | {round(mean_test_episode_len, 2)}\n"
-                f"| Test ep ret  | {round(mean_test_episode_ret, 2)}\n"
+                f"| Test ep succ.| {round(mean_test_episode_ret, 2)}\n"
                 f"| Time rem     | {time_to_go_readable}\n"
                 f"==============================================================="
             )  # this is a weird syntax trick but it just creates a single string
