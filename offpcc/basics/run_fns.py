@@ -186,6 +186,8 @@ def train(
     if hasattr(env, "track_success"):
         track_success = True
         train_episode_successes = []
+    else:
+        track_success = False
 
     # pbc stands for pybullet custom (e.g., bumps normal, top plate)
     # when env is pbc, then we avoid testing entirely
