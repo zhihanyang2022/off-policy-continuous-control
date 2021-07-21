@@ -7,14 +7,11 @@ from domains.robot_envs.bumps_env import BumpsEnvBase
 BUMP1_URDF_PATH = ASSETS_PATH / 'bumps' / 'bump_40_red.urdf'
 BUMP2_URDF_PATH = ASSETS_PATH / 'bumps' / 'bump_40_blue.urdf'
 
-from domains.wrappers import FilterObsByIndex
 
-
-class BumpsNormMdpEnv(BumpsEnvBase):
+class BumpsNormEnv(BumpsEnvBase):
     """
     Description:
         The PyBullet simulation environment of a two-same-bump environment.
-
     Observation:
          Type: Box(4)
          Num    Observation               Min                        Max
@@ -22,7 +19,6 @@ class BumpsNormMdpEnv(BumpsEnvBase):
          1      Bump #1 Position Y        self.y_bump1_limit_min     self.y_bump1_limit_max
          2      Bump #2 Position Y        self.y_bump2_limit_min     self.y_bump2_limit_max
          3      Finger Angle              - pi / 3                   pi / 3
-
     Actions (discrete mode):
         Type: Discrete(4)
         Num    Action
@@ -30,27 +26,22 @@ class BumpsNormMdpEnv(BumpsEnvBase):
         1      Moving left with hard finger
         2      Moving right with soft finger
         3      Moving right with hard finger
-
     Actions (continuous mode):
         Type: Box(2)
         Num    Action             Range
         0      step length ratio  [-1, 1]
         1      stiffness ratio    [-1, 1]
-
     Reward:
         Reward of 1 for successfully push bump #2 to the right sufficiently far.
-
     Starting State:
         The starting state of the gripper is assigned to y_g = random and theta = 0
-
     Episode Termination:
         Either bump is pushed.
     """
 
-    def __init__(self, rendering=False, hz=240, seed=None, discrete=False, action_failure_prob=-1.0):
+    def __init__(self, rendering=True, hz=240, seed=None, discrete=False, action_failure_prob=-1.0):
         """
         The initialization of the PyBullet simulation environment.
-
         :param rendering: True if rendering, False otherwise
         :param hz: Hz for p.setTimeStep
         :param seed: the random seed
@@ -68,23 +59,20 @@ class BumpsNormMdpEnv(BumpsEnvBase):
         self.ori_y_bump1 = -0.2
         self.ori_y_bump2 = 0.2
         self.bump_diameter = 0.04
-        # self.min_bump_distance = 0.6 * self.y_half_length
-        # self.max_bump_distance = self.y_half_length
         self.min_bump_distance = 0.3 * self.y_half_length
         self.max_bump_distance = 0.8 * self.y_half_length
         self.min_y_g_bump_distance = self.bump_diameter
-
-        self.y_bump1_limit_min = 0.6 * self.y_left_limit
+        self.y_bump1_limit_min = 0.7 * self.y_left_limit
         self.y_bump2_limit_min = self.y_bump1_limit_min + self.min_bump_distance
-        self.y_bump2_limit_max = 0.6 * self.y_right_limit
+        self.y_bump2_limit_max = 0.7 * self.y_right_limit
         self.y_bump1_limit_max = self.y_bump2_limit_max - self.min_bump_distance
 
         # Reward/done thresholds
         self.pushing_reward_threshold = 0.01
         self.pushing_done_threshold = 0.001
 
-        # Obs: (y_g, y_bump1, y_bump2, theta)
-        self.observation_space = spaces.Box(low=-float('inf'), high=float('inf'), shape=(4,), dtype=np.float32)
+        # Obs: (y_g, x_bump1, x_bump2, theta)
+        self.observation_space = spaces.Box(low=-float('inf'), high=float('inf'), shape=(2,), dtype=np.float32)
 
         # Declarations of the gripper's state
         self.y_g = 0
@@ -155,7 +143,6 @@ class BumpsNormMdpEnv(BumpsEnvBase):
     def step(self, action=None):
         """
         Execute action with specified primitive.
-
         :param action: the action to execute
         :return: (obs, reward, done, info) tuple containing MDP step data.
         """
@@ -192,18 +179,18 @@ class BumpsNormMdpEnv(BumpsEnvBase):
                 abs(self.y_bump1 - self.ori_y_bump1) > self.pushing_done_threshold
                 or self.y_bump2 - self.ori_y_bump2 < -self.pushing_done_threshold
                 or reward == 1.0
+                or self.y_g <= self.y_g_left_limit
+                or self.y_g >= self.y_g_right_limit
             )
 
         return self._get_obs(), reward, done, {}
 
     def _get_obs(self):
         """
-        Gets the observation (y_g, y_bump1, y_bump2, theta).
+        Gets the observation (y_g, theta).
         """
 
-        return np.array([self.y_g / self.y_half_length,
-                         self.y_bump1 / self.y_half_length,
-                         self.y_bump2 / self.y_half_length,
+        return np.array([self.y_g,
                          self.theta])
 
     def _update_state(self):
@@ -217,11 +204,3 @@ class BumpsNormMdpEnv(BumpsEnvBase):
         self.theta = self._get_theta()
 
         self.y_ur5 = self._get_raw_y_ur5()
-
-
-def mdp(rendering=False):
-    return BumpsNormMdpEnv(rendering=rendering)
-
-
-def pomdp():
-    return FilterObsByIndex(mdp(), indices_to_keep=[0, 3])

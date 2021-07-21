@@ -354,23 +354,36 @@ def train(
 
             # (wandb logging)
 
-            dict_for_wandb = {
-                'epoch': epoch,
-                'timestep': t+1,
-                'train_ep_len': mean_train_episode_len,
-                'train_ep_ret': mean_train_episode_ret,
-                'test_ep_len': mean_test_episode_len,
-                'test_ep_ret': mean_test_episode_ret,
-            }
+            dict_for_wandb = {}
+
             if track_success:
                 dict_for_wandb.update({
                     'train_success': mean_train_success,
-                    'test_success': mean_test_success
+                    'test_success': mean_test_success,
                 })
 
-            dict_for_wandb.update(algo_specific_stats_over_epoch)
+            if env.spec.id.startswith("pbc"):  # for publication purpose
+                dict_for_wandb.update({
+                    'Success Rate': mean_train_episode_ret,
+                    'Episode Length': mean_train_episode_len,
+                    'Hours': time_elapsed / 60 / 60
+                })
+            else:  # what happens normally
+                dict_for_wandb.update({
+                    'epoch': epoch,
+                    'timestep': t+1,
+                    'train_ep_len': mean_train_episode_len,
+                    'train_ep_ret': mean_train_episode_ret,
+                    'test_ep_len': mean_test_episode_len,
+                    'test_ep_ret': mean_test_episode_ret,
+                })
 
-            wandb.log(dict_for_wandb)
+            dict_for_wandb.update(algo_specific_stats_over_epoch)  # for debugging
+
+            if env.spec.id.startswith("pbc"):
+                wandb.log(dict_for_wandb, step=t+1)
+            else:
+                wandb.log(dict_for_wandb)
 
             # (csv logging - will be uploaded to wandb at the very end)
 

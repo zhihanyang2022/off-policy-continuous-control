@@ -223,20 +223,8 @@ register(
 # ============================================================================================
 
 register(
-    id='bumps-normal-mdp-v0',
-    entry_point='domains.robot_envs.bumps_norm:mdp',
-    max_episode_steps=50
-)
-
-register(
-    id='bumps-normal-pomdp-v0',
-    entry_point='domains.robot_envs.bumps_norm:pomdp',
-    max_episode_steps=50
-)
-
-register(
-    id='top-plate-v0',
-    entry_point='domains.robot_envs.top_plate:TopPlateEnv',
+    id='pbc-bumps-normal-pomdp-v0',
+    entry_point='domains.robot_envs.bumps_norm:BumpsNormEnv',
     max_episode_steps=50
 )
 
