@@ -3,6 +3,7 @@ from pathlib import Path
 import gym
 from gym.utils import seeding
 import pybullet as p
+import numpy as np
 
 ASSETS_PATH = Path(__file__).resolve().parent / 'assets'
 
@@ -108,7 +109,11 @@ class PomdpRobotEnv(gym.Env):
         :return: the sample drawn
         """
 
-        index = self.np_random.randint(len(ranges))
+        ranges = np.array(ranges)
+        probs = ranges / np.sum(ranges)   # longer ranges should be assigned higher probability
+        assert np.sum(probs) == 1, "(_uniform_ranges) Probabilities do not sum up to 1."
+
+        index = self.np_random.choice(np.arange(len(ranges)), p=probs)
 
         return self.np_random.uniform(low=ranges[index][0], high=ranges[index][1])
 
