@@ -218,7 +218,11 @@ def train(
 
         next_state, reward, done, info = env.step(action)
         episode_len += 1
-        episode_ret += reward
+
+        if env.spec.id.startswith("pbc"):
+            episode_ret += 0 if reward <= 0 else 1  # so that punishment reward is recorded as 0 (success rate)
+        else:
+            episode_ret += reward
 
         if done:
             if track_success:
