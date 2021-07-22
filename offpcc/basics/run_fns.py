@@ -60,11 +60,6 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
     while not done:
         action = algorithm.act(state, deterministic=True)
         state, reward, done, info = env.step(action)
-        if done:
-            if hasattr(env, "track_success"):
-                success = info['success']
-            else:
-                success = None
         if render:
             if env_from_dmc:
 
@@ -95,7 +90,7 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
                 env.render()
         episode_return += reward
         episode_len += 1
-    return episode_len, episode_return, success
+    return episode_len, episode_return
 
 
 def remove_jsons_from_dir(directory):

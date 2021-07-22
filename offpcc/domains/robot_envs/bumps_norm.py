@@ -39,7 +39,7 @@ class BumpsNormEnv(BumpsEnvBase):
         Either bump is pushed.
     """
 
-    def __init__(self, rendering=False, hz=240, seed=None, discrete=False, action_failure_prob=-1.0):
+    def __init__(self, rendering=True, hz=240, seed=None, discrete=False, action_failure_prob=-1.0):
         """
         The initialization of the PyBullet simulation environment.
         :param rendering: True if rendering, False otherwise
@@ -91,33 +91,44 @@ class BumpsNormEnv(BumpsEnvBase):
         self.robot.ee.set_joints(self.default_angles, velocities=[0.1, ],
                                  forces=[self.low_stiffness, ])
 
-        determine_bump_1_first = self.np_random.choice([True, False])
+        while True:
 
-        if determine_bump_1_first:
+            determine_bump_1_first = self.np_random.choice([True, False])
 
-            # y_bump1
-            self.ori_y_bump1 = self.np_random.uniform(low=self.y_bump1_limit_min,
-                                                      high=self.y_bump1_limit_max)
+            if determine_bump_1_first:
 
-            # y_bump2
-            self.ori_y_bump2 = self.np_random.uniform(low=self.ori_y_bump1 + self.min_bump_distance,
-                                                      high=min(self.ori_y_bump1 + self.max_bump_distance,
-                                                               self.y_bump2_limit_max))
+                # y_bump1
+                self.ori_y_bump1 = self.np_random.uniform(low=self.y_bump1_limit_min,
+                                                          high=self.y_bump1_limit_max)
 
-        else:
+                # y_bump2
+                self.ori_y_bump2 = self.np_random.uniform(low=self.ori_y_bump1 + self.min_bump_distance,
+                                                          high=min(self.ori_y_bump1 + self.max_bump_distance,
+                                                                   self.y_bump2_limit_max))
 
-            self.ori_y_bump2 = self.np_random.uniform(low=self.y_bump2_limit_min,
-                                                      high=self.y_bump2_limit_max)
+            else:
 
-            self.ori_y_bump1 = self.np_random.uniform(low=max(self.ori_y_bump2 - self.max_bump_distance,
-                                                              self.y_bump1_limit_min),
-                                                      high=self.ori_y_bump2 - self.min_bump_distance)
+                self.ori_y_bump2 = self.np_random.uniform(low=self.y_bump2_limit_min,
+                                                          high=self.y_bump2_limit_max)
+
+                self.ori_y_bump1 = self.np_random.uniform(low=max(self.ori_y_bump2 - self.max_bump_distance,
+                                                                  self.y_bump1_limit_min),
+                                                          high=self.ori_y_bump2 - self.min_bump_distance)
+
+            if (self.ori_y_bump1 < 0) and (self.ori_y_bump2 > 0):
+                break
 
         # y_ur5
         y_ur5_range1 = [self.y_g_left_limit, self.ori_y_bump1 - self.min_y_g_bump_distance]
         y_ur5_range2 = [self.ori_y_bump1 + self.min_y_g_bump_distance, self.ori_y_bump2 - self.min_y_g_bump_distance]
         y_ur5_range3 = [self.ori_y_bump2 + self.min_y_g_bump_distance, self.y_g_right_limit]
         y_ur5 = self._uniform_ranges([y_ur5_range1, y_ur5_range2, y_ur5_range3])
+
+        y_ur5 = self._uniform_ranges([y_ur5_range2])
+
+        # self.ori_y_bump1 = 0.10
+        # self.ori_y_bump2 = 0.22
+        # y_ur5 = -0.02
 
         # Loads the bumps.
         if self.bump1 is None:

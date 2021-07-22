@@ -32,7 +32,7 @@ def _uniform_ranges(ranges):
     return np.random.uniform(low=ranges[index][0], high=ranges[index][1])
 
 
-for i in range(10000):
+for i in range(1000):
 
     determine_bump_1_first = np.random.choice([True, False])
 
@@ -63,17 +63,20 @@ for i in range(10000):
     blue_positions.append(ori_y_bump2)
     # finger_positions.append(y_ur5)
 
-blue_cnt = 0
-for pos in blue_positions:
-    if pos >= 0.045 and pos <= 0.055:
-        blue_cnt += 1
+# blue_cnt = 0
+# for pos in blue_positions:
+#     if pos >= 0.045 and pos <= 0.055:
+#         blue_cnt += 1
+#
+# red_cnt = 0
+# for pos in red_positions:
+#     if pos >= 0.045 and pos <= 0.055:
+#         red_cnt += 1
+#
+# print(red_cnt, blue_cnt)
 
-red_cnt = 0
-for pos in red_positions:
-    if pos >= 0.045 and pos <= 0.055:
-        red_cnt += 1
-
-print(red_cnt, blue_cnt)
+plt.scatter(red_positions, blue_positions, alpha=0.1)
+plt.show()
 
 # from mpl_toolkits.mplot3d import Axes3D
 # fig = plt.figure()
