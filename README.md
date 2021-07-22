@@ -1,3 +1,78 @@
+# Off-policy-continuous-control
+
+## Algorithms implemented
+
+DDPG, TD3, SAC, RDPG, RTD3 and RSAC
+
+## Structure of the codebase
+
+-   file
+    -   containing plots reproducing stable-baselines3; you don’t need to touch this
+-   offpcc (the good stuff; you will be using this)
+    -   algorithms (where DDPG, TD3 and SAC are implemented)
+    -   algorithms_recurrent (where RDPG, RTD3 and RSAC are implemented)
+    -   basics (abstract classes, stuff shared by algorithms or algorithms_recurrent, code for training)
+    -   basics_sb3 (you don’t need to touch this)
+    -   configs (gin configs)
+    -   domains (all custom domains are stored within and registered properly)
+-   pics_for_readme
+    -   random pics; you don’t need to touch this
+-   temp
+    -   potentially outdated stuff; you don’t need to touch this
+
+## How to run experiments from scratch
+
+Add this to your bashrc or bash_profile and source it.
+
+You should replace “pomdpr” with whatever wandb account that you want to use.
+
+```
+export OFFPCC_WANDB_ENTITY="pomdpr"
+```
+
+From the command line:
+
+```
+cd offpcc
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=project123 python launch.py --env <env-name> --algo <algo-name> --config <config-path> --run_id <id>
+```
+
+Here's an example of running bumps norm:
+
+```
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=bumps-norm-recurrent python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/config/test/template_recurrent.gin --run_id 1
+```
+
+Breaking it down:
+
+-   `CUDA_VISIBLE_DEVICES=3`: Running recurrent agents can be computationally expensive for GPU. Therefore, before running anything, do check by `nvidia-smi` that no one is using the GPU you want to run on.
+-   `pbc-bumps-normal-pomdp-v0`: I register this env in `domains/__init__.py`. The prefix `pbc` stands for py-bullet-custom, i.e., pybullet envs created by ourselves. These envs have a huge problem. You cannot simultaneously create 2 versions of the env (one for training and one for testing), otherwise 4 bumps would show up in the same playground, which totally destroys the env. Therefore, whenever an env has `pbc` as prefix, we do not do testing and just report training stats.
+-   `rsac`: It can be `rdpg` or `rtd3` as well.
+-   `configs/config/test/template_recurrent.gin`: You can look into the config to get information about buffer and number of training episodes and etc.
+-   `run_id`: This is not a seed. In fact, I avoid using seeds because I would be averaging over multiple seeds anyway. This is only an identifier and will be added to wandb to differentiate between runs. Must be int.
+
+## How to visualize learned policy
+
+After training is done, the policy will be uploaded to wandb, and you can find them here. Simply click download at the very right. Then, within off-policy-continuous-control but outside offpcc, create the following folder structure:
+
+```
+results/pbc-bumps-normal-pomdp-v0/rsac/1/
+```
+
+and move the downloaded stuff within.
+
+As a sidenode, for recurrent agents, we store the policy as two parts: `actor.pth` (the mlp part) and `actor_summarizer.pth` (the lstm part). Of course, the full policy needs both component to work together.
+
+After you’ve put the trained networks in the right place, simply run the following command, but make sure that you temporarily change the render argument in the init method of robot envs, otherwise nothing will be shown. Along the visualization, some testing stats will be printed (e.g., lengths of trajectories, success)
+
+```
+python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/config/test/template_recurrent.gin --run_id 1 --render
+```
+
+![Screen Shot 2021-07-22 at 11.49.35 AM](https://i.loli.net/2021/07/22/OckBDTZXqxbfS1C.png)
+
+## Random notes you don’t need to read
+
 Design of the codebase for rdpg
 
 When it comes to rdpg, there are several things to handle correctly:
@@ -124,12 +199,12 @@ Mujoco tasks are much much harder than classic control tasks. Therefore, instead
 - The animations shown are only the first few seconds of an entire trajectory.
 - Note that both implementations use near-identical hyper-parameters. TODO: explain the only difference
 - Approximate running time (on GPU; CPU should be similar since GPU can't really accelerate linear layers):
- 
+
 | Task Name \ Algorithm | DDPG | TD3 | SAC |
 | :-------------------: | :--: | :-: | :-: |
 | `Ant-v3`              |      |     | 20h |
 | `HalfCheetah-v3`      |      |     |     |
- 
+
 **Commands for running stuff**
 
 For this repo:
@@ -203,7 +278,7 @@ Table of content
 
 |              Problems with some repos              |                 Solutions                |
 |:--------------------------------------------------:|:--------------------------------------------:|
-| "Code works but I don't understand the how"        | Offers docs and implementation notes                 | 
+| "Code works but I don't understand the how"        | Offers docs and implementation notes                 |
 | Uses sophisticated abstraction                     | Offers graphical explanation of design choices |
 | Does not have a good requirements file             | Has a requirements file tested across multiple machines |
 |    Does not compare against authoritative repos    |       Compares against OpenAI Spinning Up*       |
