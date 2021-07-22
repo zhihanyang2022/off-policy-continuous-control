@@ -109,9 +109,13 @@ class PomdpRobotEnv(gym.Env):
         :return: the sample drawn
         """
 
-        ranges = np.array(ranges)
-        probs = ranges / np.sum(ranges)   # longer ranges should be assigned higher probability
-        assert np.sum(probs) == 1, "(_uniform_ranges) Probabilities do not sum up to 1."
+        range_lens = []
+        for r in ranges:
+            range_lens.append(r[1] - r[0])
+        range_lens = np.array(range_lens)
+        probs = range_lens / np.sum(range_lens)   # longer ranges should be assigned higher probability
+
+        assert np.allclose([1.0], [np.sum(probs)]), "Probs don't sum up to 1."
 
         index = self.np_random.choice(np.arange(len(ranges)), p=probs)
 

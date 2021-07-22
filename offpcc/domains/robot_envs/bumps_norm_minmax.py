@@ -39,7 +39,7 @@ class BumpsNormEnv(BumpsEnvBase):
         Either bump is pushed.
     """
 
-    def __init__(self, rendering=False, hz=240, seed=None, discrete=False, action_failure_prob=-1.0):
+    def __init__(self, rendering=True, hz=240, seed=None, discrete=False, action_failure_prob=-1.0):
         """
         The initialization of the PyBullet simulation environment.
         :param rendering: True if rendering, False otherwise
@@ -59,8 +59,8 @@ class BumpsNormEnv(BumpsEnvBase):
         self.ori_y_bump1 = -0.2
         self.ori_y_bump2 = 0.2
         self.bump_diameter = 0.04
-        self.min_bump_distance = 0.3 * self.y_half_length
-        self.max_bump_distance = 0.8 * self.y_half_length
+        self.min_bump_distance = 0.6 * self.y_half_length * 2  # mod1: 0.2 * 0.4 = 0.08 > self.bump_diameter
+        self.max_bump_distance = 0.6 * self.y_half_length * 2
         self.min_y_g_bump_distance = self.bump_diameter
         self.y_bump1_limit_min = 0.7 * self.y_left_limit
         self.y_bump2_limit_min = self.y_bump1_limit_min + self.min_bump_distance
