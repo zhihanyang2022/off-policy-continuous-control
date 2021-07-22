@@ -229,8 +229,8 @@ register(
 )
 
 register(
-    id='pbc-bumps-normal-pomdp-minmax-v0',
-    entry_point='domains.robot_envs.bumps_norm_minmax:BumpsNormEnv',
+    id='pbc-bumps-normal-pomdp-punish-v0',
+    entry_point='domains.robot_envs.bumps_norm_punish:BumpsNormEnv',
     max_episode_steps=50
 )
 

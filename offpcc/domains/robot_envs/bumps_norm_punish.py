@@ -171,13 +171,18 @@ class BumpsNormEnv(BumpsEnvBase):
                     and self.y_g < self.y_bump2:
                 reward = 1.0
 
-            # Episode Termination:
+            # Punish condition:
             #   bump #1 is pushed in either direction
-            #   or when bump #2 is pushed in wrong direction beyond the done limit
+            #   bump #2 is pushed in wrong direction
+            if (abs(self.y_bump1 - self.ori_y_bump1) > self.pushing_done_threshold or
+                    self.y_bump2 - self.ori_y_bump2 < -self.pushing_done_threshold):
+                reward = -1.0
+
+            # Episode Termination:
+            #   when reward == -1
             #   or when reward == 1
             done = bool(
-                abs(self.y_bump1 - self.ori_y_bump1) > self.pushing_done_threshold
-                or self.y_bump2 - self.ori_y_bump2 < -self.pushing_done_threshold
+                reward == -1.0
                 or reward == 1.0
                 or self.y_g <= self.y_g_left_limit
                 or self.y_g >= self.y_g_right_limit
