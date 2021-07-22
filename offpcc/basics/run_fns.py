@@ -220,6 +220,7 @@ def train(
         episode_len += 1
 
         if env.spec.id.startswith("pbc"):
+            print('Here')
             episode_ret += 0 if reward <= 0 else 1  # so that punishment reward is recorded as 0 (success rate)
         else:
             episode_ret += reward
