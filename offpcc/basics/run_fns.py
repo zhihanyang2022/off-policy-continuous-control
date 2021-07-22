@@ -63,6 +63,8 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
         if done:
             if hasattr(env, "track_success"):
                 success = info['success']
+            else:
+                success = None
         if render:
             if env_from_dmc:
 
