@@ -40,7 +40,7 @@ CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=project123 python launch.py --env <e
 Here's an example of running bumps norm:
 
 ```
-CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=bumps-norm-recurrent python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/config/test/template_recurrent.gin --run_id 1
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=bumps-norm-recurrent python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1
 ```
 
 Breaking it down:
@@ -66,7 +66,7 @@ As a sidenode, for recurrent agents, we store the policy as two parts: `actor.pt
 After you’ve put the trained networks in the right place, simply run the following command, but make sure that you temporarily change the render argument in the init method of robot envs, otherwise nothing will be shown. Along the visualization, some testing stats will be printed (e.g., lengths of trajectories, success)
 
 ```
-python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/config/test/template_recurrent.gin --run_id 1 --render
+python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1 --render
 ```
 
 ![Screen Shot 2021-07-22 at 11.49.35 AM](https://i.loli.net/2021/07/22/OckBDTZXqxbfS1C.png)
