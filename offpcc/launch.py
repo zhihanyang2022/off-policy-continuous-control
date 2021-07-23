@@ -5,7 +5,6 @@ import os
 
 import gym
 from domains import *
-from pomdp_robot_domains import *
 import pybullet_envs
 from gym.wrappers import RescaleAction
 
