@@ -4,7 +4,7 @@ from copy import deepcopy
 
 from tqdm import tqdm
 
-env = gym.wrappers.RescaleAction(gym.make("pbc-bumps-normal-pomdp-test-v0", rendering=False), -1, 1)
+env = gym.wrappers.RescaleAction(gym.make("pbc-bumps-normal-pomdp-real-v0", rendering=False), -1, 1)
 env2 = gym.wrappers.RescaleAction(gym.make("pbc-bumps-normal-pomdp-v0"), -1, 1)
 
 
