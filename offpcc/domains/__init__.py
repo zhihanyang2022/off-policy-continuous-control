@@ -234,6 +234,12 @@ register(
     max_episode_steps=50
 )
 
+register(
+    id='pbc-bumps-normal-pomdp-test-v0',
+    entry_point='domains.robot_envs.bumps_norm_test:BumpsNormEnv',
+    max_episode_steps=50
+)
+
 # ============================================================================================
 # dm control's image-based envs (for verifying our convolutional sac implementation)
 # ============================================================================================
