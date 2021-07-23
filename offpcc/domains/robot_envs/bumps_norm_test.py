@@ -44,7 +44,7 @@ class BumpsNormEnv(BumpsEnvBase):
         Either bump is pushed.
     """
 
-    def __init__(self, rendering=True, hz=240, seed=None, discrete=False, action_failure_prob=-1.0):
+    def __init__(self, rendering=False, hz=240, seed=None, discrete=False, action_failure_prob=-1.0):
         """
         The initialization of the PyBullet simulation environment.
         :param rendering: True if rendering, False otherwise
