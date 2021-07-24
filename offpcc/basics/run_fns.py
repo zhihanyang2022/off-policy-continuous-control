@@ -59,7 +59,7 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
 
     while not done:
         action = algorithm.act(state, deterministic=True)
-        state, reward, done, _ = env.step(action)
+        state, reward, done, info = env.step(action)
         if render:
             if env_from_dmc:
 
@@ -89,7 +89,7 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
             else:
                 env.render()
         # episode_return += reward
-        episode_successs = (int)(reward == 0.0)
+        episode_successs = info["is_success"]
         episode_len += 1
     return episode_len, episode_successs
 
@@ -336,13 +336,13 @@ def train(
             # (wandb logging)
 
             dict_for_wandb = {
-                'hour': time_elapsed/3600,
+                'Hours': time_elapsed/3600,
                 # 'train_ep_len': mean_train_episode_len,
                 # 'train_ep_ret': mean_train_episode_ret,
                 # 'test_ep_len': mean_test_episode_len,
                 'Success Rate': mean_test_episode_ret,
             }
-            dict_for_wandb.update(algo_specific_stats_over_epoch)
+            # dict_for_wandb.update(algo_specific_stats_over_epoch)
 
             wandb.log(dict_for_wandb, step=t+1)
 

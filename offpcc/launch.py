@@ -4,8 +4,7 @@ import wandb
 import os
 
 import gym
-# from domains import *
-from hac_pomdp_recurrent.domains import *
+from hac_pomdp_concat.domains import *
 import pybullet_envs
 from gym.wrappers import RescaleAction
 
@@ -91,12 +90,11 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
     else:
 
         run = wandb.init(
-            project="car-flag-recurrent",
+            project="car-flag-baselines",
             # entity='hainh22',
             group=f"{args.algo} {args.env}",
             settings=wandb.Settings(_disable_stats=True),
-            name=f'run_id={run_id}',
-            reinit=True
+            name=f's{run_id}',
         )
 
         # creating buffer based on the need of the algorithm
