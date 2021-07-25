@@ -94,11 +94,8 @@ class BumpsNormEnv(BumpsEnvBase):
         # @@@@@ determine bump positions @@@@@
 
         # This procedure simulates how two bumps are randomly dropped on the table.
-        # About 50% of the times, one bump is in the left half, and the other bump is in the right half.
-        # About 25% of the times, both bumps are in the left half.
-        # About 25% of the times, both bumps are in the right half.
 
-        position_1 = self.np_random.uniform(low=-0.35, high=0.35)
+        position_1 = self.np_random.uniform(low=-0.35, high=0.35)  # boundary is -0.4 to 0.4
 
         ranges = []
 
@@ -133,6 +130,11 @@ class BumpsNormEnv(BumpsEnvBase):
         y_ur5_range2 = [self.ori_y_bump1 + self.bump_diameter / 2 * 1.5,
                         self.ori_y_bump2 - self.bump_diameter / 2 * 1.5]
         y_ur5_range3 = [self.ori_y_bump2 + self.bump_diameter / 2 * 1.5, 0.4]
+
+        assert y_ur5_range1[1] - y_ur5_range1[0] > 0
+        assert y_ur5_range2[1] - y_ur5_range2[0] > 0
+        assert y_ur5_range3[1] - y_ur5_range3[0] > 0
+
         y_ur5 = self._uniform_ranges([y_ur5_range1, y_ur5_range2, y_ur5_range3])
 
         # Loads the bumps.
