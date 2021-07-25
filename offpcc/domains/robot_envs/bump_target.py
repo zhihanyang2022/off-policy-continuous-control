@@ -1,3 +1,4 @@
+import gym
 import pybullet as p
 from gym import spaces
 import numpy as np
@@ -10,12 +11,11 @@ TARGET_URDF_PATH = ASSETS_PATH / 'bumps' / 'bump_40_virtual.urdf'
 RAIL_URDF_PATH = ASSETS_PATH / 'workspace' / 'rail.urdf'
 
 
-class BumpTargetEnv(BumpsEnvBase):
+class BumpTargetEnv(BumpsEnvBase, gym.GoalEnv):
     """
     Description:
         The PyBullet simulation environment of a single bump environment.
         The target is to move the bump to a random target position.
-
     Observation:
          Type: Box(3)
          Num    Observation               Min                        Max
@@ -23,7 +23,6 @@ class BumpTargetEnv(BumpsEnvBase):
          1      Bump Position Y           self.y_bump_limit_min      self.y_bump_limit_max
          2      Finger Angle              - pi / 3                   pi / 3
          3      Target Position Y         self.y_bump_limit_min      self.y_bump_limit_max
-
     Actions (discrete mode):
         Type: Discrete(4)
         Num    Action
@@ -31,19 +30,15 @@ class BumpTargetEnv(BumpsEnvBase):
         1      Moving left with hard finger
         2      Moving right with soft finger
         3      Moving right with hard finger
-
     Actions (continuous mode):
         Type: Box(2)
         Num    Action             Range
         0      step length ratio  [-1, 1]
         1      stiffness ratio    [-1, 1]
-
     Reward:
         Reward of 1 for successfully push the bump to the target position.
-
     Starting State:
         The starting state of the gripper is assigned to y_g = random and theta = 0
-
     Episode Termination:
         The bump reaches the target position.
     """
@@ -51,7 +46,6 @@ class BumpTargetEnv(BumpsEnvBase):
     def __init__(self, rendering=False, hz=240, seed=None, discrete=False, action_failure_prob=-1.0):
         """
         The initialization of the PyBullet simulation environment.
-
         :param rendering: True if rendering, False otherwise
         :param hz: Hz for p.setTimeStep
         :param seed: the random seed
@@ -59,7 +53,7 @@ class BumpTargetEnv(BumpsEnvBase):
         :param action_failure_prob: determines the probability that an action fails
         """
 
-        super().__init__(rendering, hz, seed, discrete, action_failure_prob)
+        BumpsEnvBase.__init__(self, rendering, hz, seed, discrete, action_failure_prob)
 
         # Gripper parameters
         # Thresholds for stably pushing a 40mm bump: 0.032
@@ -87,7 +81,7 @@ class BumpTargetEnv(BumpsEnvBase):
         self.target_mark = None  # Placeholder for declaration
 
         # Obs: (y_g, y_bump, theta, y_target)
-        self.observation_space = spaces.Box(low=-float('inf'), high=float('inf'), shape=(4,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=-float('inf'), high=float('inf'), shape=(3,), dtype=np.float32)
 
         # Declarations of the gripper's state
         self.y_g = 0
@@ -148,7 +142,6 @@ class BumpTargetEnv(BumpsEnvBase):
     def step(self, action=None):
         """
         Execute action with specified primitive.
-
         :param action: the action to execute
         :return: (obs, reward, done, info) tuple containing MDP step data.
         """
@@ -170,24 +163,18 @@ class BumpTargetEnv(BumpsEnvBase):
             # Updates the state.
             self._update_state()
 
-            # Reward condition:
-            #   when bump #2 is moving with an expected distance in the right direction
-            #   and the gripper is pushing bump #2 from its left (for avoiding some tricky unexpected cases).
-            if self.target_reached:
-                reward = 1.0
-                done = True
-
-        return self._get_obs(), reward, done, {}
+        obs = self._get_obs()
+        reward = self.compute_reward(np.array([self.y_bump]), np.array([self.y_target]))
+        return obs, reward, done, {}
 
     def _get_obs(self):
         """
-        Gets the observation (y_g, y_bump, y_bump2, theta).
+        Gets the observation (y_g, y_bump, x_bump2, theta).
         """
-
+        # To make it partially observable, one must hide the achieved goal from the agent.
         return np.array([self.y_g / self.y_half_length,
-                         self.y_bump / self.y_half_length,
-                         self.theta,
-                         self.y_target / self.y_half_length])
+                        self.theta,
+                        self.y_target / self.y_half_length])
 
     def _update_state(self):
         """
@@ -199,6 +186,14 @@ class BumpTargetEnv(BumpsEnvBase):
         self.theta = self._get_theta()
 
         self.y_ur5 = self._get_raw_y_ur5()
+
+    def compute_reward(self, achieved_goal: np.ndarray, desired_goal: np.ndarray):
+        """Compute the reward, for relabling with hindsight"""
+        # Agent must push the bump within 0.05 of the goal
+        if np.linalg.norm(achieved_goal - desired_goal) <= 0.05:
+            return 1
+        else:
+            return 0
 
     def _observation(self):
         """
