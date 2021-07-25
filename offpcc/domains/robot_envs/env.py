@@ -116,7 +116,7 @@ class PomdpRobotEnv(gym.Env):
         probs = range_lens / np.sum(range_lens)   # longer ranges should be assigned higher probability
 
         if np.any(probs < 0):
-            print(probs, len(ranges))
+            print(probs, len(ranges), ranges)
 
         assert np.allclose([1.0], [np.sum(probs)]), "Probs don't sum up to 1."
 
