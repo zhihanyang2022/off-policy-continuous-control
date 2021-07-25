@@ -120,7 +120,10 @@ class PomdpRobotEnv(gym.Env):
 
         assert np.allclose([1.0], [np.sum(probs)]), "Probs don't sum up to 1."
 
-        index = self.np_random.choice(np.arange(len(ranges)), p=probs)
+        try:
+            index = self.np_random.choice(np.arange(len(ranges)), p=probs)
+        except:
+            print(probs)
 
         return self.np_random.uniform(low=ranges[index][0], high=ranges[index][1])
 
