@@ -111,7 +111,6 @@ class BumpTargetEnv(BumpsEnvBase, gym.GoalEnv):
             ranges.append([self.y_bump_limit_min, ori_y_bump - self.min_y_g_bump_distance])
         if (ori_y_bump + self.min_y_g_bump_distance) < self.y_bump_limit_max:
             ranges.append([ori_y_bump + self.min_y_g_bump_distance, self.y_bump_limit_max])
-
         y_ur5 = self._uniform_ranges(ranges)
 
         # y_target
