@@ -180,11 +180,6 @@ def train(
     # prepare environments
 
     env = env_fn()
-    if hasattr(env, "track_success"):
-        track_success = True
-        train_episode_successes = []
-    else:
-        track_success = False
 
     # pbc stands for pybullet custom (e.g., bumps normal, top plate)
     # when env is pbc, then we avoid testing entirely
@@ -220,10 +215,6 @@ def train(
             episode_ret += 0 if reward <= 0 else 1  # so that punishment reward is recorded as 0 (success rate)
         else:
             episode_ret += reward
-
-        if done:
-            if track_success:
-                train_episode_successes.append(info['success'])
 
         # carefully decide what "done" should be at max_episode_steps
 
@@ -305,13 +296,9 @@ def train(
 
             mean_train_episode_len = np.mean(train_episode_lens)
             mean_train_episode_ret = np.mean(train_episode_rets)
-            if track_success:
-                mean_train_success = np.mean(train_episode_successes)
 
             train_episode_lens = []
             train_episode_rets = []
-            if track_success:
-                train_episode_successes = []
 
             # testing stats
 
@@ -323,8 +310,6 @@ def train(
             else:
 
                 test_episode_lens, test_episode_returns = [], []
-                if track_success:
-                    test_successes = []
 
                 for j in range(num_test_episodes_per_epoch):
 
@@ -333,16 +318,12 @@ def train(
                     elif isinstance(algorithm, OffPolicyRLAlgorithm):
                         test_algorithm = deepcopy(algorithm)
 
-                    # test_success will be none if env doesn't have track_success attribute
-                    test_episode_len, test_episode_return, test_success = test_for_one_episode(test_env, test_algorithm)
+                    test_episode_len, test_episode_return = test_for_one_episode(test_env, test_algorithm)
                     test_episode_lens.append(test_episode_len)
                     test_episode_returns.append(test_episode_return)
-                    test_successes.append(test_success)
 
                 mean_test_episode_len = np.mean(test_episode_lens)
                 mean_test_episode_ret = np.mean(test_episode_returns)
-                if track_success:
-                    mean_test_success = np.mean(test_successes)
 
             # time-related stats
 
@@ -358,12 +339,6 @@ def train(
             # (wandb logging)
 
             dict_for_wandb = {}
-
-            if track_success:
-                dict_for_wandb.update({
-                    'train_success': mean_train_success,
-                    'test_success': mean_test_success,
-                })
 
             if env.spec.id.startswith("pbc"):  # for publication purpose
                 dict_for_wandb.update({
