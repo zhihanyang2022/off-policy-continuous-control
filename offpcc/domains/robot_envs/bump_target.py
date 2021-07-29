@@ -149,9 +149,6 @@ class BumpTargetEnv(BumpsEnvBase, gym.GoalEnv):
         :return: (obs, reward, done, info) tuple containing MDP step data.
         """
 
-        reward = 0
-        done = False
-
         # When the action space is in the discrete mode:
         #   0: Left&Soft, 1: Left&Hard, 2: Right&Soft, 3: Right&Hard
         # When the action space is in the continuous mode:
@@ -168,6 +165,9 @@ class BumpTargetEnv(BumpsEnvBase, gym.GoalEnv):
 
         obs = self._get_obs()
         reward = self.compute_reward(np.array([self.y_bump]), np.array([self.y_target]))
+
+        done = reward == 1
+
         return obs, reward, done, {}
 
     def _get_obs(self):
