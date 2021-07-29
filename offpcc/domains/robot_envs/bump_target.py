@@ -106,12 +106,16 @@ class BumpTargetEnv(BumpsEnvBase, gym.GoalEnv):
         ori_y_bump = self.np_random.uniform(low=self.y_bump_limit_min,
                                             high=self.y_bump_limit_max)
         # y_ur5
-        y_ur5_range1 = [self.y_bump_limit_min, ori_y_bump - self.min_y_g_bump_distance]
-        y_ur5_range2 = [ori_y_bump + self.min_y_g_bump_distance, self.y_bump_limit_max]
-        y_ur5 = self._uniform_ranges([y_ur5_range1, y_ur5_range2])
+        ranges = []
+        if (ori_y_bump - self.min_y_g_bump_distance) > self.y_bump_limit_min:
+            ranges.append([self.y_bump_limit_min, ori_y_bump - self.min_y_g_bump_distance])
+        if (ori_y_bump + self.min_y_g_bump_distance) < self.y_bump_limit_max:
+            ranges.append([ori_y_bump + self.min_y_g_bump_distance, self.y_bump_limit_max])
+
+        y_ur5 = self._uniform_ranges(ranges)
 
         # y_target
-        self.y_target = self._uniform_ranges([y_ur5_range1, y_ur5_range2])
+        self.y_target = self._uniform_ranges(ranges)
 
         # Loads the bump.
         if self.bump is None:
