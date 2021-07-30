@@ -13,7 +13,7 @@ import mujoco_py
 
 class BumpEnv(gym.Env):
 
-    def __init__(self, args=None, rendering=True, seed=None):
+    def __init__(self, args=None, rendering=False, seed=None):
         """
         """
 
