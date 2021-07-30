@@ -150,8 +150,8 @@ class BumpEnv(gym.Env):
         self.x_g = 0
         self.theta = 0
 
-        # Obs: (x_g, theta, action)
-        self.observation_space = spaces.Box(low=-float('inf'), high=float('inf'), shape=(2,), dtype=np.float32)
+        # Obs: (x_g, theta, action, move_left)
+        self.observation_space = spaces.Box(low=-float('inf'), high=float('inf'), shape=(3,), dtype=np.float32)
 
         # The finger is always soft
         self.model.jnt_stiffness[self.hinge_wide_finger_id] = self.low_stiffness
