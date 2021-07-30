@@ -5,7 +5,7 @@ import os
 
 import gym
 from domains import *
-import pybullet_envs
+# import pybullet_envs
 from gym.wrappers import RescaleAction
 
 from basics.replay_buffer import ReplayBuffer
