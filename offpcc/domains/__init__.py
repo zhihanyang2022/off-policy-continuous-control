@@ -255,7 +255,7 @@ register(
 register(
     id='pbc-bump-mdp-v0',
     entry_point='domains.bump_mdp:BumpEnv',
-    max_episode_steps=50
+    max_episode_steps=200
 )
 
 # ============================================================================================
