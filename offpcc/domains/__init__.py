@@ -252,6 +252,12 @@ register(
     max_episode_steps=50
 )
 
+register(
+    id='bump-mdp-v0',
+    entry_point='domains.bump_mdp:BumpEnv',
+    max_episode_steps=50
+)
+
 # ============================================================================================
 # dm control's image-based envs (for verifying our convolutional sac implementation)
 # ============================================================================================

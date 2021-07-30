@@ -1,0 +1,39 @@
+<!--# Created by Xinchao Song on May 21, 2020.-->
+
+<mujoco>
+    <body name="gripah-base" pos="0 0 30" quat="0 0.707 0 -0.707">
+        <geom name="geom:gripah-base" type="cylinder" size="5 1" quat="1 0 1 0" mass="0.01"
+              rgba="0.89804 0.91765 0.92941 1"/>
+        <joint type="slide" name="slide:gripah-base-x" axis="0 0 -1" limited="true" range="0 100"/>
+
+        <body name="wrist" pos="6.95 0 0" quat="1 0 0 0">
+            <inertial pos="-2.0421 0 0" mass="0.18" diaginertia="1 1 1"/>
+            <geom name="geom:wrist" type="mesh" mesh="mesh:wrist" rgba="0.89804 0.91765 0.92941 1"/>
+
+            <body name="wide-finger" pos="5.5 0 0" quat="1 1 0 0">
+                <inertial pos="5.6976 1.5337 -2.3122e-07" quat="0.653281 0.653281 -0.270598 -0.270598" mass="0.0000167"
+                          diaginertia="1.01 1 0.99"/>
+                <geom name="geom:wide-finger" type="mesh" rgba="0.89804 0.91765 0.92941 1" mesh="mesh:wide-finger"
+                      contype="0" conaffinity="0"/>
+                <geom name="geom:wide-finger-tip" type="mesh" rgba="0.89804 0.91765 0.92941 1"
+                      mesh="mesh:wide-finger-tip"/>
+                <joint name="hinge:wide-finger" pos="0 0 0" axis="0 0 1" limited="true" range="-1.0472 1.0472"
+                       damping="50" stiffness="1" springref="0" ref="0"/>
+                <site name="wide-finger-tip" size="0.1" pos="15 0.375 0" rgba="0 0 0 1" type="sphere"/>
+            </body>
+
+            <body name="narrow-finger" pos="5.5 0 0" quat="1 1 0 0">
+                <inertial pos="5.2556 1.3896 2.3305e-05" quat="0.653281 0.653281 -0.270598 -0.270598"
+                          mass="0.0000166" diaginertia="1.03 1 0.97"/>
+                <geom name="geom:narrow-finger" type="mesh" rgba="0.89804 0.91765 0.92941 1" mesh="mesh:narrow-finger"
+                      contype="0" conaffinity="0"/>
+                <geom name="geom:narrow-finger-tip" type="mesh" rgba="0.89804 0.91765 0.92941 1"
+                      mesh="mesh:narrow-finger-tip"/>
+                <joint name="hinge:narrow-finger" pos="0 0 0" axis="0 0 1" limited="true" range="-1.0472 1.0472"
+                       damping="50" stiffness="1" springref="0" ref="0"/>
+            </body>
+
+            <site name="gripah-center" size="0.1" pos="0 0 0" rgba="0 0 0 1" type="sphere"/>
+        </body>
+    </body>
+</mujoco>

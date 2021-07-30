@@ -1,0 +1,86 @@
+<!--# Created by Xinchao Song on June 30, 2019.-->
+
+<mujoco model="The 1-D Bump Model">
+    <compiler angle="radian"/>
+
+    <option>
+        <flag gravity="disable"/>
+    </option>
+
+    <asset>
+        <include file="gripah_asset.xml"/>
+        <mesh name="mesh:bump" file="objects/bump_40_mujoco.STL"/>
+        <texture name="tex:floor" type="2d" builtin="checker" rgb1="1 1 1" rgb2="0 0 0" width="100" height="100"
+                 mark="cross"/>
+        <material name="mat:floor" reflectance="0.1" texture="tex:floor" texrepeat="60 60"/>
+    </asset>
+
+    <default>
+        <joint armature="1" damping="1"/>
+        <geom contype="1" condim="3" friction="1 0.1 0.1"/>
+
+        <default class="bump">
+            <geom type="mesh" mesh="mesh:bump" mass="0.25" quat="1 1 0 0"/>
+        </default>
+
+        <default class="blocker">
+            <geom type="cylinder" size="1 0.5" rgba="1 1 0 1"/>
+        </default>
+
+        <default class="cube">
+            <geom type="box" size="0.5 0.5 0.5" rgba="0 1 0 0.2"/>
+        </default>
+
+        <default class="bump-slider">
+            <joint type="slide" axis="1 0 0" damping="10" limited="false" range="0 0"/>
+        </default>
+    </default>
+
+    <worldbody>
+        <light name="light" directional="true" diffuse="0.8 0.8 0.8" specular="0.4 0.4 0.4" pos="0 -10 20"
+               dir="0 1 -1"/>
+        <geom name="floor" type="plane" material="mat:floor" size="480 480 480" pos="0 0 0" rgba="0.752 0.752 0.752 1"
+              quat="1 0 0 0"/>
+
+        <include file="gripah_body.xml"/>
+
+        <body name="bump1" pos="0 0 0.001">
+            <geom name="bump1" rgba="1 0 0 1" class="bump"/>
+            <joint name="slide:bump1" class="bump-slider"/>
+        </body>
+        <body name="bump2" pos="0 0 0.001">
+            <geom name="bump2" rgba="0 0 1 1" class="bump"/>
+            <joint name="slide:bump2" class="bump-slider"/>
+        </body>
+
+        <body name="bump1-blocker1" pos="-110 20 0.5">
+            <geom name="geom:bump1-blocker-1" class="blocker"/>
+        </body>
+        <body name="bump1-blocker2" pos="-115 20 0.5">
+            <geom name="geom:bump1-blocker-2" class="blocker"/>
+        </body>
+        <body name="bump2-blocker1" pos="-120 20 0.5">
+            <geom name="geom:bump2-blocker-1" class="blocker"/>
+        </body>
+        <body name="bump2-blocker2" pos="-125 20 0.5">
+            <geom name="geom:bump2-blocker-2" class="blocker"/>
+        </body>
+
+        <site name="subgoal1" size="2" pos="0 0 0.1" rgba="0 1 0 1.0" type="sphere"/>
+        <site name="subgoal2" size="2" pos="0 0 0.1" rgba="1 0 0 1.0" type="sphere"/>
+
+
+        <include file="grid_markers.xml"/>
+    </worldbody>
+
+    <actuator>
+        <velocity name="velocity:x" joint="slide:gripah-base-x" gear="1" kv="100"/>
+        <velocity name="velocity:narrow-finger" joint="hinge:narrow-finger" gear="1" kv="100"/>
+        <position name="position:narrow-finger" joint="hinge:narrow-finger" gear="1" kp="100"/>
+    </actuator>
+
+    <sensor>
+        <framepos name="sensor:gripah-center" objtype="site" objname="gripah-center"/>
+        <framepos name="sensor:wide-finger-tip" objtype="site" objname="wide-finger-tip"/>
+    </sensor>
+</mujoco>

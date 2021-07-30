@@ -1,0 +1,7 @@
+<!--# Created by Xinchao Song on May 21, 2020.-->
+
+<mujoco>
+    <exclude body1="narrow-finger" body2="wide-finger"/>
+    <exclude body1="wrist" body2="narrow-finger"/>
+    <exclude body1="wrist" body2="wide-finger"/>
+</mujoco>

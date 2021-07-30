@@ -1,0 +1,112 @@
+<!--# Created by Xinchao Song on May 21, 2020.-->
+
+<mujoco model="topplate-stacked">
+    <compiler angle="radian"/>
+    <option gravity='0 0 -9.81'/>
+
+    <asset>
+        <include file="gripah_asset.xml"/>
+        <mesh name="mesh:base_plate" file="objects/plate_whole.STL"/>
+        <mesh name="mesh:plate" file="objects/plate_half.STL"/>
+        <texture name="tex:floor" type="2d" builtin="checker" rgb1="1 1 1" rgb2="0 0 0" width="100" height="100"
+                 mark="cross"/>
+        <material name="mat:floor" reflectance="0.1" texture="tex:floor" texrepeat="25 25"/>
+    </asset>
+
+    <contact>
+        <include file="gripah_contact.xml"/>
+    </contact>
+
+    <default>
+        <joint armature="1" damping="1"/>
+        <geom contype="1" condim="3" friction="1 0.1 0.1"/>
+
+        <default class="base_plate">
+            <geom type="mesh" mesh="mesh:base_plate" quat="1 1 0 0" mass="1"/>
+        </default>
+        <default class="plate">
+            <geom type="mesh" mesh="mesh:plate" quat="1 1 0 0" mass="1"/>
+        </default>
+    </default>
+
+    <worldbody>
+        <light name="light" directional="true" diffuse="0.8 0.8 0.8" specular="0.4 0.4 0.4" pos="0 -100 200"
+               dir="1 0 -1"/>
+        <geom name="floor" type="plane" material="mat:floor" size="250 250 250" pos="0 0 -10" rgba="0.752 0.752 0.752 1"
+              quat="1 0 0 0"/>
+
+        <include file="gripah_body.xml"/>
+
+        <body name="plate1" pos="0 0 10.0">
+            <geom name="geom:plate1" rgba="0.05 1 0 1" class="base_plate"/>
+        </body>
+        <body name="plate2" pos="0 0 11.4">
+            <geom name="geom:plate2" rgba="0.1 1 0 1" class="plate"/>
+        </body>
+        <body name="plate3" pos="0 0 12.8">
+            <geom name="geom:plate3" rgba="0.15 1 0 1" class="plate"/>
+        </body>
+        <body name="plate4" pos="0 0 14.2">
+            <geom name="geom:plate4" rgba="0.2 1 0 1" class="plate"/>
+        </body>
+        <body name="plate5" pos="0 0 15.6">
+            <geom name="geom:plate5" rgba="0.25 1 0 1" class="plate"/>
+        </body>
+        <body name="plate6" pos="0 0 17.0">
+            <geom name="geom:plate6" rgba="0.3 1 0 1" class="plate"/>
+        </body>
+        <body name="plate7" pos="0 0 18.4">
+            <geom name="geom:plate7" rgba="0.35 1 0 1" class="plate"/>
+        </body>
+        <body name="plate8" pos="0 0 19.8">
+            <geom name="geom:plate8" rgba="0.4 1 0 1" class="plate"/>
+        </body>
+        <body name="plate9" pos="0 0 21.2">
+            <geom name="geom:plate9" rgba="0.45 1 0 1" class="plate"/>
+        </body>
+        <body name="plate10" pos="0 0 22.6">
+            <geom name="geom:plate10" rgba="0.5 1 0 1" class="plate"/>
+        </body>
+        <body name="plate11" pos="0 0 24.0">
+            <geom name="geom:plate11" rgba="0.55 1 0 1" class="plate"/>
+        </body>
+        <body name="plate12" pos="0 0 25.4">
+            <geom name="geom:plate12" rgba="0.6 1 0 1" class="plate"/>
+        </body>
+        <body name="plate13" pos="0 0 26.8">
+            <geom name="geom:plate13" rgba="0.65 1 0 1" class="plate"/>
+        </body>
+        <body name="plate14" pos="0 0 28.2">
+            <geom name="geom:plate14" rgba="0.7 1 0 1" class="plate"/>
+        </body>
+        <body name="plate15" pos="0 0 29.6">
+            <geom name="geom:plate15" rgba="0.75 1 0 1" class="plate"/>
+        </body>
+        <body name="plate16" pos="0 0 31.0">
+            <geom name="geom:plate16" rgba="0.8 1 0 1" class="plate"/>
+        </body>
+        <body name="plate17" pos="0 0 32.4">
+            <geom name="geom:plate17" rgba="0.85 1 0 1" class="plate"/>
+        </body>
+        <body name="plate18" pos="0 0 33.8">
+            <geom name="geom:plate18" rgba="0.9 1 0 1" class="plate"/>
+        </body>
+        <body name="plate19" pos="0 0 35.2">
+            <geom name="geom:plate19" rgba="0.95 1 0 1" class="plate"/>
+        </body>
+        <body name="plate20" pos="0 0 36.6">
+            <geom name="geom:plate20" rgba="1 1 0 1" class="plate"/>
+        </body>
+    </worldbody>
+
+    <actuator>
+        <velocity name="velocity:z" joint="slide:gripah-base-z" gear="1" kv="100"/>
+        <velocity name="velocity:narrow-finger" joint="hinge:narrow-finger" gear="1" kv="100"/>
+        <position name="position:narrow-finger" joint="hinge:narrow-finger" gear="1" kp="100"/>
+    </actuator>
+
+    <sensor>
+        <framepos name="framepos:gripah-center" objtype="site" objname="site:gripah-center"/>
+        <framepos name="framepos:wide-finger-tip" objtype="site" objname="site:wide-finger-tip"/>
+    </sensor>
+</mujoco>

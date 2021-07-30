@@ -1,0 +1,7 @@
+<!--# Created by Xinchao Song on August 17, 2020.-->
+
+<mujoco>
+    <site name="grid-marker-0" size="1" pos="0 -0.011 0" rgba="1 0 1 0.5" type="sphere"/>
+    <site name="grid-marker-1" size="1" pos="0 -0.012 0" rgba="1 0 1 0.5" type="sphere"/>
+    <site name="grid-marker-2" size="1" pos="0 -0.013 0" rgba="1 0 1 0.5" type="sphere"/>
+</mujoco>

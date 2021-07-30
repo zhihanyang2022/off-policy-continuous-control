@@ -1,0 +1,9 @@
+<!--# Created by Xinchao Song on May 21, 2020.-->
+
+<mujoco>
+    <mesh name="mesh:wrist" file="gripah/wrist_rescaled.STL"/>
+    <mesh name="mesh:wide-finger" file="gripah/wide_finger_rescaled.STL"/>
+    <mesh name="mesh:wide-finger-tip" file="gripah/wide_finger_tip.STL"/>
+    <mesh name="mesh:narrow-finger" file="gripah/narrow_finger_rescaled.STL"/>
+    <mesh name="mesh:narrow-finger-tip" file="gripah/narrow_finger_tip.STL"/>
+</mujoco>
