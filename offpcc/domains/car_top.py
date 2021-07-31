@@ -73,10 +73,10 @@ class CarEnv(gym.Env):
         # raise error instead, because position > self.max_position and position < self.min_position
         # should not happen if things are implemented correctly
 
-        assert not (position > self.max_position or position < self.min_position)
-
         if (position > self.max_position or position < self.min_position):
             print('POS:', position)
+
+        assert not (position > self.max_position or position < self.min_position)
 
         # if position > self.max_position:
         #     position = self.max_position
