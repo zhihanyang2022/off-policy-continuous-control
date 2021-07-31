@@ -93,13 +93,17 @@ class CarEnv(gym.Env):
 
         reward = 0.0
 
-        if self.heaven_position > self.hell_position:
+        if self.heaven_position > self.hell_position:  # Heaven on the right
             if position >= self.heaven_position:
                 reward = 1.0
+            elif position <= self.hell_position:
+                reward = -1.0
 
-        if self.heaven_position < self.hell_position:
+        if self.heaven_position < self.hell_position:  # Heaven on the left
             if position <= self.heaven_position:
                 reward = 1.0
+            elif position >= self.hell_position:
+                reward = -1.0
 
         direction = 0.0
 
