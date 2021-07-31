@@ -87,12 +87,6 @@ class CarEnv(gym.Env):
         if position < self.min_position:
             position = self.min_position
 
-        # if position > self.max_position:
-        #     position = self.max_position
-        #
-        # if position < self.min_position:
-        #     position = self.min_position
-
         done = bool(
             position >= 1.0 or position <= -1.0
         )
