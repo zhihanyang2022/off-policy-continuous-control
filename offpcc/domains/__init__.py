@@ -349,3 +349,13 @@ register(
     entry_point='domains.cartpole_balance:v_concat10',
     max_episode_steps=1000
 )
+
+# ============================================================================================
+# for ICRA
+# ============================================================================================
+
+register(
+    id='car-top-v0',
+    entry_point='domains.car_top:CarEnv',
+    max_episode_steps=10
+)
