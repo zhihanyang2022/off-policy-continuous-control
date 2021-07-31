@@ -6,7 +6,11 @@ import gym
 from gym import spaces
 from gym.utils import seeding
 
-# from gym.envs.classic_control import rendering as visualize
+RENDER = False
+
+if RENDER:
+    from gym.envs.classic_control import rendering as visualize
+
 
 class CarEnv(gym.Env):
 
@@ -72,6 +76,8 @@ class CarEnv(gym.Env):
 
         # raise error instead, because position > self.max_position and position < self.min_position
         # should not happen if things are implemented correctly
+
+        # it turns out that position might be out of bound by some very small error
 
         assert not (position > self.max_position + 1e3 or position < self.min_position - 1e3)
 
