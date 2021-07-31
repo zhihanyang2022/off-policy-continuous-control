@@ -5,8 +5,8 @@ import numpy as np
 import gym
 from gym import spaces
 from gym.utils import seeding
-from gym.envs.classic_control import rendering as visualize
 
+# from gym.envs.classic_control import rendering as visualize
 
 class CarEnv(gym.Env):
 
