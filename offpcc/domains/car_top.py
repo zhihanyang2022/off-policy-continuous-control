@@ -50,6 +50,7 @@ class CarEnv(gym.Env):
             shape=(1,),
             dtype=np.float32
         )
+
         self.observation_space = spaces.Box(
             low=self.low_state,
             high=self.high_state,
@@ -73,6 +74,9 @@ class CarEnv(gym.Env):
         # should not happen if things are implemented correctly
 
         assert not (position > self.max_position or position < self.min_position)
+
+        if (position > self.max_position or position < self.min_position):
+            print('POS:', position)
 
         # if position > self.max_position:
         #     position = self.max_position
