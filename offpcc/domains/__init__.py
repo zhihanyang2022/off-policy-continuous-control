@@ -371,3 +371,9 @@ register(
     entry_point='domains.bump_top:BumpEnv',
     max_episode_steps=20
 )
+
+register(
+    id='box-top-v0',
+    entry_point='domains.box_top:BoxEnv',
+    max_episode_steps=20
+)

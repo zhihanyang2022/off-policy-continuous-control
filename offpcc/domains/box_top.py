@@ -11,14 +11,13 @@ from gym import error, spaces
 from gym.utils import seeding
 import mujoco_py
 
+class BoxEnv(gym.Env):
 
-class BumpEnv(gym.Env):
-
-    def __init__(self, rendering=True, seed=None):
+    def __init__(self, rendering=False, seed=None, use_big_box=True):
         """
         """
 
-        super(BumpEnv, self).__init__()
+        super(BoxEnv, self).__init__()
 
         # X range
         self.x_left_limit = 0
@@ -33,30 +32,20 @@ class BumpEnv(gym.Env):
         self.rboundary = 60
 
         # mujoco-py
-        xml_path = Path(__file__).resolve().parent / 'assets' / 'bump_1d.xml'
+        xml_path = Path(__file__).resolve().parent / 'assets' / 'box_1d.xml'
         self.model = mujoco_py.load_model_from_path(str(xml_path))
         self.sim = mujoco_py.MjSim(self.model)
         self.viewer = None  # Initializes only when self.render() is called.
         self.rendering = rendering
 
         # Constants
-        self.BUMP_BLOCKER_DIAMETER = 2
-
-        self.SBUMP_DIAMETER = 4
-        self.SBUMP_BLOCKER_DIST = (self.SBUMP_DIAMETER + self.BUMP_BLOCKER_DIAMETER) / 2
-
-        self.BBUMP_DIAMETER = 5
-        self.BBUMP_BLOCKER_DIST = (self.BBUMP_DIAMETER + self.BUMP_BLOCKER_DIAMETER) / 2
-
         self.FINGER_TIP_OFFSET = 0.375
 
         # MuJoCo
         # bodies
         self.gripah_bid = self.model.body_name2id('gripah-base')
-        self.small_bump_bid = self.model.body_name2id('small_bump')
-        self.big_bump_bid = self.model.body_name2id('big_bump')
-        self.bump_lblocker_bid = self.model.body_name2id('bump-lblocker')
-        self.bump_rblocker_bid = self.model.body_name2id('bump-rblocker')
+        self.small_box_bid = self.model.body_name2id('small_box')
+        self.big_box_bid = self.model.body_name2id('big_box')
         self.subgoal1_bid = self.model.site_name2id('subgoal1')
         self.subgoal2_bid = self.model.site_name2id('subgoal2')
         self.lregion_bid = self.model.site_name2id('left_boundary')
@@ -79,17 +68,23 @@ class BumpEnv(gym.Env):
         self._place_grid_marks()
 
         # Gripah
-        self.default_velocity = 1
+        self.default_velocity = 1  # CHANGE
         self.step_length = 100
         self.low_stiffness = 200
 
         self.qpos_nfinger = 0
 
-        # Bumps
-        self.x_bump = None
-        self.x_bump_lblocker = None
-        self.x_sbump_rblocker = None
-        self.min_x_g_bump_distance = self.SBUMP_DIAMETER
+        self.x_box = None
+
+        self.use_big_box = use_big_box
+
+        if (self.use_big_box):
+            self.box_bid = self.big_box_bid
+        else:
+            self.box_bid = self.small_box_bid
+
+        # TODO: Tune this
+        self.min_x_g_box_distance = 6
 
         # Action
         self.action_space = spaces.Box(low=np.array([-1]), high=np.array([1]), dtype=np.float32)
@@ -99,7 +94,7 @@ class BumpEnv(gym.Env):
         self.action_scaler_a = 0.5 * (self.x_right_limit - self.x_left_limit)
         self.action_scaler_b = self.x_left_limit + self.action_scaler_a
 
-        # States: (x_g, theta, x_bump, x_bump2)
+        # States: (x_g, theta)
         self.x_g = 0
         self.theta = 0
 
@@ -118,48 +113,39 @@ class BumpEnv(gym.Env):
 
     def reset(self):
         """
-        Resets the current MuJoCo simulation environment with given initial x coordinates of the two bumps.
-        :return: the observations of the environment
         """
-
-        self.lock_bump()
 
         # Resets the mujoco env
         self.sim.reset()
 
-        self.x_bump = 50.0
+        self.x_box = 50.0
 
         ok = False
 
-        while (not ok):
+        while(not ok):
             self.x_g = self.np_random.uniform(self.x_g_left_limit, self.x_g_right_limit)
-            if abs(self.x_g - self.x_bump) >= self.min_x_g_bump_distance:
+            if abs(self.x_g - self.x_box) >= self.min_x_g_box_distance:
                 ok = True
-
-        # Records the start state.
-        self.x_bump_lblocker = self.x_bump - self.SBUMP_BLOCKER_DIST
-        self.x_sbump_rblocker = self.x_bump + self.SBUMP_BLOCKER_DIST
 
         # Assigns the parameters to mujoco-py
         coin_head = self.np_random.rand() >= 0.5
 
         if coin_head:
-            self.model.body_pos[self.small_bump_bid][0] = self.x_bump
-            self.model.body_pos[self.bump_lblocker_bid][0] = self.x_bump - self.SBUMP_BLOCKER_DIST
-            self.model.body_pos[self.bump_rblocker_bid][0] = self.x_bump + self.SBUMP_BLOCKER_DIST
-
+            # put a box on the way
+            self.model.body_pos[self.box_bid][0] = self.x_box
             self.go_to_left = 1.0
 
-            self.model.body_pos[self.big_bump_bid][0] = -500  # move the other bump far away
-
+            # put the unselected box far away
+            if self.use_big_box:
+                self.model.body_pos[self.small_box_bid][0] = -500
+            else:
+                self.model.body_pos[self.big_box_bid][0] = -500
         else:
-            self.model.body_pos[self.big_bump_bid][0] = self.x_bump
-            self.model.body_pos[self.bump_lblocker_bid][0] = self.x_bump - self.BBUMP_BLOCKER_DIST
-            self.model.body_pos[self.bump_rblocker_bid][0] = self.x_bump + self.BBUMP_BLOCKER_DIST
-
+            # there is no box
             self.go_to_left = -1.0
 
-            self.model.body_pos[self.small_bump_bid][0] = -500  # move the other bump far away
+            self.model.body_pos[self.small_box_bid][0] = -500
+            self.model.body_pos[self.big_box_bid][0] = -500
 
         # qpos
         self.sim.data.qpos[self.slide_x_c_id] = self.x_g + self.FINGER_TIP_OFFSET
@@ -192,14 +178,10 @@ class BumpEnv(gym.Env):
         if self.x_g <= self.x_g_left_limit:
             if self.go_to_left > 0.0:
                 reward = 1.0
-            else:
-                reward = -1.0
 
         if self.x_g >= self.x_g_right_limit:
             if self.go_to_left < 0.0:
                 reward = 1.0
-            else:
-                reward = -1.0
 
         if self.x_g >= self.x_g_right_limit or self.x_g <= self.x_g_left_limit or reward > 0.0:
             done = True
@@ -208,7 +190,7 @@ class BumpEnv(gym.Env):
 
     def _get_obs(self):
         return np.array((self.x_g / self.x_right_limit,
-                         self.theta))
+                self.theta))
 
     def render(self, mode='human'):
         if self.rendering:
@@ -233,11 +215,6 @@ class BumpEnv(gym.Env):
 
         return [seed_]
 
-    def lock_bump(self):
-
-        self.model.body_pos[self.bump_lblocker_bid][1] = 0
-        self.model.body_pos[self.bump_rblocker_bid][1] = 0
-
     def _update_state(self):
         """
         Samples the data from sensors and updates the state.
@@ -250,23 +227,25 @@ class BumpEnv(gym.Env):
         if self.x_g <= self.x_g_left_limit or self.x_g >= self.x_g_right_limit:
             return
 
-            # count = 0
+        # count = 0
 
         if self.rendering:
             self._display_action(desired_position)
 
-        count = 0
+        cnt = 0
 
         while abs(self.x_g - desired_position) >= self.goal_reach_threshold:
 
-            count += 1
+            cnt += 1
 
-            if count > 50:
+            if cnt > 50:
                 break
 
-            movement = (desired_position - self.x_g)  # a simple P controller
+            movement = (desired_position - self.x_g) # a simple P controller
             self.x_g = self._get_raw_x_g()
             self._control_slider_x(movement)
+
+
 
     def _control_slider_x(self, scale):
         """
