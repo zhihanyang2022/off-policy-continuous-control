@@ -14,7 +14,7 @@ import mujoco_py
 
 class BumpEnv(gym.Env):
 
-    def __init__(self, rendering=True, seed=None):
+    def __init__(self, rendering=False, seed=None):
         """
         """
 
