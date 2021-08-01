@@ -178,12 +178,16 @@ class BoxEnv(gym.Env):
         if self.x_g <= self.x_g_left_limit:
             if self.go_to_left > 0.0:
                 reward = 1.0
+            else:
+                reward = -1.0
 
         if self.x_g >= self.x_g_right_limit:
             if self.go_to_left < 0.0:
                 reward = 1.0
+            else:
+                reward = -1.0
 
-        if self.x_g >= self.x_g_right_limit or self.x_g <= self.x_g_left_limit or reward > 0.0:
+        if self.x_g >= self.x_g_right_limit or self.x_g <= self.x_g_left_limit or reward != 0.0:
             done = True
 
         return self._get_obs(), reward, done, {}
