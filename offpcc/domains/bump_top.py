@@ -255,14 +255,14 @@ class BumpEnv(gym.Env):
         if self.rendering:
             self._display_action(desired_position)
 
+        count = 0
+
         while abs(self.x_g - desired_position) >= self.goal_reach_threshold:
-            # count += 1
 
-            # if (count >= self.max_attempts):
-            #     break
+            count += 1
 
-            # print(count)
-            # print(self.x_g - desired_position)
+            assert count < 1000, "Count is too big!!!"
+
             movement = 0.04 * (desired_position - self.x_g)  # a simple P controller
             self.x_g = self._get_raw_x_g()
             self._control_slider_x(movement)
