@@ -14,7 +14,7 @@ import mujoco_py
 
 class BumpEnv(gym.Env):
 
-    def __init__(self, rendering=False, seed=None):
+    def __init__(self, rendering=True, seed=None):
         """
         """
 
@@ -79,7 +79,7 @@ class BumpEnv(gym.Env):
         self._place_grid_marks()
 
         # Gripah
-        self.default_velocity = 15
+        self.default_velocity = 1
         self.step_length = 100
         self.low_stiffness = 200
 
@@ -263,7 +263,7 @@ class BumpEnv(gym.Env):
 
             assert count < 100000, "Count is too big!!!"
 
-            movement = 0.1 * (desired_position - self.x_g)  # a simple P controller
+            movement = (desired_position - self.x_g)  # a simple P controller
             self.x_g = self._get_raw_x_g()
             self._control_slider_x(movement)
 
