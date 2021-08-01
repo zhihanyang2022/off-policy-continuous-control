@@ -13,7 +13,7 @@ import mujoco_py
 
 class BoxEnv(gym.Env):
 
-    def __init__(self, rendering=True, seed=None, use_big_box=True):
+    def __init__(self, rendering=False, seed=None, use_big_box=True):
         """
         """
 
