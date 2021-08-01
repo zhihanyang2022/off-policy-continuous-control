@@ -365,3 +365,9 @@ register(
     entry_point='domains.ant_reacher_top:AntEnv',
     max_episode_steps=20
 )
+
+register(
+    id='bump-top-v0',
+    entry_point='domains.bump_top:BumpEnv',
+    max_episode_steps=20
+)

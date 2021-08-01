@@ -11,7 +11,7 @@ ASSETS_PATH = Path(__file__).resolve().parent / 'assets'
 
 class AntEnv(gym.Env):
 
-    def __init__(self, seed=None, obs_type='coodinate', num_frames_skip=15, rendering=False):
+    def __init__(self, seed=None, obs_type='coodinate', num_frames_skip=15, rendering=True):
 
         num_frames_skip = num_frames_skip
 
@@ -76,6 +76,9 @@ class AntEnv(gym.Env):
         self.heaven_hell = [[-6.25, 6.75], [6.25, 6.75]]
         self.priest_pos = [5.25, -5.75]
         self.radius = 1.9
+
+    def render(self, mode='human'):
+        pass
 
     def _scale_action(self, action):
         return action * self.cage_max_dim
