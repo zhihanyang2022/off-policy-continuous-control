@@ -359,3 +359,9 @@ register(
     entry_point='domains.car_top:CarEnv',
     max_episode_steps=10
 )
+
+register(
+    id='ant-reacher-top-v0',
+    entry_point='domains.ant_reacher_top:AntEnv',
+    max_episode_steps=20
+)

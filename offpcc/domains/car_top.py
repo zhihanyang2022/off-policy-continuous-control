@@ -6,9 +6,10 @@ import gym
 from gym import spaces
 from gym.utils import seeding
 
-RENDER = False
+RENDER = True
 
 if RENDER:
+    import time
     from gym.envs.classic_control import rendering as visualize
 
 
@@ -71,6 +72,9 @@ class CarEnv(gym.Env):
         return [seed]
 
     def step(self, action):
+
+        if RENDER:
+            time.sleep(0.5)
 
         position = float(action[0])
 
