@@ -152,10 +152,17 @@ class AntEnv(gym.Env):
         ant_pos = self.sim.data.qpos[:2]
 
         d2heaven = np.linalg.norm(ant_pos - self.heaven_pos)
+        d2hell = np.linalg.norm(ant_pos - self.hell_pos)
 
         reward = 0.0
         if (d2heaven < self.radius):
             reward = 1.0
+        elif (d2hell < self.radius):
+            reward = -1.0
+
+        done = False
+        if reward != 0.0:
+            done = True
 
         d2priest = np.linalg.norm(ant_pos - self.priest_pos)
         if (d2priest < self.radius):
@@ -163,7 +170,7 @@ class AntEnv(gym.Env):
         else:
             reveal_heave_pos = False
 
-        return self.get_state(reveal_heave_pos), reward, False, {}
+        return self.get_state(reveal_heave_pos), reward, done, {}
 
     def seed(self, seed=None):
         self.np_random, seed_ = seeding.np_random(seed)
