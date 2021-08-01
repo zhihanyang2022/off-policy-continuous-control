@@ -11,7 +11,7 @@ ASSETS_PATH = Path(__file__).resolve().parent / 'assets'
 
 class AntEnv(gym.Env):
 
-    def __init__(self, seed=None, obs_type='coodinate', num_frames_skip=15, rendering=True):
+    def __init__(self, seed=None, obs_type='coodinate', num_frames_skip=15, rendering=False):
 
         num_frames_skip = num_frames_skip
 
