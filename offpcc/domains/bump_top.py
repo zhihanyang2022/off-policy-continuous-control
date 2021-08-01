@@ -23,8 +23,8 @@ class BumpEnv(gym.Env):
         # X range
         self.x_left_limit = 0
         self.x_right_limit = 100
-        self.x_g_left_limit = self.x_left_limit
-        self.x_g_right_limit = self.x_right_limit
+        self.x_g_left_limit = self.x_left_limit + 10
+        self.x_g_right_limit = self.x_right_limit - 10
 
         self.go_to_left = 0.0
 
