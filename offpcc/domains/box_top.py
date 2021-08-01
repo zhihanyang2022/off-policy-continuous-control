@@ -13,7 +13,7 @@ import mujoco_py
 
 class BoxEnv(gym.Env):
 
-    def __init__(self, rendering=False, seed=None, use_big_box=True):
+    def __init__(self, rendering=True, seed=None, use_big_box=True):
         """
         """
 
@@ -22,8 +22,8 @@ class BoxEnv(gym.Env):
         # X range
         self.x_left_limit = 0
         self.x_right_limit = 100
-        self.x_g_left_limit = self.x_left_limit + 10
-        self.x_g_right_limit = self.x_right_limit - 10
+        self.x_g_left_limit = self.x_left_limit + 5
+        self.x_g_right_limit = self.x_right_limit - 5
 
         self.go_to_left = 0.0
 
@@ -93,6 +93,9 @@ class BoxEnv(gym.Env):
         # 1  --> a + b = x_right_limit
         self.action_scaler_a = 0.5 * (self.x_right_limit - self.x_left_limit)
         self.action_scaler_b = self.x_left_limit + self.action_scaler_a
+
+        # action_scalar_a = 0.5 * self.x_right_limit
+        # action_scalar_b = 0.5 * self.x_right_limit
 
         # States: (x_g, theta)
         self.x_g = 0
@@ -193,8 +196,7 @@ class BoxEnv(gym.Env):
         return self._get_obs(), reward, done, {}
 
     def _get_obs(self):
-        return np.array((self.x_g / self.x_right_limit,
-                self.theta))
+        return np.array((self.x_g / self.x_right_limit, self.theta))
 
     def render(self, mode='human'):
         if self.rendering:

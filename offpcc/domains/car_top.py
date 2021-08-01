@@ -6,7 +6,7 @@ import gym
 from gym import spaces
 from gym.utils import seeding
 
-RENDER = True
+RENDER = False
 
 if RENDER:
     import time
@@ -15,7 +15,7 @@ if RENDER:
 
 class CarEnv(gym.Env):
 
-    def __init__(self, rendering=False):
+    def __init__(self, rendering=RENDER):
 
         self.max_position = 1.1
         self.min_position = -self.max_position
