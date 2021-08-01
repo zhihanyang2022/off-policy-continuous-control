@@ -261,7 +261,7 @@ class BumpEnv(gym.Env):
 
             count += 1
 
-            assert count < 1000, "Count is too big!!!"
+            assert count < 10000, "Count is too big!!!"
 
             movement = 0.04 * (desired_position - self.x_g)  # a simple P controller
             self.x_g = self._get_raw_x_g()
