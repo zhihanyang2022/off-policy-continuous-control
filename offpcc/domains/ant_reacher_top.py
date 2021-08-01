@@ -89,13 +89,13 @@ class AntEnv(gym.Env):
                 return np.concatenate((self.sim.data.qpos, heaven_pos))
 
             heaven_pos = self.heaven_pos if reveal_heave_pos else np.zeros_like(self.heaven_pos)
-            return np.concatenate((self.sim.data.qpos, heaven_pos))
+            return np.concatenate((self.sim.data.qpos[:2], heaven_pos))
         else:
             if at_reset:
                 return np.concatenate((self.sim.data.qpos, 0.0))
 
             heaven_direction = np.sign(self.heaven_pos[0])
-            return np.concatenate((self.sim.data.qpos, heaven_direction))
+            return np.concatenate((self.sim.data.qpos[:2], heaven_direction))
 
     # Reset simulation to state within initial state specified by user
     def reset(self):
