@@ -21,8 +21,8 @@ import basics.replay_buffer_recurrent
 import basics.run_fns
 import algorithms_recurrent.recurrent_td3
 
-algorithms_recurrent.recurrent_td3.action_noise = %action_noise
-algorithms_recurrent.recurrent_td3.exploration_mode = %exploration_mode
+algorithms_recurrent.recurrent_td3.RecurrentTD3.action_noise = %action_noise
+algorithms_recurrent.recurrent_td3.RecurrentTD3.exploration_mode = %exploration_mode
 
 basics.replay_buffer_recurrent.RecurrentReplayBufferGlobal.capacity = %capacity
 basics.replay_buffer_recurrent.RecurrentReplayBufferGlobal.batch_size = %batch_size
