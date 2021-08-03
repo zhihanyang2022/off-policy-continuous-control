@@ -20,7 +20,6 @@ algo_name2class = {
     'ddpg': DDPG,
     'td3': TD3,
     'sac': SAC,
-    'sac_cnn': ConvolutionalSAC,
     'rdpg': RecurrentDDPG,
     'rtd3': RecurrentTD3,
     'rsac': RecurrentSAC,
