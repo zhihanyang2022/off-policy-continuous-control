@@ -76,3 +76,36 @@ class MLPCritic(nn.Module):
 
     def forward(self, states: torch.tensor, actions: torch.tensor):
         return self.net(torch.cat([states, actions], dim=-1))
+
+
+@gin.configurable(module=__name__)
+class RNN(nn.Module):
+
+    """
+    Recurrent neural network; used as preprocessing unit for actor and critic.
+    Note that this class is NOT the same as torch.nn.RNN.
+    """
+
+    def __init__(
+            self,
+            input_dim,
+            hidden_size,
+            num_layers=gin.REQUIRED,
+            variant=gin.REQUIRED
+    ):
+
+        super().__init__()
+
+        if variant == "vanilla":
+            klass = nn.RNN
+        elif variant == "lstm":
+            klass = nn.LSTM
+        elif variant == "gru":
+            klass = nn.GRU
+        else:
+            raise NotImplementedError(f"RNN with name {variant} is not supported.")
+
+        self.net = klass(input_dim, hidden_size, num_layers, batch_first=True)
+
+    def forward(self, input, hidden):
+        return self.net(input, hidden)

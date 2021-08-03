@@ -8,6 +8,7 @@ from basics.utils import get_device
 
 
 RecurrentBatch = namedtuple('RecurrentBatch', 'o a r d m')
+RecurrentBatchWithStoredStates = namedtuple('RecurrentBatchWithStoredStates', 'o a r d m actor_stored_states critic_stored_states')
 
 
 def as_probas(positive_values: np.array) -> np.array:
