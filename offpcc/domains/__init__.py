@@ -387,5 +387,5 @@ register(
 register(
     id='ur5-top-v0',
     entry_point='domains.ur5_top:Ur5Env',
-    max_episode_steps=20
+    max_episode_steps=100
 )
