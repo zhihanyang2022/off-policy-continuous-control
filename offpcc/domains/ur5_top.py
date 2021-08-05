@@ -18,7 +18,7 @@ def ur5_bound_angle(angle):
 
 class Ur5Env(gym.Env):
 
-    def __init__(self, seed=None, num_frames_skip=15, rendering=True):
+    def __init__(self, seed=None, num_frames_skip=15, rendering=False):
 
         model_name = "ur5_reacher.xml"
 
