@@ -389,3 +389,9 @@ register(
     entry_point='domains.ur5_top:Ur5Env',
     max_episode_steps=200
 )
+
+register(
+    id='ur5-mdp-top-v0',
+    entry_point='domains.ur5_mdp_top:Ur5Env',
+    max_episode_steps=10
+)
