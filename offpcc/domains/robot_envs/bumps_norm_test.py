@@ -44,7 +44,7 @@ class BumpsNormEnv(BumpsEnvBase):
         Either bump is pushed.
     """
 
-    def __init__(self, rendering=True, hz=240, seed=None, discrete=False, action_failure_prob=-1.0):
+    def __init__(self, rendering=False, hz=240, seed=None, discrete=False, action_failure_prob=-1.0, default_option_index=None):
         """
         The initialization of the PyBullet simulation environment.
         :param rendering: True if rendering, False otherwise
@@ -86,6 +86,8 @@ class BumpsNormEnv(BumpsEnvBase):
         # Declarations of the auxiliary internal state parameters.
         self.y_ur5 = 0
 
+        self.default_option_index = default_option_index
+
     def reset(self):
         """
         Performs common reset functionality for all supported robots.
@@ -96,7 +98,8 @@ class BumpsNormEnv(BumpsEnvBase):
         self.robot.ee.set_joints(self.default_angles, velocities=[0.1, ],
                                  forces=[self.low_stiffness, ])
 
-        option_idx = self.np_random.randint(1, 4)
+        if self.default_option_index is None:
+            option_idx = self.np_random.randint(1, 4)
         interval_len = (self.y_right_limit - self.y_left_limit) / 5  # 4 bumps -> 5 intervals
 
         # interval_len is about 0.16
