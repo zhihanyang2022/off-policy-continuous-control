@@ -59,6 +59,7 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
 
     while not done:
         action = algorithm.act(state, deterministic=True)
+        print(algorithm.hidden[0][1].size())
         state, reward, done, info = env.step(action)
         if render:
             if env_from_dmc:
