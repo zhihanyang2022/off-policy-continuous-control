@@ -57,9 +57,18 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
     if render and env_from_dmc:
         cv2.namedWindow('img', cv2.WINDOW_NORMAL)
 
+    cnt = 0
+    import os
+
     while not done:
         action = algorithm.act(state, deterministic=True)
-        print(algorithm.hidden[0][1].size())
+        cnt += 1
+
+        num_files = len([fname for fname in os.listdir(f"../results/latent_vecs/vecs/") if fname.endswith("npy")]) // 3
+        np.save(f"../results/latent_vecs/vecs/{num_files+1}", algorithm.hidden[1][1].squeeze(0).numpy())
+        np.save(f"../results/latent_vecs/vecs/{num_files+1}_timestep", np.array([cnt]))
+        np.save(f"../results/latent_vecs/vecs/{num_files+1}_label", np.array([env.option_idx]))
+
         state, reward, done, info = env.step(action)
         if render:
             if env_from_dmc:

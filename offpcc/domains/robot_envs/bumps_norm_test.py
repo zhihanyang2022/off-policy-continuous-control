@@ -44,7 +44,7 @@ class BumpsNormEnv(BumpsEnvBase):
         Either bump is pushed.
     """
 
-    def __init__(self, rendering=False, hz=240, seed=None, discrete=False, action_failure_prob=-1.0, default_option_index=0):
+    def __init__(self, rendering=False, hz=240, seed=None, discrete=False, action_failure_prob=-1.0, default_option_index=None):
         """
         The initialization of the PyBullet simulation environment.
         :param rendering: True if rendering, False otherwise
@@ -99,7 +99,9 @@ class BumpsNormEnv(BumpsEnvBase):
                                  forces=[self.low_stiffness, ])
 
         if self.default_option_index is None:
-            option_idx = self.np_random.randint(1, 4)
+            self.option_idx = self.np_random.randint(1, 4)
+        else:
+            self.option_idx = self.default_option_index
         interval_len = (self.y_right_limit - self.y_left_limit) / 5  # 4 bumps -> 5 intervals
 
         # interval_len is about 0.16
@@ -110,9 +112,9 @@ class BumpsNormEnv(BumpsEnvBase):
 
         noise_low, noise_high = -0.03, 0.03
 
-        self.ori_y_bump1 = self.y_left_limit + option_idx * interval_len + self.np_random.uniform(low=noise_low,
+        self.ori_y_bump1 = self.y_left_limit + self.option_idx * interval_len + self.np_random.uniform(low=noise_low,
                                                                                                   high=noise_high)
-        self.ori_y_bump2 = self.y_left_limit + (option_idx + 1) * interval_len + self.np_random.uniform(low=noise_low,
+        self.ori_y_bump2 = self.y_left_limit + (self.option_idx + 1) * interval_len + self.np_random.uniform(low=noise_low,
 
                                                                                                         high=noise_high)
 
