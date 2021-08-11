@@ -88,7 +88,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
     else:
 
         run = wandb.init(
-            project="car-flag-baselines",
+            project="ant-heaven-hell-baselines",
             # entity='hainh22',
             group=f"timing-smooth-{args.algo} {args.env}",
             settings=wandb.Settings(_disable_stats=True),
