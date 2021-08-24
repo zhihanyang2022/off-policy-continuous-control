@@ -1,4 +1,4 @@
-# Off-policy-continuous-control
+![logo](https://user-images.githubusercontent.com/43589364/130589782-80e7f0f3-725d-45d7-bea4-a4857dc4a7ac.png)
 
 ## Algorithms implemented
 
