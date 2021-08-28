@@ -1,10 +1,17 @@
-CUDA_VISIBLE_DEVICES=0, python3 launch.py --env car-flag-v0 --algo rtd3 --config configs/test/template_recurrent.gin --run_id 0 1 2 3 4 5
-CUDA_VISIBLE_DEVICES=1, python3 launch.py --env car-flag-v0 --algo rdpg --config configs/test/template_recurrent.gin --run_id 0 1 2 3 4 5
-CUDA_VISIBLE_DEVICES=0, python3 launch.py --env car-flag-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 0 1 2 3 4 5
-CUDA_VISIBLE_DEVICES=1, python3 launch.py --env car-flag-v0 --algo sac --config configs/test/template_recurrent.gin --run_id 0 1 2 3 4 5
+# CUDA_VISIBLE_DEVICES=0, python3 launch.py --env car-flag-v0 --algo rtd3 --config configs/test/template_recurrent.gin --run_id 0 1 2 3 4 5
+# CUDA_VISIBLE_DEVICES=1, python3 launch.py --env car-flag-v0 --algo rdpg --config configs/test/template_recurrent.gin --run_id 0 1 2 3 4 5
+# CUDA_VISIBLE_DEVICES=0, python3 launch.py --env car-flag-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 0 1 2 3 4 5
+# CUDA_VISIBLE_DEVICES=1, python3 launch.py --env car-flag-v0 --algo sac --config configs/test/template_recurrent.gin --run_id 0 1 2 3 4 5
 
 # python3 launch.py --env box-v0 --algo rtd3 --config configs/test/template_recurrent.gin --run_id 0 1 2 3
-# python3 launch.py --env box-v0 --algo rdpg --config configs/test/template_recurrent.gin --run_id 0 1 2 3
+# python3 launch.py --env two-boxes-check-v0 --algo rdpg --config configs/test/template_recurrent.gin --run_id 0 1 2 3
 # python3 launch.py --env box-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 0 1 2 3
-# python3 launch.py --env box-v0 --algo sac --config configs/test/template_recurrent.gin --run_id 0 1 2 3
+# python3 launch.py --env two-boxes-check-v0 --algo sac --config configs/test/template_recurrent.gin --run_id 0 1 2 3
+
+python3 launch.py --env ur5-reacher-v1 --algo rtd3 --config configs/test/template_recurrent.gin --run_id 0 1 2 3
+python3 launch.py --env ur5-reacher-v1 --algo rdpg --config configs/test/template_recurrent.gin --run_id 0 1 2 3
+python3 launch.py --env ur5-reacher-v1 --algo rsac --config configs/test/template_recurrent.gin --run_id 0 1 2 3
+python3 launch.py --env ur5-reacher-v1 --algo sac --config configs/test/template_recurrent.gin --run_id 0 1 2 3
+
+
 

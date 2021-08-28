@@ -4,7 +4,7 @@
 # python3 launch.py --env car-flag-v0 --algo sac --config configs/test/template_recurrent.gin --run_id 0 1 2 3
 
 python3 launch.py --env box-v0 --algo rtd3 --config configs/test/template_recurrent.gin --run_id 0 1 2 3
-# python3 launch.py --env box-v0 --algo rdpg --config configs/test/template_recurrent.gin --run_id 0 1 2 3
+python3 launch.py --env box-v0 --algo rdpg --config configs/test/template_recurrent.gin --run_id 0 1 2 3
 python3 launch.py --env box-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 0 1 2 3
-# python3 launch.py --env box-v0 --algo sac --config configs/test/template_recurrent.gin --run_id 0 1 2 3
+python3 launch.py --env box-v0 --algo sac --config configs/test/template_recurrent.gin --run_id 0 1 2 3
 
