@@ -213,7 +213,7 @@ class CarEnv(gym.Env):
         if self.show:
             self.render()
 
-        return self.state, env_reward, done, {"is_success": reward > 0.0}
+        return self.state, env_reward, False, {"is_success": reward > 0.0}
 
     def render(self, mode='human'):
         self._setup_view()
