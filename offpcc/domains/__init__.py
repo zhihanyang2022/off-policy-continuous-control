@@ -361,6 +361,12 @@ register(
 )
 
 register(
+    id='car-top-relative-v0',
+    entry_point='domains.car_top_relative:CarEnv',
+    max_episode_steps=10
+)
+
+register(
     id='car-top-v1',
     entry_point='domains.car_top_narrow:CarEnv',
     max_episode_steps=10
