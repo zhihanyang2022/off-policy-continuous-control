@@ -76,7 +76,7 @@ class CarEnv(gym.Env):
         if RENDER:
             time.sleep(0.5)
 
-        position = self.state[0] + action  # action is sort of like position delta
+        position = float(self.state[0]) + float(action)  # action is sort of like position delta
 
         # raise error instead, because position > self.max_position and position < self.min_position
         # should not happen if things are implemented correctly
