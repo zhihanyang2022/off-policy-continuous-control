@@ -7,7 +7,7 @@ batch_size = 10
 
 num_epochs = 200
 num_steps_per_epoch = 1000
-update_after = 0
+update_after = 500
 num_test_episodes_per_epoch = 5
 
 # ====================================================================================
