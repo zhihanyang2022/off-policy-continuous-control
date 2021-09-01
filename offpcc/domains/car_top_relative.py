@@ -211,11 +211,13 @@ class CarEnv(gym.Env):
             observation.extend([position, 0, direction])
         observation = np.array(observation)
 
+        assert not "heaven" in locations and "hell" in locations
+
         if "heaven" in locations:
             reward = 0
             done = True
         elif "hell" in locations:
-            reward = - (self.max_ep_length - self.steps_cnt)
+            reward = - (self.max_ep_length - self.steps_cnt) // 20
             done = True
         else:
             reward = -1
