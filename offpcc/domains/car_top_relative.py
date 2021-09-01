@@ -237,7 +237,7 @@ class CarEnv(gym.Env):
 
         self.state = np.array([self.np_random.uniform(low=-0.2, high=0.2), 0, 0.0])
 
-        observation = np.zeros((20, ))
+        observation = np.zeros((60, ))
         observation[-3:] = self.state
 
         return observation
