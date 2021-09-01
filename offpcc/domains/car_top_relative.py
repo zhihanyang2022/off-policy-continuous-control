@@ -7,7 +7,7 @@ from gym import spaces
 from gym.utils import seeding
 import socket
 
-from gym.envs.classic_control import rendering as visualize
+# from gym.envs.classic_control import rendering as visualize
 
 
 @gin.configurable
