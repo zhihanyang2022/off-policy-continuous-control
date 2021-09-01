@@ -211,7 +211,7 @@ class CarEnv(gym.Env):
             observation.extend([position, 0, direction])
         observation = np.array(observation)
 
-        assert not "heaven" in locations and "hell" in locations
+        assert not ("heaven" in locations and "hell" in locations)
 
         if "heaven" in locations:
             reward = 0
