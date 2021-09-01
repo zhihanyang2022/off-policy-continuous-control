@@ -199,7 +199,7 @@ class CarEnv(gym.Env):
 
         observation = positions
         total_reward = np.sum(rewards)
-        done = self.steps_cnt == 160
+        done = self.steps_cnt == self.max_ep_length
 
         return observation, total_reward, done, {}
 
