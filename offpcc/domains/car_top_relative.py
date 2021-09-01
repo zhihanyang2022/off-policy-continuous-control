@@ -195,9 +195,15 @@ class CarEnv(gym.Env):
 
             directions.append(direction)
 
+        assert len(positions) == len(rewards) == len(directions)
+
+        observation = []
+        for position, direction in zip(positions, directions):
+            observation.extend([position, 0, direction])
+
         self.steps_cnt += 20
 
-        observation = positions
+        observation = np.array(observation)
         total_reward = np.sum(rewards)
         done = self.steps_cnt == self.max_ep_length
 
