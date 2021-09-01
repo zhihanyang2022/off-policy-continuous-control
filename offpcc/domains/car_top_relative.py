@@ -7,8 +7,7 @@ from gym import spaces
 from gym.utils import seeding
 import socket
 
-if socket.gethostname() in ['hainh-sys']:
-    from gym.envs.classic_control import rendering as visualize
+from gym.envs.classic_control import rendering as visualize
 
 
 @gin.configurable
@@ -169,19 +168,37 @@ class CarEnv(gym.Env):
         rewards = []
         directions = []
 
-        for position in positions:
+        done_low = False
 
-            reward = -1
+        for i, position in enumerate(positions):
 
-            if self.heaven_position > self.hell_position:
-                if position >= self.heaven_position:
-                    reward = 0
+            # reward
 
-            if self.heaven_position < self.hell_position:
-                if position <= self.heaven_position:
-                    reward = 0
+            if done_low is False:
+
+                reward = -1
+
+                if self.heaven_position > self.hell_position:
+                    if position >= self.heaven_position:
+                        done_low = True
+                    if position <= self.hell_position:
+                        done_low = True
+                        reward = - (self.max_ep_length - self.steps_cnt - (i + 1))
+
+                if self.heaven_position < self.hell_position:
+                    if position <= self.heaven_position:
+                        done_low = True
+                    if position >= self.hell_position:
+                        done_low = True
+                        reward = - (self.max_ep_length - self.steps_cnt - (i + 1))
+
+            else:
+
+                reward = 0
 
             rewards.append(reward)
+
+            # direction
 
             direction = 0.0
 
@@ -205,7 +222,7 @@ class CarEnv(gym.Env):
 
         observation = np.array(observation)
         total_reward = np.sum(rewards)
-        done = self.steps_cnt == self.max_ep_length
+        done = (self.steps_cnt == self.max_ep_length) or done_low
 
         return observation, total_reward, done, {}
 

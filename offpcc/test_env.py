@@ -2,6 +2,7 @@ import argparse
 import gym
 from domains import *
 from pomdp_robot_domains import *
+import time
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--env', required=True, type=str)
@@ -25,7 +26,8 @@ cnt = 0
 while True:
     state, reward, done, info = env.step(env.action_space.sample())
     # state, reward, done, info = env.step([0])
-    # env.render()
+    env.render()
+    time.sleep(1.0)
     ret += reward
     cnt += 1
     if not (cnt == env.spec.max_episode_steps):
