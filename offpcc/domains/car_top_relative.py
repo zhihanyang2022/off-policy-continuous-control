@@ -165,38 +165,28 @@ class CarEnv(gym.Env):
 
         positions = np.linspace(prev_position, curr_position, 21)[1:]
 
-        rewards = []
+        locations = []
         directions = []
-
-        done_low = False
 
         for i, position in enumerate(positions):
 
-            # reward
+            # locations
 
-            if done_low is False:
+            location = "nowhere"
 
-                reward = -1
+            if self.heaven_position > self.hell_position:
+                if position >= self.heaven_position:
+                    location = "heaven"
+                if position <= self.hell_position:
+                    location = "hell"
 
-                if self.heaven_position > self.hell_position:
-                    if position >= self.heaven_position:
-                        done_low = True
-                    if position <= self.hell_position:
-                        done_low = True
-                        reward = - (self.max_ep_length - self.steps_cnt - (i + 1))
+            if self.heaven_position < self.hell_position:
+                if position <= self.heaven_position:
+                    location = "heaven"
+                if position >= self.hell_position:
+                    location = "hell"
 
-                if self.heaven_position < self.hell_position:
-                    if position <= self.heaven_position:
-                        done_low = True
-                    if position >= self.hell_position:
-                        done_low = True
-                        reward = - (self.max_ep_length - self.steps_cnt - (i + 1))
-
-            else:
-
-                reward = 0
-
-            rewards.append(reward)
+            locations.append(location)
 
             # direction
 
@@ -212,19 +202,28 @@ class CarEnv(gym.Env):
 
             directions.append(direction)
 
-        assert len(positions) == len(rewards) == len(directions)
+        assert len(positions) == len(locations) == len(directions)
+
+        self.steps_cnt += 20
 
         observation = []
         for position, direction in zip(positions, directions):
             observation.extend([position, 0, direction])
-
-        self.steps_cnt += 20
-
         observation = np.array(observation)
-        total_reward = np.sum(rewards)
-        done = (self.steps_cnt == self.max_ep_length) or done_low
 
-        return observation, total_reward, done, {}
+        if "heaven" in locations:
+            reward = 0
+            done = True
+        elif "hell" in locations:
+            reward = - (self.max_ep_length - self.steps_cnt)
+            done = True
+        else:
+            reward = -1
+            done = False
+
+        done = (self.steps_cnt == self.max_ep_length) or done
+
+        return observation, reward, done, {}
 
     def render(self, mode='human'):
         self._setup_view()
