@@ -172,6 +172,7 @@ def train(
     train_episode_lens = []
     train_episode_rets = []
     algo_specific_stats_tracker = []
+    train_success_tracker = []
 
     total_steps = num_steps_per_epoch * num_epochs
 
@@ -251,6 +252,9 @@ def train(
         # end of trajectory handling
         if done or cutoff:
 
+            if "success" in info.keys():
+                train_success_tracker.append(int(info["success"]))
+
             train_episode_lens.append(episode_len)
             train_episode_rets.append(episode_ret)
             state, episode_len, episode_ret = env.reset(), 0, 0  # reset state and stats trackers
@@ -296,9 +300,11 @@ def train(
 
             mean_train_episode_len = np.mean(train_episode_lens)
             mean_train_episode_ret = np.mean(train_episode_rets)
+            mean_train_success = np.mean(train_success_tracker)
 
             train_episode_lens = []
             train_episode_rets = []
+            train_success_tracker = []
 
             # testing stats
 
@@ -354,6 +360,7 @@ def train(
                     'train_ep_ret': mean_train_episode_ret,
                     'test_ep_len': mean_test_episode_len,
                     'test_ep_ret': mean_test_episode_ret,
+                    'train_success': mean_train_success
                 })
 
             dict_for_wandb.update(algo_specific_stats_over_epoch)  # for debugging

@@ -225,7 +225,7 @@ class CarEnv(gym.Env):
 
         done = (self.steps_cnt == self.max_ep_length) or done
 
-        return observation, reward, done, {}
+        return observation, reward, done, {"success": reward == 0}
 
     def render(self, mode='human'):
         self._setup_view()
