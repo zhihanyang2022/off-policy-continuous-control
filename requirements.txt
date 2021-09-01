@@ -14,7 +14,6 @@ pandas
 psutil
 scipy
 seaborn
-tensorflow==1.8.0
 tqdm
 joblib
 pybullet
