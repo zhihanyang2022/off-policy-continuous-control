@@ -86,10 +86,10 @@ class CarEnv(gym.Env):
         self.priest_delta = 0.2
 
         self.low_state = np.array(
-            [self.min_position, -self.max_speed, -1.0], dtype=np.float32
+            [self.min_position, -self.max_speed, -1.0] * 20, dtype=np.float32
         )
         self.high_state = np.array(
-            [self.max_position, self.max_speed, 1.0], dtype=np.float32
+            [self.max_position, self.max_speed, 1.0] * 20, dtype=np.float32
         )
 
         world_width = self.max_position - self.min_position
@@ -151,69 +151,57 @@ class CarEnv(gym.Env):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-    def step(self, action):
-        if np.isscalar(action):
-            action = [action]
+    def step(self, action: np.array):
 
-        self.steps_cnt += 1
+        prev_position = self.state[0]
+        curr_position = self.state[0] + float(action[0])
 
-        position = self.state[0] + float(action[0])
+        self.state[0] = curr_position  # for next call to the step method
 
-        assert not (position > self.max_position + 1e3 or position < self.min_position - 1e3)
+        if curr_position > self.max_position:
+            curr_position = self.max_position
 
-        if position > self.max_position:
-            position = self.max_position
+        if curr_position < self.min_position:
+            curr_position = self.min_position
 
-        if position < self.min_position:
-            position = self.min_position
+        positions = np.linspace(prev_position, curr_position, 21)[1:]
 
-        max_position = max(self.heaven_position, self.hell_position)
-        min_position = min(self.heaven_position, self.hell_position)
+        rewards = []
+        directions = []
 
-        done = bool(
-            position >= max_position or position <= min_position
-        )
+        for position in positions:
 
-        self.done = done
+            reward = -1
 
-        env_reward = -1
+            if self.heaven_position > self.hell_position:
+                if position >= self.heaven_position:
+                    reward = 0
 
-        reward = 0.0
-        if (self.heaven_position > self.hell_position):
-            if (position >= self.heaven_position):
-                reward = 1.0
+            if self.heaven_position < self.hell_position:
+                if position <= self.heaven_position:
+                    reward = 0
 
-            if (position <= self.hell_position):
-                reward = -1.0
-                env_reward = self.steps_cnt - self.max_ep_length
+            rewards.append(reward)
 
-        if (self.heaven_position < self.hell_position):
-            if (position <= self.heaven_position):
-                reward = 1.0
+            direction = 0.0
 
-            if (position >= self.hell_position):
-                reward = -1.0
-                env_reward = self.steps_cnt - self.max_ep_length
+            if self.priest_position - self.priest_delta <= position <= self.priest_position + self.priest_delta:
+                if self.heaven_position > self.hell_position:
+                    # Heaven on the right
+                    direction = 1.0
+                else:
+                    # Heaven on the left
+                    direction = -1.0
 
-        direction = 0.0
-        if position >= self.priest_position - self.priest_delta and position <= self.priest_position + self.priest_delta:
-            if (self.heaven_position > self.hell_position):
-                # Heaven on the right
-                direction = 1.0
-            else:
-                # Heaven on the left
-                direction = -1.0
+            directions.append(direction)
 
-        self.state = np.array([position, 0, direction])
-        self.solved = (reward > 0.0)
+        self.steps_cnt += 20
 
-        if self.solved:
-            env_reward = 0
+        observation = positions
+        total_reward = np.sum(rewards)
+        done = self.steps_cnt == 160
 
-        if self.show:
-            self.render()
-
-        return self.state, env_reward, False, {"is_success": reward > 0.0}
+        return observation, total_reward, done, {}
 
     def render(self, mode='human'):
         self._setup_view()
@@ -227,12 +215,10 @@ class CarEnv(gym.Env):
 
     def reset(self):
 
-        self.solved = False
-        self.done = False
         self.steps_cnt = 0
 
         # Randomize the heaven/hell location
-        if (self.np_random.randint(2) == 0):
+        if self.np_random.randint(2) == 0:
             self.heaven_position = 1.0
         else:
             self.heaven_position = -1.0
@@ -244,7 +230,11 @@ class CarEnv(gym.Env):
             self._draw_boundary()
 
         self.state = np.array([self.np_random.uniform(low=-0.2, high=0.2), 0, 0.0])
-        return np.array(self.state)
+
+        observation = np.zeros((20, ))
+        observation[-3:] = self.state
+
+        return observation
 
     def _height(self, xs):
         return .55 * np.ones_like(xs)
