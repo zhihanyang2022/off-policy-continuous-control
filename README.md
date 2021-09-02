@@ -1,7 +1,5 @@
 <img width="930" alt="Screen Shot 2021-09-02 at 5 13 14 PM" src="https://user-images.githubusercontent.com/43589364/131817275-c872cbf2-1f7a-40be-8aaa-535f53515039.png">
 
----
-
 # Off-policy-continuous-control
 
 ## Algorithms implemented
