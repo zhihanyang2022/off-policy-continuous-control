@@ -210,6 +210,7 @@ def train(
             action = env.action_space.sample()
 
         next_state, reward, done, info = env.step(action)
+        env.save_position(t)
         episode_len += 1
         episode_ret += reward
 

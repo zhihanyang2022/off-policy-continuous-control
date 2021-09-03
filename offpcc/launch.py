@@ -4,7 +4,7 @@ import wandb
 import os
 
 import gym
-from hac_pomdp_concat.domains import *
+from rhac.domains import *
 from gym.wrappers import RescaleAction
 
 from basics.replay_buffer import ReplayBuffer
