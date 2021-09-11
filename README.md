@@ -2,14 +2,7 @@
 
 ## Introduction
 
-```bibtex
-@article{yang2021off,
-  title={Off-policy Baselines for Memory-based Control},
-  author={Yang, Zhihan and Nguyen, Hai and Amato, Christopher},
-  journal={arXiv preprint arXiv:1512.04455},  # TODO: change this later to the actual index 
-  year={2021}
-}
-```
+
 
 ## Algorithms implemented
 
