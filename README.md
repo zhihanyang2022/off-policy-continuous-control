@@ -1,6 +1,11 @@
 <img width="969" alt="logo" src="https://user-images.githubusercontent.com/43589364/131818167-b3fd3799-91df-4e61-bba4-f5967edc66f5.png">
 
-BlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlablaBlabla
+@article{yang2021off,
+  title={Off-Policy Baselines for Memory-based Control},
+  author={Yang, Zhihan and Nguyen, Hai and Amato, Christopher},
+  journal={arXiv preprint arXiv:1512.04455},
+  year={2021}
+}
 
 ## Algorithms implemented
 
