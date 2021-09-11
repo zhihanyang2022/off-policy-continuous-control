@@ -2,11 +2,12 @@
 
 ## Introduction
 
+summary:
+- introduce what algorithm this repo implements
+- what is included in the accompanying technical report
+- cite the technical report
 
-
-## Algorithms implemented
-
-DDPG, TD3, SAC, RDPG, RTD3 and RSAC
+## Dependencies
 
 ## Structure of the codebase
 
@@ -24,7 +25,7 @@ DDPG, TD3, SAC, RDPG, RTD3 and RSAC
 -   temp
     -   potentially outdated stuff; you don’t need to touch this
 
-## How to run experiments from scratch
+## Training code
 
 Add this to your bashrc or bash_profile and source it.
 
@@ -55,7 +56,7 @@ Breaking it down:
 -   `configs/config/test/template_recurrent.gin`: You can look into the config to get information about buffer and number of training episodes and etc.
 -   `run_id`: This is not a seed. In fact, I avoid using seeds because I would be averaging over multiple seeds anyway. This is only an identifier and will be added to wandb to differentiate between runs. Must be int.
 
-## How to visualize learned policy
+## Evaluation code
 
 After training is done, the policy will be uploaded to wandb, and you can find them here. Simply click download at the very right. Then, within off-policy-continuous-control but outside offpcc, create the following folder structure:
 
@@ -74,6 +75,14 @@ python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/te
 ```
 
 ![Screen Shot 2021-07-22 at 11.49.35 AM](https://i.loli.net/2021/07/22/OckBDTZXqxbfS1C.png)
+
+## Pre-trained models
+
+
+
+## How to visualize learned policy
+
+
 
 ## Random notes you don’t need to read
 
