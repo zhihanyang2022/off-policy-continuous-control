@@ -1,15 +1,31 @@
 <img width="969" alt="logo" src="https://user-images.githubusercontent.com/43589364/131818167-b3fd3799-91df-4e61-bba4-f5967edc66f5.png">
 
+TODO: change the name to A PyTorch repo for off-policy continuous control
+
 ## Introduction
 
-summary:
-- introduce what algorithm this repo implements
-- what is included in the accompanying technical report
-- cite the technical report
+This PyTorch repo implements off-policy RL algorithms for continuous control, including:
 
-## Dependencies
+-   Standard algorithms: DDPG, TD3, SAC
+-   Image-based algorithm: ConvolutionalSAC
+-   Recurrent algorithms: RecurrentDPG, RecurrentTD3, RecurrentSAC
 
-## Structure of the codebase
+where recurrent algorithms are generally not available in other repos.
+
+Several good things about this repo:
+
+-   Code is readable and extendable; all algorithms share the same class template.
+-   Code is easily configurable using gin-configs. We provide a short tutorial on gin-config (see Extra)
+-   We describe the structure of the codebase so you don’t have to figure it out yourself (see Codebase structure).
+-   We benchmark standard algorithms on several Pybullet tasks against stable-baselines3 or SB3 (see Standard algorithms). We provide an interface to SB3 (see Extra) so that our code and SB3’s code can use the same configs, but this only applies to standard algorithms.
+-   We augment ConvolutionalSAC with Data Regularized Q to reproduce results in that paper (see Image-based algorithm).
+-   Design of recurrent agents and their results across various domains are available in the following technical report. We also provide the commands for reproducing these results in the report (see Recurrent algorithms).
+
+If you use this repo for your research, consider citing the technical report:
+
+[cite the technical report]
+
+## Codebase structure
 
 -   file
     -   containing plots reproducing stable-baselines3; you don’t need to touch this
@@ -24,6 +40,10 @@ summary:
     -   random pics; you don’t need to touch this
 -   temp
     -   potentially outdated stuff; you don’t need to touch this
+
+## Dependencies
+
+Blabla
 
 ## Training code
 
