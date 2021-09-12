@@ -1,6 +1,4 @@
-<img width="969" alt="logo" src="https://user-images.githubusercontent.com/43589364/131818167-b3fd3799-91df-4e61-bba4-f5967edc66f5.png">
-
-TODO: change the name to A PyTorch repo for off-policy continuous control
+![offpcc_logo](https://user-images.githubusercontent.com/43589364/132970591-d6a3ea38-dd3b-42e0-b2ce-28ec9aeb89f0.png)
 
 ## Introduction
 
