@@ -98,9 +98,9 @@ Blabla
 
 The othermost env wrapper should always be a timelimit wrapper (mention code reasons)
 
-## Training code
+## Train an agent
 
-TODO: commands for running, a bit more about what happens behind the scene, talk a little bit about how to confiure the classes using gin-config, domains available
+### Setup (wandb & GPU)
 
 Add this to your bashrc or bash_profile and source it.
 
@@ -117,21 +117,71 @@ cd offpcc
 CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=project123 python launch.py --env <env-name> --algo <algo-name> --config <config-path> --run_id <id>
 ```
 
-Here's an example of running bumps norm:
+### Command line template
 
+```bash
+python launch.py --env ENV_NAME --algo ALGO_NAME --config CONFIG_PATH --run_id RUN_ID
 ```
-CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=bumps-norm-recurrent python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1
+
+There are multiple options for each field. 
+
+-   `ENV_NAME` can be:
+    -   A environment from OpenAI gym, e.g., `pendulum-v0`. Mujoco environments are directly obtainable from gym if the corresponding packages like `mujoco_py` are installed, so they are included in this category.
+    -   A Pybullet env. The `pybullet_envs` library is imported at the top of `launch.py`
+    -   A custom environment stored in `domains`. The instructions for adding your own custom domain is available in the Extra section.
+-   `ALGO_NAME` need to satisfy some requirements:
+    -   Must be included in the keys of the `algo_name2class` directionary in `launch.py`.
+    -   Non-image envs CANNOT be used with convolutional algorithms. 
+    -   Image-based envs CANNOT be used with standard or recurrent algorithms.
+-   `CONFIG_PATH` is the relative path of a config file inside `configs`. Again, you CANNOT use an arbitrary config with an arbitrary algorithm, you need to make sure that the specified config ACTUALLY configures all classes and objects in the call hierarchy. Here are some template configs already in the repo: 
+    -   `configs/test/template.gin`: for DDPG, TD3 and SAC; for 200k steps
+    -   `configs/test/template_cnn.gin`: for ConvolutionalSAC; for 1 million steps; with DRQ
+    -   `configs/test/template_cnn_noaug.gin`: for ConvolutionalSAC; for 1 million steps; without DRQ
+    -   `configs/test/recurrent.gin`: for RecurrentDDPG, RecurrentTD3 and RecurrentSAC; for 200k steps
+    -   `configs/test/recurrent.gin`: for RecurrentDDPG, RecurrentTD3 and RecurrentSAC; for 1 million steps
+-   `RUN_ID` is simply a integer assigned to a specific run; it’s NOT a seed. In fact, in this repo, we don’t use seeding at all. To run multiple runs (e.g., 5 runs), simply pass in multiple run ids, e.g., `--run_id 1 2 3 4 5`. 
+
+Training stats are available from 3 places:
+
+-   Directly within console
+-   Within the corresponding wandb project and the corresponding run group
+-   After the run, the csv for the run can be downloaded from wandb
+
+There are 3 types of training stats logged on wandb:
+
+-   Performance: Episode length (train and test), episode return (train and test)
+-   Debugging: Q-values, losses (entropy coefficient for SAC-based algorithms)
+-   Hours elapsed
+
+Below, we give one simple example for each category of algorithms.
+
+### For DDPG, TD3, SAC
+
+On `Pendulum-v0` (from gym):
+
+```bash
+python launch.py --env Pendulum-v0 --algo sac --config configs/test/template.gin --run_id 1
 ```
 
-Breaking it down:
+Commands and plots for benchmarking on Pybullet domains are in a Issue called “Performance check against SB3”.
 
--   `CUDA_VISIBLE_DEVICES=3`: Running recurrent agents can be computationally expensive for GPU. Therefore, before running anything, do check by `nvidia-smi` that no one is using the GPU you want to run on.
--   `pbc-bumps-normal-pomdp-v0`: I register this env in `domains/__init__.py`. The prefix `pbc` stands for py-bullet-custom, i.e., pybullet envs created by ourselves. These envs have a huge problem. You cannot simultaneously create 2 versions of the env (one for training and one for testing), otherwise 4 bumps would show up in the same playground, which totally destroys the env. Therefore, whenever an env has `pbc` as prefix, we do not do testing and just report training stats.
--   `rsac`: It can be `rdpg` or `rtd3` as well.
--   `configs/config/test/template_recurrent.gin`: You can look into the config to get information about buffer and number of training episodes and etc.
--   `run_id`: This is not a seed. In fact, I avoid using seeds because I would be averaging over multiple seeds anyway. This is only an identifier and will be added to wandb to differentiate between runs. Must be int.
+### For ConvolutionalSAC
 
-## Evaluation code
+On `dmc-cartpole-balance-mdp-img-concat3-v0` (custom env; concatenating 3 images to infer velocity):
+
+```bash
+python launch.py --env dmc-cartpole-balance-mdp-img-concat3-v0 --algo csac --config configs/test/template_cnn.gin --run_id 1
+```
+
+### For RecurrentDDPG, RecurrentTD3, RecurrentSAC
+
+On `Pendulum-p-v0` (custom env; position only)
+
+```bash
+python launch.py --env pendulum-p-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1
+```
+
+## Visualize a trained policy
 
 After training is done, the policy will be uploaded to wandb, and you can find them here. Simply click download at the very right. Then, within off-policy-continuous-control but outside offpcc, create the following folder structure:
 
@@ -151,6 +201,28 @@ python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/te
 
 ![Screen Shot 2021-07-22 at 11.49.35 AM](https://i.loli.net/2021/07/22/OckBDTZXqxbfS1C.png)
 
-## How to visualize learned policy
+## Reproduce results of DrQ
 
+## Reproduce results of technical report
 
+## Extra
+
+#### How to add a custom domain
+
+ talk a little bit about how to confiure the classes using gin-config
+
+TODO: commands for running, a bit more about what happens behind the scene,, domains available
+
+Here's an example of running bumps norm:
+
+```
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=bumps-norm-recurrent python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1
+```
+
+Breaking it down:
+
+-   `CUDA_VISIBLE_DEVICES=3`: Running recurrent agents can be computationally expensive for GPU. Therefore, before running anything, do check by `nvidia-smi` that no one is using the GPU you want to run on.
+-   `pbc-bumps-normal-pomdp-v0`: I register this env in `domains/__init__.py`. The prefix `pbc` stands for py-bullet-custom, i.e., pybullet envs created by ourselves. These envs have a huge problem. You cannot simultaneously create 2 versions of the env (one for training and one for testing), otherwise 4 bumps would show up in the same playground, which totally destroys the env. Therefore, whenever an env has `pbc` as prefix, we do not do testing and just report training stats.
+-   `rsac`: It can be `rdpg` or `rtd3` as well.
+-   `configs/config/test/template_recurrent.gin`: You can look into the config to get information about buffer and number of training episodes and etc.
+-   `run_id`: This is not a seed. In fact, I avoid using seeds because I would be averaging over multiple seeds anyway. This is only an identifier and will be added to wandb to differentiate between runs. Must be int.

@@ -14,7 +14,15 @@ import cv2
 
 from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from basics.replay_buffer import ReplayBuffer
-from basics.replay_buffer_recurrent import RecurrentReplayBufferGlobal
+from basics.replay_buffer_recurrent import RecurrentReplayBuffer
+
+
+BASE_LOG_DIR = '../results'
+
+
+def make_log_dir(env_name, algo_name, run_id) -> str:
+    log_dir = f'{BASE_LOG_DIR}/{env_name}/{algo_name}/{run_id}'
+    return log_dir
 
 
 def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, render_pixel_state=False) -> tuple:
@@ -141,7 +149,7 @@ def load_and_visualize_policy(
 def train(
         env_fn,
         algorithm: Union[OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm],
-        buffer: Union[ReplayBuffer, RecurrentReplayBufferGlobal],
+        buffer: Union[ReplayBuffer, RecurrentReplayBuffer],
         num_epochs=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
         num_test_episodes_per_epoch=gin.REQUIRED,

@@ -5,23 +5,22 @@ import os
 
 import gym
 from domains import *
-# import pybullet_envs
+import pybullet_envs
 from gym.wrappers import RescaleAction
 
 from basics.replay_buffer import ReplayBuffer
-from basics.replay_buffer_recurrent import RecurrentReplayBufferGlobal
+from basics.replay_buffer_recurrent import RecurrentReplayBuffer
 from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from algorithms import *
 from algorithms_recurrent import *
 
-# from basics.utils import get_device, set_random_seed
 from basics.run_fns import train, make_log_dir, load_and_visualize_policy
 
 algo_name2class = {
     'ddpg': DDPG,
     'td3': TD3,
     'sac': SAC,
-    'sac_cnn': ConvolutionalSAC,
+    'csac': ConvolutionalSAC,
     'rdpg': RecurrentDDPG,
     'rtd3': RecurrentTD3,
     'rsac': RecurrentSAC,
@@ -44,7 +43,7 @@ gin.parse_config_file(args.config)
 
 def env_fn():
     """Any wrapper by default copies the observation and action space of its wrappee."""
-    if args.env.startswith("bumps"):  # some of our custom envs require special treatment
+    if args.env.startswith("pbc"):  # some of our custom envs require special treatment
         return RescaleAction(gym.make(args.env, rendering=args.render), -1, 1)
     else:
         return RescaleAction(gym.make(args.env), -1, 1)
@@ -57,7 +56,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
 
     # set_random_seed(seed=run_id, device=get_device())
 
-    if args.algo.endswith('cnn'):
+    if args.algo.startswith('c'):
         algorithm = algo_name2class[args.algo](
             input_shape=example_env.observation_space.shape,
             action_dim=example_env.action_space.shape[0],
@@ -101,7 +100,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
 
         # creating buffer based on the need of the algorithm
         if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
-            buffer = RecurrentReplayBufferGlobal(
+            buffer = RecurrentReplayBuffer(
                 o_dim=example_env.observation_space.shape[0],
                 a_dim=example_env.action_space.shape[0],
                 max_episode_len=example_env.spec.max_episode_steps

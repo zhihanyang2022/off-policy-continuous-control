@@ -19,7 +19,7 @@ def as_tensor_on_device(np_array: np.array):
 
 
 @gin.configurable(module=__name__)
-class RecurrentReplayBufferGlobal:
+class RecurrentReplayBuffer:
 
     """Use this version when num_bptt == max_episode_len"""
 
