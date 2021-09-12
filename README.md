@@ -6,7 +6,7 @@ This PyTorch repo implements off-policy RL algorithms for continuous control, in
 
 -   Standard algorithms: DDPG, TD3, SAC
 -   Image-based algorithm: ConvolutionalSAC
--   Recurrent algorithms: RecurrentDPG, RecurrentTD3, RecurrentSAC
+-   Recurrent algorithms: RecurrentDPG, RecurrentTD3, RecurrentSAC, RecurrentSACNoSharing (see report)
 
 where recurrent algorithms are generally not available in other repos.
 
@@ -203,13 +203,17 @@ python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/te
 
 ## Reproduce results of DrQ
 
+TODO
+
 ## Reproduce results of technical report
+
+TODO
 
 ## Extra
 
 #### How to add a custom domain
 
- talk a little bit about how to confiure the classes using gin-config
+#### talk a little bit about how to confiure the classes using gin-config
 
 TODO: commands for running, a bit more about what happens behind the scene,, domains available
 
