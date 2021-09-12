@@ -6,7 +6,7 @@ hidden_dimensions = (256, 256, 256, 256)
 
 num_epochs = 200
 num_steps_per_epoch = 1000
-num_test_episodes_per_epoch = 5
+num_test_episodes_per_epoch = 10
 update_after = 1000
 
 # ====================================================================================
