@@ -1,4 +1,4 @@
-![offpcc_logo](https://user-images.githubusercontent.com/43589364/132970591-d6a3ea38-dd3b-42e0-b2ce-28ec9aeb89f0.png)
+![offpcc_logo](https://user-images.githubusercontent.com/43589364/132970697-e396c9a8-4ef3-4350-8b25-cefa09d96005.png)
 
 ## Introduction
 
