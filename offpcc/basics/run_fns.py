@@ -16,13 +16,6 @@ from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyR
 from basics.replay_buffer import ReplayBuffer
 from basics.replay_buffer_recurrent import RecurrentReplayBufferGlobal
 
-BASE_LOG_DIR = '../results'
-
-
-def make_log_dir(env_name, algo_name, run_id) -> str:
-    log_dir = f'{BASE_LOG_DIR}/{env_name}/{algo_name}/{run_id}'
-    return log_dir
-
 
 def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, render_pixel_state=False) -> tuple:
 
@@ -146,24 +139,22 @@ def train(
         num_epochs=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
         num_test_episodes_per_epoch=gin.REQUIRED,
-        update_every=1,  # number of env interactions between grad updates; but the ratio is locked to 1-to-1
-        update_after=gin.REQUIRED,  # for exploration; no update & random action from action space
+        update_every=1,  #
+        update_after=gin.REQUIRED,
 ) -> None:
+    """
+    @param env_fn:
+    @param algorithm:
+    @param buffer:
+    @param num_epochs:
+    @param num_steps_per_epoch:
+    @param num_test_episodes_per_epoch:
+    @param update_every: number of env interactions between grad updates; but the ratio is locked to 1-to-1
+    @param update_after: for exploration; during the first update_after steps, no update & uniformly random action
+    @return:
+    """
 
     """Follow from OpenAI Spinup's training loop style"""
-
-    # prepare for logging (csv)
-
-    csv_file = open(f'{wandb.run.dir}/progress.csv', 'w+')
-    csv_writer = csv.writer(csv_file)
-    csv_writer.writerow([
-        'epoch',
-        'timestep',  # number of env interactions OR grad updates (both are equivalent; ratio 1:1)
-        'train_ep_len',  # averaged across epoch
-        'train_ep_ret',  # averaged across epoch
-        'test_ep_len',  # averaged across epoch
-        'test_ep_ret',  # averaged across epoch
-    ])
 
     # prepare stats trackers
 
@@ -181,10 +172,14 @@ def train(
 
     env = env_fn()
 
-    # pbc stands for pybullet custom (e.g., bumps normal, top plate)
-    # when env is pbc, then we avoid testing entirely
+    # pbc stands for pybullet custom
+    # when env is pbc, then we avoid testing entirely, and compute success rate instead of return
+    # it's highly likely that you will never need to worry about it
+    # the only reason why it's here is that we need it for our research
 
-    if env.spec.id.startswith("pbc") is False:
+    env_is_pbc = env.spec.id.startswith("pbc") is False
+
+    if not env_is_pbc:
         test_env = env_fn()
 
     state = env.reset()
@@ -192,16 +187,17 @@ def train(
     # training loop
 
     if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
-        algorithm_clone = deepcopy(algorithm)  # algorithm is for action; algorithm_clone is for updates and testing
 
         # Since algorithm is a recurrent policy, it (ideally) shouldn't be updated during an episode since this would
         # affect its ability to interpret past hidden states. Therefore, during an episode, algorithm_clone is updated
-        # while algorithm is not. Once an episode has finished, we do algorithm = deepcopy(algorithm_clone) to carry
-        # over the changes.
+        # while algorithm is not. Once an episode has finished, we do algorithm.copy_networks_from(algorithm_clone) to
+        # carry over the changes.
+
+        algorithm_clone = deepcopy(algorithm)  # algorithm is for action; algorithm_clone is for updates and testing
 
     for t in range(total_steps):
 
-        # action = algorithm.act(state, deterministic=False)
+        # @@@@@@@@@@ environment interaction @@@@@@@@@@
 
         if t >= update_after:  # exploration is done
             action = algorithm.act(state, deterministic=False)
@@ -212,7 +208,7 @@ def train(
         episode_len += 1
 
         if env.spec.id.startswith("pbc"):
-            episode_ret += 0 if reward <= 0 else 1  # so that punishment reward is recorded as 0 (success rate)
+            episode_ret += 0 if reward <= 0 else 1  # for pbc envs, reward is 1 only when the task is accomplished
         else:
             episode_ret += reward
 
@@ -248,7 +244,8 @@ def train(
         # crucial, crucial preparation for next step
         state = next_state
 
-        # end of trajectory handling
+        # @@@@@@@@@@ end of trajectory handling @@@@@@@@@@
+
         if done or cutoff:
 
             train_episode_lens.append(episode_len)
@@ -257,10 +254,11 @@ def train(
 
             if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
 
-                algorithm.copy_networks_from(algorithm_clone)  # doing a deepcopy will ruin the action noise schedule
+                algorithm.copy_networks_from(algorithm_clone)
                 algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
 
-        # update handling
+        # @@@@@@@@@@ update handling @@@@@@@@@@
+
         if t >= update_after and (t + 1) % update_every == 0:
             for j in range(update_every):
 
@@ -273,12 +271,13 @@ def train(
 
                 algo_specific_stats_tracker.append(algo_specific_stats)
 
-        # end of epoch handling
+        # @@@@@@@@@@ end of epoch handling @@@@@@@@@@
+
         if (t + 1) % num_steps_per_epoch == 0:
 
             epoch = (t + 1) // num_steps_per_epoch
 
-            # algo specific stats
+            # @@@@@@@@@@ algo specific stats (averaged across update steps) @@@@@@@@@@
 
             algo_specific_stats_over_epoch = {}
 
@@ -292,103 +291,81 @@ def train(
                     algo_specific_stats_over_epoch[k] = np.mean(values)
                 algo_specific_stats_tracker = []
 
-            # training stats
+            # @@@@@@@@@@ training stats (averaged across episodes) @@@@@@@@@@
 
-            mean_train_episode_len = np.mean(train_episode_lens)
-            mean_train_episode_ret = np.mean(train_episode_rets)
+            mean_train_episode_len = float(np.mean(train_episode_lens))
+            mean_train_episode_ret = float(np.mean(train_episode_rets))
 
             train_episode_lens = []
             train_episode_rets = []
 
-            # testing stats
+             # @@@@@@@@@@ testing stats (averaged across episodes) @@@@@@@@@@
 
-            if env.spec.id.startswith("pbc"):
+            if not env_is_pbc:
 
-                mean_test_episode_len = -999  # just ignore this value
-                mean_test_episode_ret = -999
+                test_episode_lens, test_episode_rets = [], []
 
-            else:
-
-                test_episode_lens, test_episode_returns = [], []
+                if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+                    # testing may happen during the middle of an episode, and hence "algorithm" may not contain the
+                    # latest parameters
+                    test_algorithm = deepcopy(algorithm_clone)
+                elif isinstance(algorithm, OffPolicyRLAlgorithm):
+                    test_algorithm = algorithm
 
                 for j in range(num_test_episodes_per_epoch):
-
-                    if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
-                        test_algorithm = deepcopy(algorithm_clone)
-                    elif isinstance(algorithm, OffPolicyRLAlgorithm):
-                        test_algorithm = deepcopy(algorithm)
-
-                    test_episode_len, test_episode_return = test_for_one_episode(test_env, test_algorithm)
+                    test_episode_len, test_episode_ret = test_for_one_episode(test_env, test_algorithm)
                     test_episode_lens.append(test_episode_len)
-                    test_episode_returns.append(test_episode_return)
+                    test_episode_rets.append(test_episode_ret)
 
-                mean_test_episode_len = np.mean(test_episode_lens)
-                mean_test_episode_ret = np.mean(test_episode_returns)
+                mean_test_episode_len = float(np.mean(test_episode_lens))
+                mean_test_episode_ret = float(np.mean(test_episode_rets))
 
-            # time-related stats
+            # @@@@@@@@@@ hours elapsed @@@@@@@@@@
 
-            epoch_end_time = time.perf_counter()
-            time_elapsed = epoch_end_time - start_time  # in seconds
-            avg_time_per_epoch = time_elapsed / epoch  # in seconds
-            num_epochs_to_go = num_epochs - epoch
-            time_to_go = int(num_epochs_to_go * avg_time_per_epoch)  # in seconds
-            time_to_go_readable = str(datetime.timedelta(seconds=time_to_go))
+            current_time = time.perf_counter()
+            hours_elapsed = (current_time - start_time) / 60 / 60
 
-            # actually record / print the stats
-
-            # (wandb logging)
+            # @@@@@@@@@@ wandb logging @@@@@@@@@@
 
             dict_for_wandb = {}
 
-            if env.spec.id.startswith("pbc"):  # for publication purpose
+            if env_is_pbc:
+
                 dict_for_wandb.update({
                     'Success Rate': mean_train_episode_ret,
                     'Episode Length': mean_train_episode_len,
-                    'Hours': time_elapsed / 60 / 60
-                })
-            else:  # what happens normally
-                dict_for_wandb.update({
-                    'epoch': epoch,
-                    'timestep': t+1,
-                    'train_ep_len': mean_train_episode_len,
-                    'train_ep_ret': mean_train_episode_ret,
-                    'test_ep_len': mean_test_episode_len,
-                    'test_ep_ret': mean_test_episode_ret,
+                    'Hours': hours_elapsed
                 })
 
-            dict_for_wandb.update(algo_specific_stats_over_epoch)  # for debugging
-
-            if env.spec.id.startswith("pbc"):
-                wandb.log(dict_for_wandb, step=t+1)
             else:
-                wandb.log(dict_for_wandb)
 
-            # (csv logging - will be uploaded to wandb at the very end)
+                dict_for_wandb.update({
+                    'Episode Length (Train)': mean_train_episode_len,
+                    'Episode Return (Train)': mean_train_episode_ret,
+                    'Episode Length (Test)': mean_test_episode_len,
+                    'Episode Return (Test)': mean_test_episode_ret,
+                    'Hours': hours_elapsed
+                })
 
-            csv_writer.writerow([
-                epoch,
-                t + 1,
-                mean_train_episode_len,
-                mean_train_episode_ret,
-                mean_test_episode_len,
-                mean_test_episode_ret,
-            ])
+            dict_for_wandb.update(algo_specific_stats_over_epoch)
 
-            # (console logging)
+            wandb.log(dict_for_wandb, step=t+1)
+
+            # @@@@@@@@@@ console logging @@@@@@@@@@
 
             stats_string = (
                 f"===============================================================\n"
-                f"| Epoch        | {epoch}\n"
-                f"| Timestep     | {t+1}\n"
-                f"| Train ep len | {round(mean_train_episode_len, 2)}\n"
-                f"| Train ep ret | {round(mean_train_episode_ret, 2)}\n"
-                f"| Test ep len  | {round(mean_test_episode_len, 2)}\n"
-                f"| Test ep ret  | {round(mean_test_episode_ret, 2)}\n"
-                f"| Time rem     | {time_to_go_readable}\n"
+                f"| Epochs                  | {epoch}/{num_epochs}\n"
+                f"| Timesteps               | {t+1}\n"
+                f"| Episode Length (Train)  | {round(mean_train_episode_len, 2)}\n"
+                f"| Episode Return (Train)  | {round(mean_train_episode_ret, 2)}\n"
+                f"| Episode Length (Test)   | {round(mean_test_episode_len, 2)}\n"
+                f"| Episode Return (Test)   | {round(mean_test_episode_ret, 2)}\n"
+                f"| Hours                   | {round(hours_elapsed, 2)}\n"
                 f"==============================================================="
             )  # this is a weird syntax trick but it just creates a single string
+
             print(stats_string)
 
     # save stats and model after training loop finishes
     algorithm.save_actor(wandb.run.dir)  # will get uploaded to cloud after script finishes
-    csv_file.close()
