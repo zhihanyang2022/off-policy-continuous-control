@@ -1,5 +1,7 @@
 ![offpcc_logo](https://user-images.githubusercontent.com/43589364/132970697-e396c9a8-4ef3-4350-8b25-cefa09d96005.png)
 
+[![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
+
 ## Introduction
 
 This PyTorch repo implements off-policy RL algorithms for continuous control, including:
