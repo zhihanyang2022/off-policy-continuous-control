@@ -190,7 +190,7 @@ def train(
     # it's highly likely that you will never need to worry about it
     # the only reason why it's here is that we need it for our research
 
-    env_is_pbc = env.spec.id.startswith("pbc") is False
+    env_is_pbc = env.spec.id.startswith("pbc")
 
     if not env_is_pbc:
         test_env = env_fn()

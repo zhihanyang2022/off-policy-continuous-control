@@ -207,7 +207,60 @@ TODO
 
 ## Reproduce results of technical report
 
-TODO
+### Experiment 1: comparing base algorithm
+
+Project name: report-pendulum
+
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=project123
+
+```bash
+# mdp baseline
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-pendulum python launch.py --env pendulum-v0 --algo sac --config configs/test/template.gin --run_id 1 2 3 4
+
+# mdp concat baseline for position
+python launch.py --env pendulum-p-concat5-v0 --algo sac --config configs/test/template_deep.gin --run_id 1 2 3 4
+
+# position only (rdpg)
+python launch.py --env pendulum-p-v0 --algo rdpg --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+
+# position only (rtd3)
+python launch.py --env pendulum-p-v0 --algo rtd3 --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+
+# position only (rsac)
+python launch.py --env pendulum-p-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# velocity only
+
+# mdp concat baseline
+python launch.py --env pendulum-v-concat10-v0 --algo sac --config configs/test/template_deep.gin --run_id 1 2 3 4
+
+# rdpg
+python launch.py --env pendulum-v-v0 --algo rdpg --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+
+# rtd3
+python launch.py --env pendulum-v-v0 --algo rtd3 --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+
+# rsac
+python launch.py --env pendulum-v-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# velocity + action
+
+# mdp concat baseline
+python launch.py --env pendulum-va-concat10-v0 --algo sac --config configs/test/template_deep.gin --run_id 1 2 3 4
+
+# rdpg
+python launch.py --env pendulum-va-v0 --algo rdpg --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+
+# rtd3
+python launch.py --env pendulum-va-v0 --algo rtd3 --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+
+# rsac
+python launch.py --env pendulum-va-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+```
+
+
 
 ## Extra
 
