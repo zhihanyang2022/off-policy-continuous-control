@@ -57,9 +57,7 @@ There are three core classes in this repo:
 
 Their relationships are best illustrated by a diagram:
 
-
-
-
+![offpcc_steps](https://user-images.githubusercontent.com/43589364/132971751-c356cb36-adae-4967-9596-a5bca15eda88.jpg)
 
 ## Dependencies
 
