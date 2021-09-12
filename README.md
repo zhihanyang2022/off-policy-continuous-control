@@ -25,6 +25,8 @@ If you use this repo for your research, consider citing the technical report:
 
 ## Codebase structure
 
+Folder structure:
+
 -   file
     -   containing plots reproducing stable-baselines3; you don’t need to touch this
 -   offpcc (the good stuff; you will be using this)
@@ -38,6 +40,26 @@ If you use this repo for your research, consider citing the technical report:
     -   random pics; you don’t need to touch this
 -   temp
     -   potentially outdated stuff; you don’t need to touch this
+
+### Class intuitions and relationships
+
+There are three core classes in this repo:
+
+-   Any environment written using OpenAI’s API would have:
+    -   `reset` method outputs the current state
+    -   `step` method takes in an action, outputs (reward, next state, done)
+-   `OffPolicyRLAlgorithm` and `RecurrentOffPolicyRLAlgorithm` are the base class for all algorithms listed in introduction. You should think about them as neural network (e.g., actors, critics, CNNs, RNNs) wrappers that are augmented with methods to help these networks interact with other stuff:
+    -   `act` method takes in state from env, outputs action back to env
+    -   `update_networks` method takes in batch from buffer
+-   The replay buffers `ReplayBuffer` and `RecurrentReplayBuffer` are built to interact with the environment and the algorithm classes
+    -   `push` method takes in a transition from env
+    -   `sample` method outputs a batch for algorithm’s `update_networks` method
+
+Their relationships are best illustrated by a diagram:
+
+
+
+
 
 ## Dependencies
 
