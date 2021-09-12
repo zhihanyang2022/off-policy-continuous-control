@@ -10,7 +10,6 @@ from basics.summarizer import Summarizer
 from basics.actors_and_critics import MLPTanhActor, MLPCritic
 from basics.replay_buffer_recurrent import RecurrentBatch
 from basics.utils import get_device, create_target, mean_of_unmasked_elements, polyak_update, save_net, load_net
-from basics.action_noise_scheduler import ActionNoiseScheduler
 
 
 @gin.configurable(module=__name__)
@@ -26,8 +25,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         gamma=0.99,
         lr=3e-4,
         polyak=0.995,
-        action_noise_schedule=lambda for_which_update: 0.1,
-        exploration_mode="standard",  # or "dqn_style"
+        action_noise=0.1
     ):
 
         # hyperparameters
@@ -39,14 +37,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
         self.lr = lr
         self.polyak = polyak
 
-        self.action_noise = None
-        self.action_noise_schedule = action_noise_schedule
-        self.exploration_mode = exploration_mode
-
-        assert self.exploration_mode in ["dqn_style", "standard"], f"{exploration_mode} is not a valid exploration mode"
-
-        if self.action_noise_schedule is not None:
-            self.action_noise_scheduler = ActionNoiseScheduler(schedule=action_noise_schedule)
+        self.action_noise = action_noise
 
         # trackers
 
@@ -79,10 +70,6 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
 
     def act(self, observation: np.array, deterministic: bool) -> np.array:
 
-        # don't update action noise during testing, only during rollouts that get stored in buffer
-        if deterministic is False:
-            self.action_noise = self.action_noise_scheduler.get_new_action_noise()
-
         with torch.no_grad():
             observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
             summary, self.hidden = self.actor_summarizer(observation, self.hidden, return_hidden=True)
@@ -90,13 +77,7 @@ class RecurrentDDPG(RecurrentOffPolicyRLAlgorithm):
             if deterministic:
                 return greedy_action
             else:
-                if self.exploration_mode == "standard":
-                    return np.clip(greedy_action + self.action_noise * np.random.randn(self.action_dim), -1.0, 1.0)
-                elif self.exploration_mode == "dqn_style":
-                    if np.random.uniform() > self.action_noise:
-                        return greedy_action
-                    else:
-                        return np.random.uniform(-1.0, 1.0)
+                return np.clip(greedy_action + self.action_noise * np.random.randn(self.action_dim), -1.0, 1.0)
 
     def update_networks(self, b: RecurrentBatch):
 

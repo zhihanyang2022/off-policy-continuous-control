@@ -25,8 +25,7 @@ class RecurrentTD3(RecurrentOffPolicyRLAlgorithm):
         action_noise=0.1,  # standard deviation of action noise
         target_noise=0.2,  # standard deviation of target smoothing noise
         noise_clip=0.5,  # max abs value of target smoothing noise
-        policy_delay=2,
-        exploration_mode="standard"
+        policy_delay=2
     ):
 
         # hyper-parameters
@@ -38,7 +37,6 @@ class RecurrentTD3(RecurrentOffPolicyRLAlgorithm):
         self.lr = lr
         self.polyak = polyak
 
-        self.exploration_mode = exploration_mode
         self.action_noise = action_noise
         self.target_noise = target_noise
         self.noise_clip = noise_clip
@@ -92,15 +90,7 @@ class RecurrentTD3(RecurrentOffPolicyRLAlgorithm):
             if deterministic:
                 return greedy_action
             else:
-                if self.exploration_mode == "standard":
-                    return np.clip(greedy_action + self.action_noise * np.random.randn(self.action_dim), -1.0, 1.0)
-                elif self.exploration_mode == "dqn":
-                    if np.random.uniform(low=0.0, high=1.0) < self.action_noise:
-                        return np.random.uniform(low=-1.0, high=1.0, size=self.action_dim)
-                    else:
-                        return greedy_action
-                else:
-                    raise ValueError
+                return np.clip(greedy_action + self.action_noise * np.random.randn(self.action_dim), -1.0, 1.0)
 
     def update_networks(self, b: RecurrentBatch):
 
