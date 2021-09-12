@@ -47,7 +47,7 @@ There are three core classes in this repo:
 
 -   Any environment written using OpenAI’s API would have:
     -   `reset` method outputs the current state
-    -   `step` method takes in an action, outputs (reward, next state, done)
+    -   `step` method takes in an action, outputs (reward, next state, done, info)
 -   `OffPolicyRLAlgorithm` and `RecurrentOffPolicyRLAlgorithm` are the base class for all algorithms listed in introduction. You should think about them as neural network (e.g., actors, critics, CNNs, RNNs) wrappers that are augmented with methods to help these networks interact with other stuff:
     -   `act` method takes in state from env, outputs action back to env
     -   `update_networks` method takes in batch from buffer
