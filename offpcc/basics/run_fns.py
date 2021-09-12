@@ -51,9 +51,12 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
         cv2.namedWindow('img', cv2.WINDOW_NORMAL)
 
     while not done:
+
         action = algorithm.act(state, deterministic=True)
         state, reward, done, info = env.step(action)
+
         if render:
+
             if env_from_dmc:
 
                 # thanks to Basj's answer from
@@ -80,9 +83,12 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
                 cv2.waitKey(1)
 
             else:
+
                 env.render()
+
         episode_return += reward
         episode_len += 1
+
     return episode_len, episode_return
 
 
@@ -139,10 +145,13 @@ def train(
         num_epochs=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
         num_test_episodes_per_epoch=gin.REQUIRED,
-        update_every=1,  #
+        update_every=1,
         update_after=gin.REQUIRED,
 ) -> None:
     """
+    Function containing the main loop for environment interaction / learning / testing.
+    Follow from OpenAI Spinup's training loop style.
+
     @param env_fn:
     @param algorithm:
     @param buffer:
@@ -154,8 +163,6 @@ def train(
     @return:
     """
 
-    """Follow from OpenAI Spinup's training loop style"""
-
     # prepare stats trackers
 
     episode_len = 0
@@ -163,8 +170,6 @@ def train(
     train_episode_lens = []
     train_episode_rets = []
     algo_specific_stats_tracker = []
-
-    total_steps = num_steps_per_epoch * num_epochs
 
     start_time = time.perf_counter()
 
@@ -182,9 +187,9 @@ def train(
     if not env_is_pbc:
         test_env = env_fn()
 
-    state = env.reset()
+    # @@@@@@@@@@ training loop @@@@@@@@@@
 
-    # training loop
+    state = env.reset()
 
     if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
 
@@ -195,7 +200,7 @@ def train(
 
         algorithm_clone = deepcopy(algorithm)  # algorithm is for action; algorithm_clone is for updates and testing
 
-    for t in range(total_steps):
+    for t in range(num_steps_per_epoch * num_epochs):
 
         # @@@@@@@@@@ environment interaction @@@@@@@@@@
 
