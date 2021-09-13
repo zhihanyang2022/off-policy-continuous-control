@@ -224,7 +224,7 @@ CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-pendulum python launch.py --e
 CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-pendulum python launch.py --env pendulum-p-v0 --algo sac --config configs/test/template_short.gin --run_id 1 2 3 4
 
 # mdp concat baseline for position
-python launch.py --env pendulum-p-concat5-v0 --algo sac --config configs/test/template_deep.gin --run_id 1 2 3 4
+python launch.py --env pendulum-p-concat5-v0 --algo sac --config configs/test/template_deep_short.gin --run_id 1 2 3 4
 
 # position only (rdpg)
 python launch.py --env pendulum-p-v0 --algo rdpg --config configs/test/template_recurrent_short.gin --run_id 1 2 3 4
@@ -239,7 +239,7 @@ python launch.py --env pendulum-p-v0 --algo rsac --config configs/test/template_
 # velocity only
 
 # mdp concat baseline
-python launch.py --env pendulum-v-concat10-v0 --algo sac --config configs/test/template_deep.gin --run_id 1 2 3 4
+python launch.py --env pendulum-v-concat10-v0 --algo sac --config configs/test/template_deep_short.gin --run_id 1 2 3 4
 
 # rdpg
 python launch.py --env pendulum-v-v0 --algo rdpg --config configs/test/template_recurrent_short.gin --run_id 1 2 3 4
@@ -254,7 +254,7 @@ python launch.py --env pendulum-v-v0 --algo rsac --config configs/test/template_
 # velocity + action
 
 # mdp concat baseline
-python launch.py --env pendulum-va-concat10-v0 --algo sac --config configs/test/template_deep.gin --run_id 1 2 3 4
+python launch.py --env pendulum-va-concat10-v0 --algo sac --config configs/test/template_deep_short.gin --run_id 1 2 3 4
 
 # rdpg
 python launch.py --env pendulum-va-v0 --algo rdpg --config configs/test/template_recurrent_short.gin --run_id 1 2 3 4

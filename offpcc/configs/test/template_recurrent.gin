@@ -17,8 +17,8 @@ num_test_episodes_per_epoch = 10
 import basics.replay_buffer_recurrent
 import basics.run_fns
 
-basics.replay_buffer_recurrent.RecurrentReplayBufferGlobal.capacity = %capacity
-basics.replay_buffer_recurrent.RecurrentReplayBufferGlobal.batch_size = %batch_size
+basics.replay_buffer_recurrent.RecurrentReplayBuffer.capacity = %capacity
+basics.replay_buffer_recurrent.RecurrentReplayBuffer.batch_size = %batch_size
 
 basics.run_fns.train.num_epochs = %num_epochs
 basics.run_fns.train.num_steps_per_epoch = %num_steps_per_epoch
