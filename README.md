@@ -134,7 +134,7 @@ There are multiple options for each field.
     -   Non-image envs CANNOT be used with convolutional algorithms. 
     -   Image-based envs CANNOT be used with standard or recurrent algorithms.
 -   `CONFIG_PATH` is the relative path of a config file inside `configs`. Again, you CANNOT use an arbitrary config with an arbitrary algorithm, you need to make sure that the specified config ACTUALLY configures all classes and objects in the call hierarchy. Here are some template configs already in the repo: 
-    -   `configs/test/template.gin`: for DDPG, TD3 and SAC; for 200k steps
+    -   `configs/test/template_short.gin`: for DDPG, TD3 and SAC; for 200k steps
     -   `configs/test/template_cnn.gin`: for ConvolutionalSAC; for 1 million steps; with DRQ
     -   `configs/test/template_cnn_noaug.gin`: for ConvolutionalSAC; for 1 million steps; without DRQ
     -   `configs/test/recurrent.gin`: for RecurrentDDPG, RecurrentTD3 and RecurrentSAC; for 200k steps
@@ -160,7 +160,7 @@ Below, we give one simple example for each category of algorithms.
 On `Pendulum-v0` (from gym):
 
 ```bash
-python launch.py --env Pendulum-v0 --algo sac --config configs/test/template.gin --run_id 1
+python launch.py --env Pendulum-v0 --algo sac --config configs/test/template_short.gin --run_id 1
 ```
 
 Commands and plots for benchmarking on Pybullet domains are in a Issue called “Performance check against SB3”.
@@ -178,7 +178,7 @@ python launch.py --env dmc-cartpole-balance-mdp-img-concat3-v0 --algo csac --con
 On `Pendulum-p-v0` (custom env; position only)
 
 ```bash
-python launch.py --env pendulum-p-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1
+python launch.py --env pendulum-p-v0 --algo rsac --config configs/test/template_recurrent_short.gin --run_id 1
 ```
 
 ## Visualize a trained policy
@@ -196,7 +196,7 @@ As a sidenode, for recurrent agents, we store the policy as two parts: `actor.pt
 After you’ve put the trained networks in the right place, simply run the following command, but make sure that you temporarily change the render argument in the init method of robot envs, otherwise nothing will be shown. Along the visualization, some testing stats will be printed (e.g., lengths of trajectories, success)
 
 ```
-python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1 --render
+python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/test/template_recurrent_short.gin --run_id 1 --render
 ```
 
 ![Screen Shot 2021-07-22 at 11.49.35 AM](https://i.loli.net/2021/07/22/OckBDTZXqxbfS1C.png)
@@ -215,22 +215,25 @@ CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=project123
 
 ```bash
 # mdp baseline
-CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-pendulum python launch.py --env pendulum-v0 --algo sac --config configs/test/template.gin --run_id 1 2 3 4
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-pendulum python launch.py --env pendulum-v0 --algo sac --config configs/test/template_short.gin --run_id 1 2 3 4
+
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# position only
 
 # pomdp baseline
-
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-pendulum python launch.py --env pendulum-p-v0 --algo sac --config configs/test/template_short.gin --run_id 1 2 3 4
 
 # mdp concat baseline for position
 python launch.py --env pendulum-p-concat5-v0 --algo sac --config configs/test/template_deep.gin --run_id 1 2 3 4
 
 # position only (rdpg)
-python launch.py --env pendulum-p-v0 --algo rdpg --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+python launch.py --env pendulum-p-v0 --algo rdpg --config configs/test/template_recurrent_short.gin --run_id 1 2 3 4
 
 # position only (rtd3)
-python launch.py --env pendulum-p-v0 --algo rtd3 --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+python launch.py --env pendulum-p-v0 --algo rtd3 --config configs/test/template_recurrent_short.gin --run_id 1 2 3 4
 
 # position only (rsac)
-python launch.py --env pendulum-p-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+python launch.py --env pendulum-p-v0 --algo rsac --config configs/test/template_recurrent_short.gin --run_id 1 2 3 4
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # velocity only
@@ -239,13 +242,13 @@ python launch.py --env pendulum-p-v0 --algo rsac --config configs/test/template_
 python launch.py --env pendulum-v-concat10-v0 --algo sac --config configs/test/template_deep.gin --run_id 1 2 3 4
 
 # rdpg
-python launch.py --env pendulum-v-v0 --algo rdpg --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+python launch.py --env pendulum-v-v0 --algo rdpg --config configs/test/template_recurrent_short.gin --run_id 1 2 3 4
 
 # rtd3
-python launch.py --env pendulum-v-v0 --algo rtd3 --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+python launch.py --env pendulum-v-v0 --algo rtd3 --config configs/test/template_recurrent_short.gin --run_id 1 2 3 4
 
 # rsac
-python launch.py --env pendulum-v-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+python launch.py --env pendulum-v-v0 --algo rsac --config configs/test/template_recurrent_short.gin --run_id 1 2 3 4
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # velocity + action
@@ -254,13 +257,13 @@ python launch.py --env pendulum-v-v0 --algo rsac --config configs/test/template_
 python launch.py --env pendulum-va-concat10-v0 --algo sac --config configs/test/template_deep.gin --run_id 1 2 3 4
 
 # rdpg
-python launch.py --env pendulum-va-v0 --algo rdpg --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+python launch.py --env pendulum-va-v0 --algo rdpg --config configs/test/template_recurrent_short.gin --run_id 1 2 3 4
 
 # rtd3
-python launch.py --env pendulum-va-v0 --algo rtd3 --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+python launch.py --env pendulum-va-v0 --algo rtd3 --config configs/test/template_recurrent_short.gin --run_id 1 2 3 4
 
 # rsac
-python launch.py --env pendulum-va-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1 2 3 4
+python launch.py --env pendulum-va-v0 --algo rsac --config configs/test/template_recurrent_short.gin --run_id 1 2 3 4
 ```
 
 
@@ -276,7 +279,7 @@ TODO: commands for running, a bit more about what happens behind the scene,, dom
 Here's an example of running bumps norm:
 
 ```
-CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=bumps-norm-recurrent python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/test/template_recurrent.gin --run_id 1
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=bumps-norm-recurrent python launch.py --env pbc-bumps-normal-pomdp-v0 --algo rsac --config configs/test/template_recurrent_short.gin --run_id 1
 ```
 
 Breaking it down:
@@ -284,5 +287,5 @@ Breaking it down:
 -   `CUDA_VISIBLE_DEVICES=3`: Running recurrent agents can be computationally expensive for GPU. Therefore, before running anything, do check by `nvidia-smi` that no one is using the GPU you want to run on.
 -   `pbc-bumps-normal-pomdp-v0`: I register this env in `domains/__init__.py`. The prefix `pbc` stands for py-bullet-custom, i.e., pybullet envs created by ourselves. These envs have a huge problem. You cannot simultaneously create 2 versions of the env (one for training and one for testing), otherwise 4 bumps would show up in the same playground, which totally destroys the env. Therefore, whenever an env has `pbc` as prefix, we do not do testing and just report training stats.
 -   `rsac`: It can be `rdpg` or `rtd3` as well.
--   `configs/config/test/template_recurrent.gin`: You can look into the config to get information about buffer and number of training episodes and etc.
+-   `configs/config/test/template_recurrent_short.gin`: You can look into the config to get information about buffer and number of training episodes and etc.
 -   `run_id`: This is not a seed. In fact, I avoid using seeds because I would be averaging over multiple seeds anyway. This is only an identifier and will be added to wandb to differentiate between runs. Must be int.
