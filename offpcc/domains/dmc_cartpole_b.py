@@ -4,11 +4,11 @@ from domains.wrappers_for_image import Normalize255Image, GrayscaleImage, Concat
 
 
 def mdp():
-    return dmc2gym.make(domain_name="cartpole", task_name="balance", keys_to_exclude=[], frame_skip=5)
+    return dmc2gym.make(domain_name="cartpole", task_name="balance", keys_to_exclude=[], frame_skip=5, track_prev_action=False)
 
 
 def p():
-    return dmc2gym.make(domain_name="cartpole", task_name="balance", keys_to_exclude=['velocity'], frame_skip=5)
+    return dmc2gym.make(domain_name="cartpole", task_name="balance", keys_to_exclude=['velocity'], frame_skip=5, track_prev_action=False)
 
 
 def va():
