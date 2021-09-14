@@ -12,7 +12,7 @@ def p():
 
 
 def va():
-    return dmc2gym.make(domain_name="cartpole", task_name="balance", keys_to_exclude=['position'], track_prev_action=False, frame_skip=5)
+    return dmc2gym.make(domain_name="cartpole", task_name="balance", keys_to_exclude=['position'], track_prev_action=True, frame_skip=5)
 
 
 def p_concat5():

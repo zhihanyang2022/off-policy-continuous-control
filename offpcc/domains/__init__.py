@@ -114,6 +114,36 @@ register(
     max_episode_steps=200
 )
 
+register(
+    id='dmc-acrobot-v0',
+    entry_point='domains.dmc_cartpole_b:mdp',
+    max_episode_steps=200
+)
+
+register(
+    id='dmc-acrobot-p-v0',
+    entry_point='domains.dmc_cartpole_b:mdp',
+    max_episode_steps=200
+)
+
+register(
+    id='dmc-acrobot-p-concat5-v0',
+    entry_point='domains.dmc_cartpole_b:mdp',
+    max_episode_steps=200
+)
+
+register(
+    id='dmc-acrobot-va-v0',
+    entry_point='domains.dmc_cartpole_b:mdp',
+    max_episode_steps=200
+)
+
+register(
+    id='dmc-acrobot-va-concat10-v0',
+    entry_point='domains.dmc_cartpole_b:mdp',
+    max_episode_steps=200
+)
+
 # ============================================================================================
 # DMC CartPole Swing-up (dense reward, fixed episode length)
 # ============================================================================================
