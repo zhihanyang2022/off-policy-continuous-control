@@ -273,27 +273,27 @@ CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-cartpole-balance python launc
 dmc-cartpole-swingup-v0
 
 ```bash
-OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-v0 --algo sac --config configs/test/template_200k.gin --run_id 1 2 3 4 &&\
+CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-v0 --algo sac --config configs/test/template_200k.gin --run_id 1 2 3 4 &&
 ```
 
 dmc-cartpole-swingup-p-v0
 
 ```bash
-OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-p-v0 --algo sac --config configs/test/template_200k.gin --run_id 1 2 3 4 &&\
-OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-p-concat5-v0 --algo sac --config configs/test/template_200k.gin --run_id 1 2 3 4 &&\
-OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-p-v0 --algo rdpg --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4 &&\
-OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-p-v0 --algo rtd3 --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4 &&\
-OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-p-v0 --algo rsac --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4
+CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-p-v0 --algo sac --config configs/test/template_200k.gin --run_id 1 2 3 4 &&\
+CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-p-concat5-v0 --algo sac --config configs/test/template_200k.gin --run_id 1 2 3 4 &&\
+CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-p-v0 --algo rdpg --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4 &&\
+CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-p-v0 --algo rtd3 --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4 &&\
+CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-p-v0 --algo rsac --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4
 ```
 
 dmc-cartpole-swingup-va-v0
 
 ```bash
-OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-va-v0 --algo sac --config configs/test/template_200k.gin --run_id 1 2 3 4 &&\
-OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-va-concat10-v0 --algo sac --config configs/test/template_200k.gin --run_id 1 2 3 4 &&\
-OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-va-v0 --algo rdpg --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4 &&\
-OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-va-v0 --algo rtd3 --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4 &&\
-OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-va-v0 --algo rsac --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4
+CUDA_VISIBLE_DEVICES=2 OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-va-v0 --algo sac --config configs/test/template_200k.gin --run_id 1 2 3 4 &&\
+CUDA_VISIBLE_DEVICES=2 OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-va-concat10-v0 --algo sac --config configs/test/template_200k.gin --run_id 1 2 3 4 &&\
+CUDA_VISIBLE_DEVICES=2 OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-va-v0 --algo rdpg --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4 &&\
+CUDA_VISIBLE_DEVICES=2 OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-va-v0 --algo rtd3 --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4 &&\
+CUDA_VISIBLE_DEVICES=2 OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-va-v0 --algo rsac --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4
 ```
 
 
