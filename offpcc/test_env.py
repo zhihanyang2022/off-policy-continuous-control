@@ -27,7 +27,6 @@ while True:
     state, reward, done, info = env.step(env.action_space.sample())
     # state, reward, done, info = env.step([0])
     env.render()
-    time.sleep(1.0)
     ret += reward
     cnt += 1
     if not (cnt == env.spec.max_episode_steps):
