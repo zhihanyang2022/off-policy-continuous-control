@@ -150,7 +150,6 @@ def train(
         env_fn,
         algorithm: Union[OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm],
         buffer: Union[ReplayBuffer, RecurrentReplayBuffer],
-        track_action: bool,
         num_epochs=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
         num_test_episodes_per_epoch=gin.REQUIRED,
@@ -196,9 +195,6 @@ def train(
 
     start_time = time.perf_counter()
 
-    if track_action:
-        prev_action = np.zeros(*env.action_space.shape)  # initialize prev_action to be zeros
-
     # @@@@@@@@@@ training loop @@@@@@@@@@
 
     state = env.reset()
@@ -217,10 +213,7 @@ def train(
         # @@@@@@@@@@ environment interaction @@@@@@@@@@
 
         if t >= update_after:  # exploration is done
-            if track_action:
-                action = algorithm.act(np.concatenate([state, prev_action]), deterministic=False)
-            else:
-                action = algorithm.act(state, deterministic=False)
+            action = algorithm.act(state, deterministic=False)
         else:
             action = env.action_space.sample()
 
@@ -257,17 +250,12 @@ def train(
 
         # store the transition
         if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
-            if track_action:
-                buffer.push(np.concatenate([state, prev_action]), action, reward, np.concatenate([next_state, action]), done, cutoff)
-            else:
-                buffer.push(state, action, reward, next_state, done, cutoff)
+            buffer.push(state, action, reward, next_state, done, cutoff)
         elif isinstance(algorithm, OffPolicyRLAlgorithm):
             buffer.push(state, action, reward, next_state, done)
 
         # crucial, crucial preparation for next step
         state = next_state
-        if track_action:
-            prev_action = action
 
         # @@@@@@@@@@ end of trajectory handling @@@@@@@@@@
 

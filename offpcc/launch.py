@@ -32,13 +32,11 @@ parser.add_argument('--env', type=str, required=True)
 parser.add_argument('--algo', type=str, required=True, help='Choose among ddpg, ddpg-lstm, td3, td3-lstm, sac and sac-lstm')
 parser.add_argument('--run_id', nargs='+', type=int, required=True)
 parser.add_argument('--config', type=str, required=True, help='Task-specific hyperparameters')
-parser.add_argument('--track_a', action='store_true', help='Include previous action in current observation; useful for recurrent')
 parser.add_argument('--render', action='store_true', help='Visualize a trained policy (no training happens)')
 parser.add_argument('--record', action='store_true', help='Record a trained policy (no training happens)')
 
 args = parser.parse_args()
 assert not (args.render and args.record), "You should only set one of these two flags."
-assert args.track_a and args.algo.startswith("r"), "Include previous action should only be done for recurrent"
 
 gin.parse_config_file(args.config)
 
@@ -62,16 +60,10 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
             action_dim=example_env.action_space.shape[0],
         )
     else:
-        if args.track_a:
-            algorithm = algo_name2class[args.algo](
-                input_dim=example_env.observation_space.shape[0] + example_env.action_space.shape[0],
-                action_dim=example_env.action_space.shape[0],
-            )
-        else:
-            algorithm = algo_name2class[args.algo](
-                input_dim=example_env.observation_space.shape[0],
-                action_dim=example_env.action_space.shape[0],
-            )
+        algorithm = algo_name2class[args.algo](
+            input_dim=example_env.observation_space.shape[0],
+            action_dim=example_env.action_space.shape[0],
+        )
 
     if args.render:
 
@@ -106,18 +98,11 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
 
         # creating buffer based on the need of the algorithm
         if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
-            if args.track_a:
-                buffer = RecurrentReplayBuffer(
-                    o_dim=example_env.observation_space.shape[0],
-                    a_dim=example_env.action_space.shape[0],
-                    max_episode_len=example_env.spec.max_episode_steps
-                )
-            else:
-                buffer = RecurrentReplayBuffer(
-                    o_dim=example_env.observation_space.shape[0] + example_env.action_space.shape[0],
-                    a_dim=example_env.action_space.shape[0],
-                    max_episode_len=example_env.spec.max_episode_steps
-                )
+            buffer = RecurrentReplayBuffer(
+                o_dim=example_env.observation_space.shape[0],
+                a_dim=example_env.action_space.shape[0],
+                max_episode_len=example_env.spec.max_episode_steps
+            )
         elif isinstance(algorithm, OffPolicyRLAlgorithm):
             buffer = ReplayBuffer(
                 input_shape=example_env.observation_space.shape,
@@ -127,8 +112,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
         train(
             env_fn=env_fn,
             algorithm=algorithm,
-            buffer=buffer,
-            track_a=args.track_a
+            buffer=buffer
         )
 
         run.finish()

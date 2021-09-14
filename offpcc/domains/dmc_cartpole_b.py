@@ -7,12 +7,19 @@ def mdp():
     return dmc2gym.make(domain_name="cartpole", task_name="balance", keys_to_exclude=[], frame_skip=5)
 
 
-def pomdp():
+def p():
     return dmc2gym.make(domain_name="cartpole", task_name="balance", keys_to_exclude=['velocity'], frame_skip=5)
 
 
-def mdp_concat5():
-    return ConcatObs(pomdp(), 5)
+def va():
+    return dmc2gym.make(domain_name="cartpole", task_name="balance", keys_to_exclude=['position'], track_prev_action=False, frame_skip=5)
+
+
+def p_concat5():
+    return ConcatObs(p(), 5)
+
+def va_concat10():
+    return ConcatObs(va(), 10)
 
 
 def pomdp_img():

@@ -97,20 +97,20 @@ register(
 # we use frame_skip of 5, so timeout would be 200
 
 register(
-    id='dmc-cartpole-balance-mdp-v0',
+    id='dmc-cartpole-balance-v0',
     entry_point='domains.dmc_cartpole_b:mdp',
     max_episode_steps=200
 )
 
 register(
-    id='dmc-cartpole-balance-pomdp-v0',
-    entry_point='domains.dmc_cartpole_b:pomdp',
+    id='dmc-cartpole-balance-p-v0',
+    entry_point='domains.dmc_cartpole_b:p',
     max_episode_steps=200
 )
 
 register(
-    id='dmc-cartpole-balance-mdp-concat5-v0',
-    entry_point='domains.dmc_cartpole_b:mdp_concat5',
+    id='dmc-cartpole-balance-va-v0',
+    entry_point='domains.dmc_cartpole_b:va',
     max_episode_steps=200
 )
 
