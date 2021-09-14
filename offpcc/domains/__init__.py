@@ -116,31 +116,31 @@ register(
 
 register(
     id='dmc-acrobot-v0',
-    entry_point='domains.dmc_cartpole_b:mdp',
+    entry_point='domains.dmc_acrobot:mdp',
     max_episode_steps=200
 )
 
 register(
     id='dmc-acrobot-p-v0',
-    entry_point='domains.dmc_cartpole_b:mdp',
+    entry_point='domains.dmc_acrobot:p',
     max_episode_steps=200
 )
 
 register(
     id='dmc-acrobot-p-concat5-v0',
-    entry_point='domains.dmc_cartpole_b:mdp',
+    entry_point='domains.dmc_acrobot:p_concat5',
     max_episode_steps=200
 )
 
 register(
     id='dmc-acrobot-va-v0',
-    entry_point='domains.dmc_cartpole_b:mdp',
+    entry_point='domains.dmc_acrobot:va',
     max_episode_steps=200
 )
 
 register(
     id='dmc-acrobot-va-concat10-v0',
-    entry_point='domains.dmc_cartpole_b:mdp',
+    entry_point='domains.dmc_acrobot:va_concat10',
     max_episode_steps=200
 )
 
