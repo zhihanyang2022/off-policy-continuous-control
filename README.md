@@ -296,7 +296,10 @@ CUDA_VISIBLE_DEVICES=2 OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launc
 CUDA_VISIBLE_DEVICES=2 OFFPCC_WANDB_PROJECT=report-cartpole-swingup python launch.py --env dmc-cartpole-swingup-va-v0 --algo rsac --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4
 ```
 
+todo:
 
+-   check the domains
+-   consider the next two environments to test
 
 
 
@@ -322,7 +325,7 @@ CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=bumps-norm-recurrent python launch.p
 
 Breaking it down:
 
--   `CUDA_VISIBLE_DEVICES=3`: Running recurrent agents can be computationally expensive for GPU. Therefore, before running anything, do check by `nvidia-smi` that no one is using the GPU you want to run on.
+-   `CUDA_VISIBLE_DEVICES=3no`: Running recurrent agents can be computationally expensive for GPU. Therefore, before running anything, do check by `nvidia-smi` that no one is using the GPU you want to run on.
 -   `pbc-bumps-normal-pomdp-v0`: I register this env in `domains/__init__.py`. The prefix `pbc` stands for py-bullet-custom, i.e., pybullet envs created by ourselves. These envs have a huge problem. You cannot simultaneously create 2 versions of the env (one for training and one for testing), otherwise 4 bumps would show up in the same playground, which totally destroys the env. Therefore, whenever an env has `pbc` as prefix, we do not do testing and just report training stats.
 -   `rsac`: It can be `rdpg` or `rtd3` as well.
 -   `configs/config/test/template_recurrent_100k.gin`: You can look into the config to get information about buffer and number of training episodes and etc.

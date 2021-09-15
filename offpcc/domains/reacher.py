@@ -120,6 +120,7 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                     self.returning_first_obs = False  # only show the goal info if returning the first obs
                 else:
                     ob = self.zero_out_goal_info(ob)
+                self.last_action = np.zeros_like(self.last_action)  # I forgot why I'm tracking action, so I just ignore it here
                 ob = np.concatenate([ob, self.last_action])  # a is the last action
         return ob
 
