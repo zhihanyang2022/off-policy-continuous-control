@@ -21,4 +21,4 @@ class RandomAlgorithm:
         return self.env.action_space.sample()
 
 
-test_for_one_episode(env, RandomAlgorithm(env), render=True, env_from_dmc=True, render_pixel_state=True)
+print(test_for_one_episode(env, RandomAlgorithm(env), render=True, env_from_dmc=True, render_pixel_state=True))

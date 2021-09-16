@@ -156,6 +156,17 @@ register(
     max_episode_steps=200
 )
 
+register(
+    id='dmc-cart2pole-v0',
+    entry_point='domains.dmc_cart2pole:mdp',
+    max_episode_steps=200
+)
+
+register(
+    id='dmc-cart3pole-v0',
+    entry_point='domains.dmc_cart3pole:mdp',
+    max_episode_steps=200
+)
 
 # ============================================================================================
 # DMC CartPole Swing-up (dense reward, fixed episode length)
