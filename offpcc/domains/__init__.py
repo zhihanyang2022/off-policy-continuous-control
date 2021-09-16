@@ -272,6 +272,18 @@ register(
     max_episode_steps=200,
 )
 
+register(
+    id='water-maze-simple-mdp-v0',
+    entry_point='domains.water_maze_simple:mdp',
+    max_episode_steps=200,
+)
+
+register(
+    id='water-maze-simple-pomdp-v0',
+    entry_point='domains.water_maze_simple:pomdp',
+    max_episode_steps=200,
+)
+
 # ============================================================================================
 # robot envs (for HAC paper)
 # ============================================================================================

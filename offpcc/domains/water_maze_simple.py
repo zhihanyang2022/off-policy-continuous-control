@@ -10,9 +10,12 @@ if socket.gethostname() not in ['theseus', 'SXC-Wichita']:
 from domains.wrappers import FilterObsByIndex
 
 
+ZERO_VELO = np.array([0., 0.])
+
+
 class WaterMazeMdpEnv(gym.Env):
 
-    def __init__(self, max_action_value=0.2):
+    def __init__(self, max_action_value=0.03):
 
         self.max_action_value = max_action_value
 
@@ -40,6 +43,8 @@ class WaterMazeMdpEnv(gym.Env):
 
         self.seed()
 
+        self.velocity = np.array([0., 0.])
+
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
@@ -47,6 +52,9 @@ class WaterMazeMdpEnv(gym.Env):
     # At reset: randomize the position of the agent and the platform
     # such that the agent is not within the platform
     def reset(self):
+
+        self.velocity = ZERO_VELO  # added
+
         self.inside_platform = 0.0
         self.step_in_platform = 0
 
@@ -55,8 +63,13 @@ class WaterMazeMdpEnv(gym.Env):
             radius_agent = self.np_random.rand()
             self.agent_pos = np.array([radius_agent * np.cos(theta_agent), radius_agent * np.sin(theta_agent)])
 
+            self.agent_pos = np.array([0., 0.])
+
             theta_platform = 2 * np.pi * self.np_random.rand()
             radius_platform = self.np_random.rand()
+
+            radius_platform = 0.7
+
             self.platform_center = np.array(
                 [radius_platform * np.cos(theta_platform), radius_platform * np.sin(theta_platform)])
 
@@ -81,15 +94,16 @@ class WaterMazeMdpEnv(gym.Env):
             if is_agent_not_in_platform:
                 return agent_pos
 
-    def step(self, action):
+    def step(self, action: np.array):
 
         previous_pos = copy.deepcopy(self.agent_pos)
-        action = action * self.max_action_value
-        self.agent_pos += np.array(action)
+        self.velocity = np.clip(self.velocity + action, -0.1, 0.1)  # action is more like acceleration
+        self.agent_pos += np.array(self.velocity)
 
         # If new action move the agent out of the world, revert back
         if not self.is_agent_inside_world():
             self.agent_pos = previous_pos
+            self.velocity = ZERO_VELO
 
         # The agent is rewarded if it is inside the platform
         reward = 0
@@ -102,7 +116,9 @@ class WaterMazeMdpEnv(gym.Env):
 
         # Randomize the agent again when it stays within the platform for 5 consecutive timesteps
         if self.step_in_platform % 5 == 0 and self.step_in_platform > 0 and reward == 1:
-            self.agent_pos = self._randomize_agent()
+            # self.agent_pos = self._randomize_agent()
+            self.agent_pos = np.array([0., 0.])
+            self.velocity = ZERO_VELO
             self.step_in_platform = 0
 
         # Only terminate due to the TimeLimit Wrapper
