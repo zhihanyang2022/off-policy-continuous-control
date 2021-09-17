@@ -45,9 +45,14 @@ class WaterMazeMdpEnv(gym.Env):
 
         self.velocity = np.array([0., 0.])
 
+        self.theta_platform = None
+
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
+
+    def set_platform(self, theta_platform):
+        self.theta_platform = theta_platform
 
     # At reset: randomize the position of the agent and the platform
     # such that the agent is not within the platform
@@ -59,13 +64,17 @@ class WaterMazeMdpEnv(gym.Env):
         self.step_in_platform = 0
 
         while (True):
+
             theta_agent = 2 * np.pi * self.np_random.rand()
             radius_agent = self.np_random.rand()
             self.agent_pos = np.array([radius_agent * np.cos(theta_agent), radius_agent * np.sin(theta_agent)])
 
             self.agent_pos = np.array([0., 0.])
 
-            theta_platform = 2 * np.pi * self.np_random.rand()
+            if self.theta_platform is None:
+                theta_platform = 2 * np.pi * self.np_random.rand()
+            else:
+                theta_platform = self.theta_platform
             radius_platform = self.np_random.rand()
 
             radius_platform = 0.7
@@ -73,7 +82,9 @@ class WaterMazeMdpEnv(gym.Env):
             self.platform_center = np.array(
                 [radius_platform * np.cos(theta_platform), radius_platform * np.sin(theta_platform)])
 
-            is_platform_within_world = self._is_circle_within_circle(np.array([0, 0]), self.world_radius,
+            print(theta_platform, self.platform_center)
+
+            is_platform_within_world = self._is_circle_within_circle(np.array([0, 0]), self.world_radius + 0.1,  # mod
                                                                      self.platform_center, self.platform_radius)
             is_agent_not_in_platform = not self._is_within_circle(self.agent_pos, self.platform_center,
                                                                   self.platform_radius)
@@ -115,14 +126,16 @@ class WaterMazeMdpEnv(gym.Env):
             reward = 1
 
         # Randomize the agent again when it stays within the platform for 5 consecutive timesteps
+        final_pos = None
         if self.step_in_platform % 5 == 0 and self.step_in_platform > 0 and reward == 1:
+            final_pos = self.agent_pos
             self.agent_pos = self._randomize_agent()
             self.agent_pos = np.array([0., 0.])
             self.velocity = ZERO_VELO
             self.step_in_platform = 0
 
         # Only terminate due to the TimeLimit Wrapper
-        return self._get_obs(), reward, False, {}
+        return self._get_obs(), reward, False, {'final_pos': final_pos}
 
     # The agent knows its position and whether it is inside the platform or not
     def _get_obs(self):
