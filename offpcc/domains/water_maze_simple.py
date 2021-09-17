@@ -10,7 +10,8 @@ if socket.gethostname() not in ['theseus', 'SXC-Wichita']:
 from domains.wrappers import FilterObsByIndex
 
 
-ZEROS = np.array([0., 0.])
+def get_new_zeros():
+    return np.array([0., 0.])
 
 
 class WaterMazeMdpEnv(gym.Env):
@@ -57,18 +58,14 @@ class WaterMazeMdpEnv(gym.Env):
 
     def reset(self):
 
-        # reset agent
-
-        self.agent_pos = ZEROS  # agent is initialized at the center of the world
-        self.velocity = ZEROS
+        self.agent_pos = get_new_zeros()
+        self.velocity = get_new_zeros()
         self.inside_platform = 0.0
         self.step_in_platform = 0
 
-        # reset platform
-
         if self.theta_platform is None:
-            theta_platform = 2 * np.pi * self.np_random.rand()  # random uniform from [0, 2 pi]
-        else:  # this is when we want to pick specific platform location during policy visualization
+            theta_platform = 2 * np.pi * self.np_random.rand()
+        else:
             theta_platform = self.theta_platform
 
         radius_platform = 0.7
@@ -76,34 +73,25 @@ class WaterMazeMdpEnv(gym.Env):
         self.platform_center = np.array(
             [radius_platform * np.cos(theta_platform), radius_platform * np.sin(theta_platform)])
 
-        # sanity checks
+        is_platform_within_world = self._is_circle_within_circle(get_new_zeros(), self.world_radius + 0.1,  # mod
+                                                                 self.platform_center, self.platform_radius)
+        is_agent_not_in_platform = not self._is_within_circle(self.agent_pos, self.platform_center,
+                                                              self.platform_radius)
 
-        is_platform_within_world = self._is_circle_within_circle(
-            np.array([0, 0]),
-            self.world_radius + 0.1,  # a small offset is added; without this offset, sometimes the platform can be considered outside due to round-off errors
-            self.platform_center,
-            self.platform_radius
-        )
-        is_agent_not_in_platform = not self._is_within_circle(
-            self.agent_pos,
-            self.platform_center,
-            self.platform_radius
-        )  # this should be true since the agent is initialized at the center
-
-        assert is_platform_within_world and is_agent_not_in_platform, "reset() method failed at least 1/2 checks"
+        assert  is_agent_not_in_platform and is_platform_within_world
 
         return self._get_obs()
 
     def step(self, action: np.array):
 
         previous_pos = copy.deepcopy(self.agent_pos)
-        self.velocity = np.clip(self.velocity + action, -0.1, 0.1)  # action can be interpreted as acceleration
+        self.velocity = np.clip(self.velocity + action, -0.1, 0.1)  # action is more like acceleration
         self.agent_pos += np.array(self.velocity)
 
         # If new action move the agent out of the world, revert back
         if not self.is_agent_inside_world():
             self.agent_pos = previous_pos
-            self.velocity = ZEROS
+            self.velocity = get_new_zeros()
 
         # The agent is rewarded if it is inside the platform
         reward = 0
@@ -114,12 +102,12 @@ class WaterMazeMdpEnv(gym.Env):
             self.inside_platform = 1.0
             reward = 1
 
-        # Re-center the agent again when it stays within the platform for 5 consecutive timesteps
-        final_pos = None  # for policy vizualization purpose only; don't worry about this
+        # Randomize the agent again when it stays within the platform for 5 consecutive timesteps
+        final_pos = None
         if self.step_in_platform % 5 == 0 and self.step_in_platform > 0 and reward == 1:
             final_pos = self.agent_pos
-            self.agent_pos = ZEROS
-            self.velocity = ZEROS
+            self.agent_pos = get_new_zeros()
+            self.velocity = get_new_zeros()
             self.step_in_platform = 0
 
         # Only terminate due to the TimeLimit Wrapper
