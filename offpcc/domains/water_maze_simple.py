@@ -82,8 +82,6 @@ class WaterMazeMdpEnv(gym.Env):
             self.platform_center = np.array(
                 [radius_platform * np.cos(theta_platform), radius_platform * np.sin(theta_platform)])
 
-            print(theta_platform, self.platform_center)
-
             is_platform_within_world = self._is_circle_within_circle(np.array([0, 0]), self.world_radius + 0.1,  # mod
                                                                      self.platform_center, self.platform_radius)
             is_agent_not_in_platform = not self._is_within_circle(self.agent_pos, self.platform_center,
