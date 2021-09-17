@@ -301,13 +301,44 @@ todo:
 -   check the domains
 -   consider the next two environments to test
 
+Reacher
+
+```bash
+CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-reacher python launch.py --env reacher-mdp-v0 --algo sac --config configs/test/template_200k.gin --run_id 1 2 3 4 &&\
+CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-reacher python launch.py --env reacher-pomdp-v0 --algo sac --config configs/test/template_200k.gin --run_id 1 2 3 4 &&\
+CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-reacher python launch.py --env reacher-pomdp-v0 --algo rsac --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4
+
+CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-reacher python launch.py --env reacher-pomdp-v0 --algo rdpg --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4 &&\
+CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-reacher python launch.py --env reacher-pomdp-v0 --algo rtd3 --config configs/test/template_recurrent_200k.gin --run_id 1 2 3 4
+```
+
+Watermaze
+
+```bash
+CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-mdp-v0 --algo sac --config configs/test/template_500k.gin --run_id 1 &&\
+CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo sac --config configs/test/template_500k.gin --run_id 1
+CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rsac --config configs/test/template_recurrent_1m.gin --run_id 1
+CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rsac --config configs/test/template_recurrent_1m.gin --run_id 2
+CUDA_VISIBLE_DEVICES=2 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rsac --config configs/test/template_recurrent_1m.gin --run_id 3
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rsac --config configs/test/template_recurrent_1m.gin --run_id 4
+```
+
+```bash
+CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rtd3 --config configs/test/template_recurrent_500k.gin --run_id 1 &&\
+CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rtd3 --config configs/test/template_recurrent_500k.gin --run_id 2
+CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rtd3 --config configs/test/template_recurrent_500k.gin --run_id 3 &&\
+CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rtd3 --config configs/test/template_recurrent_500k.gin --run_id 4
+```
 
 
 
 
-Cartpole swingup (depends on DM control)
 
-Inverted double pendulum (depends on mujoco)
+
+
+
+
+
 
 ## Extra
 
