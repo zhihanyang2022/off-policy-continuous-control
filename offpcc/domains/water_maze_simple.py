@@ -116,9 +116,9 @@ class WaterMazeMdpEnv(gym.Env):
 
         # Randomize the agent again when it stays within the platform for 5 consecutive timesteps
         if self.step_in_platform % 5 == 0 and self.step_in_platform > 0 and reward == 1:
-            # self.agent_pos = self._randomize_agent()
-            # self.agent_pos = np.array([0., 0.])
-            # self.velocity = ZERO_VELO
+            self.agent_pos = self._randomize_agent()
+            self.agent_pos = np.array([0., 0.])
+            self.velocity = ZERO_VELO
             self.step_in_platform = 0
 
         # Only terminate due to the TimeLimit Wrapper
@@ -126,7 +126,7 @@ class WaterMazeMdpEnv(gym.Env):
 
     # The agent knows its position and whether it is inside the platform or not
     def _get_obs(self):
-        return np.array([self.agent_pos[0], self.agent_pos[1], False, *list(self.platform_center)])
+        return np.array([self.agent_pos[0], self.agent_pos[1], self.inside_platform, *list(self.platform_center)])
 
     def render(self, mode='human'):
         self._setup_view()
