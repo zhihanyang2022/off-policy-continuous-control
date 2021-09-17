@@ -94,7 +94,7 @@ for i, traj in enumerate(trajs_toward_platform):
     # plt.scatter(xs[-1], ys[-1], color=line.get_color(), marker='o')
     add_arrow(line)
 
-start = world = plt.Circle((0, 0), 0.025, color='black', fill=False)
+start = world = plt.Circle((0, 0), 0.025, color='black', fill=True)
 world = plt.Circle((0, 0), 1.0, color='black', fill=False)
 platform = plt.Circle((env.platform_center[0], env.platform_center[1]), 0.3, color="red", fill=False)
 plt.gca().add_patch(start)
