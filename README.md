@@ -320,7 +320,7 @@ CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --
 CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rsac --config configs/test/template_recurrent_1m.gin --run_id 1
 CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rsac --config configs/test/template_recurrent_1m.gin --run_id 2
 CUDA_VISIBLE_DEVICES=2 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rsac --config configs/test/template_recurrent_1m.gin --run_id 3
-CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rsac --config configs/test/template_recurrent_1m.gin --run_id 4
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rsac --config configs/test/template_recurrent_500k.gin --run_id 4
 ```
 
 ```bash
@@ -330,17 +330,36 @@ CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --
 CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rtd3 --config configs/test/template_recurrent_500k.gin --run_id 4
 ```
 
+```bash
+CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rdpg --config configs/test/template_recurrent_500k.gin --run_id 1
+CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rdpg --config configs/test/template_recurrent_500k.gin --run_id 2
+CUDA_VISIBLE_DEVICES=2 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rdpg --config configs/test/template_recurrent_500k.gin --run_id 3
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-watermaze python launch.py --env water-maze-simple-pomdp-v0 --algo rdpg --config configs/test/template_recurrent_500k.gin --run_id 4
+```
+
+**bumps-normal-test**
+
+```bash
+CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-bumps-normal-test python launch.py --env pbc-bumps-normal-test-v0 --algo sac --config configs/test/template_500k.gin --run_id 1 2 3 4
+```
+
+```bash
+CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-bumps-normal-test python launch.py --env pbc-bumps-normal-test-v0 --algo rdpg --config configs/test/template_recurrent_500k.gin --run_id 1 2 3 4
+```
+
+```bash
+CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-bumps-normal-test python launch.py --env pbc-bumps-normal-test-v0 --algo rtd3 --config configs/test/template_recurrent_500k.gin --run_id 1 2 3 4
+```
+
+```bash
+CUDA_VISIBLE_DEVICES=2 OFFPCC_WANDB_PROJECT=report-bumps-normal-test python launch.py --env pbc-bumps-normal-test-v0 --algo rsac --config configs/test/template_recurrent_500k.gin --run_id 1 2 3 4
+```
 
 
 
 
 
 
-
-
-
-
-## Extra
 
 #### How to add a custom domain
 
