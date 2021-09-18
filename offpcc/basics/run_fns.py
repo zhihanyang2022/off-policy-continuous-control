@@ -366,17 +366,31 @@ def train(
 
             # @@@@@@@@@@ console logging @@@@@@@@@@
 
-            stats_string = (
-                f"===============================================================\n"
-                f"| Epochs                  | {epoch}/{num_epochs}\n"
-                f"| Timesteps               | {t+1}\n"
-                f"| Episode Length (Train)  | {round(mean_train_episode_len, 2)}\n"
-                f"| Episode Return (Train)  | {round(mean_train_episode_ret, 2)}\n"
-                f"| Episode Length (Test)   | {round(mean_test_episode_len, 2)}\n"
-                f"| Episode Return (Test)   | {round(mean_test_episode_ret, 2)}\n"
-                f"| Hours                   | {round(hours_elapsed, 2)}\n"
-                f"==============================================================="
-            )  # this is a weird syntax trick but it just creates a single string
+            if env_is_pbc:
+
+                stats_string = (
+                    f"===============================================================\n"
+                    f"| Epochs                  | {epoch}/{num_epochs}\n"
+                    f"| Timesteps               | {t + 1}\n"
+                    f"| Episode Length (Train)  | {round(mean_train_episode_len, 2)}\n"
+                    f"| Episode Return (Train)  | {round(mean_train_episode_ret, 2)}\n"
+                    f"| Hours                   | {round(hours_elapsed, 2)}\n"
+                    f"==============================================================="
+                )  # this is a weird syntax trick but it just creates a single string
+
+            else:
+
+                stats_string = (
+                    f"===============================================================\n"
+                    f"| Epochs                  | {epoch}/{num_epochs}\n"
+                    f"| Timesteps               | {t+1}\n"
+                    f"| Episode Length (Train)  | {round(mean_train_episode_len, 2)}\n"
+                    f"| Episode Return (Train)  | {round(mean_train_episode_ret, 2)}\n"
+                    f"| Episode Length (Test)   | {round(mean_test_episode_len, 2)}\n"
+                    f"| Episode Return (Test)   | {round(mean_test_episode_ret, 2)}\n"
+                    f"| Hours                   | {round(hours_elapsed, 2)}\n"
+                    f"==============================================================="
+                )  # this is a weird syntax trick but it just creates a single string
 
             print(stats_string)
 
