@@ -301,7 +301,7 @@ register(
 )
 
 register(
-    id='pbc-bumps-normal-pomdp-test-v0',
+    id='pbc-bumps-normal-test-v0',
     entry_point='domains.robot_envs.bumps_norm_test:BumpsNormEnv',
     max_episode_steps=50
 )

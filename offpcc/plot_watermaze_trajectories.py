@@ -10,8 +10,12 @@ env = RescaleAction(gym.make("water-maze-simple-pomdp-v0"), -1, 1)
 algo = RecurrentSAC(input_dim=env.observation_space.shape[0], action_dim=env.action_space.shape[0])
 algo.load_actor("../results/water-maze-simple-pomdp-v0/rsac/2/")
 
-# env.set_platform(np.pi * 1.25)
-env.set_platform(np.random.uniform(0.75 * np.pi, 1.25 * np.pi))
+angle = 90
+env.set_platform(np.deg2rad(angle))
+
+# env.set_platform(np.pi * 0.85)
+# env.set_platform(np.random.uni
+# form(0.75 * np.pi, 1.25 * np.pi))
 obs = env.reset()
 trajs_toward_platform = []
 traj = []
@@ -44,7 +48,7 @@ while True:
 
 plt.figure(figsize=(4,4))
 
-def add_arrow(line, position=None, direction='right', size=30, color=None):
+def add_arrow(line, direction='right', size=30, color=None):
     """
     add an arrow to a line.
 
@@ -60,10 +64,12 @@ def add_arrow(line, position=None, direction='right', size=30, color=None):
     xdata = line.get_xdata()
     ydata = line.get_ydata()
 
-    if position is None:
-        position = xdata.mean()
     # find closest index
-    start_ind = np.argmin(np.absolute(xdata - position))
+    pos_x, pos_y = xdata.mean(), ydata.mean()
+    start_ind = np.argmin(np.absolute(xdata - pos_x) + np.absolute(ydata - pos_y))
+
+    if start_ind == len(xdata) - 1:
+        start_ind -= 1
     if direction == 'right':
         end_ind = start_ind + 1
     else:
@@ -92,7 +98,7 @@ for i, traj in enumerate(trajs_toward_platform):
     line = plt.plot(xs, ys, label=f"{i+1}{index_to_rank(i+1)} attempt")[0]
     # plt.scatter(xs[0], ys[0], color=line.get_color(), marker='o')
     # plt.scatter(xs[-1], ys[-1], color=line.get_color(), marker='o')
-    add_arrow(line)
+    # add_arrow(line)
 
 start = world = plt.Circle((0, 0), 0.025, color='black', fill=True)
 world = plt.Circle((0, 0), 1.0, color='black', fill=False)
@@ -104,6 +110,9 @@ plt.gca().add_patch(platform)
 plt.xlim(-1.1, 1.1)
 plt.ylim(-1.1, 1.1)
 plt.axis('off')
-plt.legend()
+if angle == 90:
+    legend = plt.legend(loc='lower right')
+    for line in legend.get_lines():
+        line.set_linewidth(4.0)
 
-plt.show()
+plt.savefig(f"../results/watermaze_policy_viz/watermaze_policy_viz_angle_{angle}.png", bbox_inches = 'tight', dpi=200)
