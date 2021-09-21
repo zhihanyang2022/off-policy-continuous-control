@@ -2,6 +2,7 @@ import argparse
 import gym
 from domains import *
 from pomdp_robot_domains import *
+import pybullet_envs
 import time
 
 parser = argparse.ArgumentParser()
@@ -9,7 +10,7 @@ parser.add_argument('--env', required=True, type=str)
 parser.add_argument('--use_random_policy', action="store_true")
 args = parser.parse_args()
 
-env = gym.wrappers.RescaleAction(gym.make(args.env, rendering=True), -1, 1)
+env = gym.wrappers.RescaleAction(gym.make(args.env), -1, 1)
 
 print('=> Env:', env)
 print('=> Timeout:', env.spec.max_episode_steps)
@@ -18,6 +19,7 @@ print('=> Observation space low:', env.observation_space.low)
 print('=> Observation space high:', env.observation_space.high)
 print('=> Random trajectory:')
 
+env.render()
 state = env.reset()
 print(state)
 

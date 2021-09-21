@@ -467,3 +467,9 @@ register(
     entry_point='domains.ur5_mdp_top:Ur5Env',
     max_episode_steps=10
 )
+
+register(
+    id='halfcheetah-p-v0',
+    entry_point='domains.pybullet_halfcheetah:p',
+    max_episode_steps=1000
+)
