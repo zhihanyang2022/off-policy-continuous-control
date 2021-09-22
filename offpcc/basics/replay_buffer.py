@@ -5,6 +5,8 @@ import torch.nn as nn
 from collections import namedtuple
 from basics.utils import get_device
 import kornia
+# import random
+# from collections import deque
 
 Transition = namedtuple('Transition', 's a r ns d')
 Batch = namedtuple('Batch', 's a r ns d')
@@ -14,7 +16,7 @@ Batch = namedtuple('Batch', 's a r ns d')
 # class ReplayBuffer:
 #     """Just a standard FIFO replay buffer."""
 #
-#     def __init__(self, capacity=int(1e6), batch_size=100):
+#     def __init__(self, input_shape, action_dim, capacity=int(1e6), batch_size=100):
 #         self.capacity = capacity
 #         self.memory = deque(maxlen=capacity)
 #         self.batch_size = batch_size

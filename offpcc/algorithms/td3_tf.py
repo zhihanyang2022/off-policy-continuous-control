@@ -1,7 +1,9 @@
 import gin
 
+import time
 import numpy as np
 import tensorflow as tf
+import tensorflow.keras as keras
 
 from basics.abstract_algorithms import OffPolicyRLAlgorithm
 from basics.actors_and_critics_tf import MLPTanhActor, MLPCritic
@@ -10,7 +12,7 @@ from basics.utils_tf import polyak_update, save_net, load_net
 
 
 @gin.configurable(module=__name__)
-class TD3(OffPolicyRLAlgorithm):
+class TD3_tf(OffPolicyRLAlgorithm):
 
     def __init__(
         self,
@@ -65,13 +67,13 @@ class TD3(OffPolicyRLAlgorithm):
 
         # optimizers
 
-        self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
-        self.Q1_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
-        self.Q2_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
+        self.actor_optimizer = keras.optimizers.Adam(learning_rate=lr)
+        self.Q1_optimizer = keras.optimizers.Adam(learning_rate=lr)
+        self.Q2_optimizer = keras.optimizers.Adam(learning_rate=lr)
 
     def act(self, state: np.array, deterministic: bool) -> np.array:
         state = tf.convert_to_tensor(state.reshape(1, -1))
-        greedy_action = self.actor(state)  # view as 1d -> to cpu -> to numpy
+        greedy_action = self.actor(state).numpy().reshape(-1)  # to numpy -> view as 1d
         if deterministic:
             return greedy_action
         else:
@@ -79,53 +81,46 @@ class TD3(OffPolicyRLAlgorithm):
 
     def update_networks(self, b: Batch):
 
-        # update learning rate
-
-        if self.lr_schedule is not None:
-            self.lr_scheduler.get_new_lr()
-
         bs = len(b.ns)  # for shape checking
-
-        # compute predictions
-
-        Q1_predictions = self.Q1(b.s, b.a)
-        Q2_predictions = self.Q2(b.s, b.a)
 
         # compute targets
 
-        with torch.no_grad():
+        na = self.actor_targ(b.ns)
+        noise = tf.clip_by_value(
+            tf.random.normal(na.shape) * self.target_noise, -self.noise_clip, self.noise_clip
+        )
+        smoothed_na = tf.clip_by_value(na + noise, -1, 1)
 
-            na = self.actor_targ(b.ns)
-            noise = torch.clamp(
-                torch.randn(na.size()) * self.target_noise, -self.noise_clip, self.noise_clip
-            ).to(get_device())
-            smoothed_na = torch.clamp(na + noise, -1, 1)
+        n_min_Q_targ = tf.math.minimum(self.Q1_targ((b.ns, smoothed_na)), self.Q2_targ((b.ns, smoothed_na)))
 
-            n_min_Q_targ = torch.min(self.Q1_targ(b.ns, smoothed_na), self.Q2_targ(b.ns, smoothed_na))
+        targets = b.r + self.gamma * (1 - b.d) * n_min_Q_targ
 
-            targets = b.r + self.gamma * (1 - b.d) * n_min_Q_targ
+        assert na.shape == (bs, self.action_dim)
+        assert n_min_Q_targ.shape == (bs, 1)
+        assert targets.shape == (bs, 1)
 
-            assert na.shape == (bs, self.action_dim)
-            assert n_min_Q_targ.shape == (bs, 1)
-            assert targets.shape == (bs, 1)
+        with tf.GradientTape(persistent=True) as tape:
 
-        # compute td error
+            # compute predictions
 
-        Q1_loss = torch.mean((Q1_predictions - targets) ** 2)
-        Q2_loss = torch.mean((Q2_predictions - targets) ** 2)
+            Q1_predictions = self.Q1((b.s, b.a))
+            Q2_predictions = self.Q2((b.s, b.a))
+
+            # compute td error
+
+            Q1_loss = tf.reduce_mean((Q1_predictions - targets) ** 2)
+            Q2_loss = tf.reduce_mean((Q2_predictions - targets) ** 2)
 
         assert Q1_loss.shape == ()
         assert Q2_loss.shape == ()
 
         # reduce td error
 
-        self.Q1_optimizer.zero_grad()
-        Q1_loss.backward()
-        self.Q1_optimizer.step()
+        Q1_gradients = tape.gradient(Q1_loss, self.Q1.trainable_weights)
+        self.Q1_optimizer.apply_gradients(zip(Q1_gradients, self.Q1.trainable_weights))
 
-        self.Q2_optimizer.zero_grad()
-        Q2_loss.backward()
-        self.Q2_optimizer.step()
+        Q2_gradients = tape.gradient(Q2_loss, self.Q2.trainable_weights)
+        self.Q2_optimizer.apply_gradients(zip(Q2_gradients, self.Q2.trainable_weights))
 
         self.num_Q_updates += 1
 
@@ -133,9 +128,13 @@ class TD3(OffPolicyRLAlgorithm):
 
             # compute policy loss
 
-            a = self.actor(b.s)
-            Q1_values = self.Q1(b.s, a)  # val stands for values
-            policy_loss = - torch.mean(Q1_values)
+
+
+            with tf.GradientTape() as tape:
+
+                a = self.actor(b.s)
+                Q1_values = self.Q1((b.s, a))
+                policy_loss = - tf.reduce_mean(Q1_values)
 
             self.mean_Q1_value = float(-policy_loss)
             assert a.shape == (bs, self.action_dim)
@@ -144,9 +143,8 @@ class TD3(OffPolicyRLAlgorithm):
 
             # reduce policy loss
 
-            self.actor_optimizer.zero_grad()
-            policy_loss.backward()
-            self.actor_optimizer.step()
+            policy_gradients = tape.gradient(policy_loss, self.actor.trainable_weights)
+            self.actor_optimizer.apply_gradients(zip(policy_gradients, self.actor.trainable_weights))
 
             # update target networks
 
@@ -156,8 +154,8 @@ class TD3(OffPolicyRLAlgorithm):
 
         return {
             # for learning the q functions
-            '(qfunc) Q1 pred': float(Q1_predictions.mean()),
-            '(qfunc) Q2 pred': float(Q2_predictions.mean()),
+            '(qfunc) Q1 pred': float(tf.reduce_mean(Q1_predictions)),
+            '(qfunc) Q2 pred': float(tf.reduce_mean(Q2_predictions)),
             '(qfunc) Q1 loss': float(Q1_loss),
             '(qfunc) Q2 loss': float(Q2_loss),
             # for learning the actor
@@ -165,7 +163,7 @@ class TD3(OffPolicyRLAlgorithm):
         }
 
     def save_actor(self, save_dir: str) -> None:
-        save_net(net=self.actor, save_dir=save_dir, save_name="actor.pth")
+        save_net(net=self.actor, save_dir=save_dir, save_name="actor.h5")
 
     def load_actor(self, save_dir: str) -> None:
-        load_net(net=self.actor, save_dir=save_dir, save_name="actor.pth")
+        load_net(net=self.actor, save_dir=save_dir, save_name="actor.h5")

@@ -1,0 +1,25 @@
+# ====================================================================================
+# gin macros
+# ====================================================================================
+
+num_epochs = 200
+num_steps_per_epoch = 1000
+num_test_episodes_per_epoch = 10
+update_after = 1000
+
+# ====================================================================================
+# applying the parameters above to two codebases (sb3 and ours)
+# ====================================================================================
+
+import basics.run_fns
+import basics_sb3.run_fns
+
+basics.run_fns.train.num_epochs = %num_epochs
+basics.run_fns.train.num_steps_per_epoch = %num_steps_per_epoch
+basics.run_fns.train.num_test_episodes_per_epoch = %num_test_episodes_per_epoch
+basics.run_fns.train.update_after = %update_after
+
+basics_sb3.run_fns.train_and_save_model.num_epochs = %num_epochs
+basics_sb3.run_fns.train_and_save_model.num_steps_per_epoch = %num_steps_per_epoch
+basics_sb3.run_fns.configure_ddpg.update_after = %update_after
+basics_sb3.run_fns.train_and_save_model.num_test_episodes_per_epoch = %num_test_episodes_per_epoch

@@ -1,6 +1,6 @@
 import gin
 import tensorflow as tf
-import tensorflow.keras as keras
+from tensorflow import keras
 
 
 @gin.configurable(module=__name__)
@@ -12,7 +12,7 @@ def make_MLP(num_in, num_out, final_activation, hidden_dimensions=(256, 256)):
     if num_out is not None:
         tensor_dimensions.append(num_out)
 
-    num_layers = len(tensor_dimensions) - 1
+    num_layers = len(tensor_dimensions)  # now including the input layer
     list_of_layers = []
 
     # tf uses lazy instantiation, so input dimension is inferred during forward pass
@@ -26,10 +26,7 @@ def make_MLP(num_in, num_out, final_activation, hidden_dimensions=(256, 256)):
             else:
                 list_of_layers.append(tf.keras.layers.Dense(output_dimension, activation=final_activation))
         else:
-            list_of_layers.extend([
-                tf.keras.layers.Dense(output_dimension),
-                tf.keras.layers.ReLU(),
-            ])
+            list_of_layers.append(tf.keras.layers.Dense(output_dimension, activation='relu'))
     net = keras.Sequential(list_of_layers)
 
     return net  # actual_num_out is not required
@@ -42,7 +39,7 @@ class MLPTanhActor(keras.Model):
         self.net = make_MLP(num_in=input_dim, num_out=action_dim, final_activation='tanh')
         self.build(input_shape=(None, input_dim))  # create the parameters within init based on call; crucial
 
-    def call(self, states: tf.Tensor, **kwargs):
+    def call(self, states: tf.Tensor):
         return self.net(states)
 
 
@@ -61,7 +58,7 @@ class MLPGaussianActor(keras.Model):
         self.LOG_STD_MAX = 2
         self.LOG_STD_MIN = -20
 
-    def call(self, states: tf.Tensor, **kwargs) -> tuple:
+    def call(self, states: tf.Tensor) -> tuple:
         out = self.shared_net(states)
         means, log_stds = self.means_layer(out), self.log_stds_layer(out)
         stds = tf.exp(tf.clip_by_value(log_stds, self.LOG_STD_MIN, self.LOG_STD_MAX))
@@ -75,5 +72,5 @@ class MLPCritic(keras.Model):
         self.net = make_MLP(num_in=input_dim + action_dim, num_out=1, final_activation=None)
         self.build(input_shape=(None, input_dim + action_dim))
 
-    def call(self, states: tf.Tensor, actions: tf.Tensor, **kwargs):
-        return self.net(tf.concat([states, actions], axis=-1))
+    def call(self, states_and_actions: tuple):
+        return self.net(tf.concat(states_and_actions, axis=-1))

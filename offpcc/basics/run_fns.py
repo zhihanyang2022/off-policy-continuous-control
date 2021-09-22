@@ -194,6 +194,7 @@ def train(
     algo_specific_stats_tracker = []
 
     start_time = time.perf_counter()
+    total_time_for_update_networks = 0
 
     # @@@@@@@@@@ training loop @@@@@@@@@@
 
@@ -280,7 +281,9 @@ def train(
                 if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
                     algo_specific_stats = algorithm_clone.update_networks(batch)
                 elif isinstance(algorithm, OffPolicyRLAlgorithm):
+                    _time = time.perf_counter()
                     algo_specific_stats = algorithm.update_networks(batch)
+                    total_time_for_update_networks += time.perf_counter() - _time
 
                 algo_specific_stats_tracker.append(algo_specific_stats)
 
@@ -389,6 +392,7 @@ def train(
                     f"| Episode Length (Test)   | {round(mean_test_episode_len, 2)}\n"
                     f"| Episode Return (Test)   | {round(mean_test_episode_ret, 2)}\n"
                     f"| Hours                   | {round(hours_elapsed, 2)}\n"
+                    f"| % used for update       | {round((total_time_for_update_networks / 60 / 60) / hours_elapsed * 100, 2)}\n"
                     f"==============================================================="
                 )  # this is a weird syntax trick but it just creates a single string
 
