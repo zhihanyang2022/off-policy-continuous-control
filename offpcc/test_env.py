@@ -1,7 +1,6 @@
 import argparse
 import gym
 from domains import *
-from pomdp_robot_domains import *
 import pybullet_envs
 import time
 
@@ -19,7 +18,7 @@ print('=> Observation space low:', env.observation_space.low)
 print('=> Observation space high:', env.observation_space.high)
 print('=> Random trajectory:')
 
-env.render()
+# env.render()
 state = env.reset()
 print(state)
 
@@ -27,8 +26,11 @@ ret = 0
 cnt = 0
 while True:
     state, reward, done, info = env.step(env.action_space.sample())
+
     # state, reward, done, info = env.step([0])
     env.render()
+    if cnt > 30:
+        time.sleep(10)
     ret += reward
     cnt += 1
     if not (cnt == env.spec.max_episode_steps):
