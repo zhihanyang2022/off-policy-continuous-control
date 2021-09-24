@@ -9,7 +9,6 @@ import pybullet_envs
 from gym.wrappers import RescaleAction
 
 from basics.replay_buffer import ReplayBuffer
-from basics.replay_buffer_tf import ReplayBuffer_tf
 from basics.replay_buffer_recurrent import RecurrentReplayBuffer
 from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
 from algorithms import *
@@ -20,7 +19,6 @@ from basics.run_fns import train, make_log_dir, load_and_visualize_policy
 algo_name2class = {
     'ddpg': DDPG,
     'td3': TD3,
-    'td3_tf': TD3_tf,
     'sac': SAC,
     'csac': ConvolutionalSAC,
     'rdpg': RecurrentDDPG,
@@ -99,20 +97,17 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
         )
 
         # creating buffer based on the need of the algorithm
-        if args.algo.endswith('_tf'):
-            buffer = ReplayBuffer_tf()
-        else:
-            if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
-                buffer = RecurrentReplayBuffer(
-                    o_dim=example_env.observation_space.shape[0],
-                    a_dim=example_env.action_space.shape[0],
-                    max_episode_len=example_env.spec.max_episode_steps
-                )
-            elif isinstance(algorithm, OffPolicyRLAlgorithm):
-                buffer = ReplayBuffer(
-                    input_shape=example_env.observation_space.shape,
-                    action_dim=example_env.action_space.shape[0]
-                )
+        if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+            buffer = RecurrentReplayBuffer(
+                o_dim=example_env.observation_space.shape[0],
+                a_dim=example_env.action_space.shape[0],
+                max_episode_len=example_env.spec.max_episode_steps
+            )
+        elif isinstance(algorithm, OffPolicyRLAlgorithm):
+            buffer = ReplayBuffer(
+                input_shape=example_env.observation_space.shape,
+                action_dim=example_env.action_space.shape[0]
+            )
 
         train(
             env_fn=env_fn,
