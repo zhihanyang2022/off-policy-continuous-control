@@ -356,11 +356,21 @@ CUDA_VISIBLE_DEVICES=2 OFFPCC_WANDB_PROJECT=report-bumps-normal-test python laun
 ```
 
 ```bash
-CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-bumps-normal-test python launch.py --env pbc-bumps-normal-test-v0 --algo rdpg --config configs/test/template_recurrent_500k.gin --run_id 4
-CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-bumps-normal-test python launch.py --env pbc-bumps-normal-test-v0 --algo rtd3 --config configs/test/template_recurrent_500k.gin --run_id 4
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-bumps-normal-test python launch.py --env pbc-bumps-normal-test-v0 --algo rdpg --config configs/test/template_recurrent_500k.gin --run_id 4 &&\
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-bumps-normal-test python launch.py --env pbc-bumps-normal-test-v0 --algo rtd3 --config configs/test/template_recurrent_500k.gin --run_id 4 &&\
 CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-bumps-normal-test python launch.py --env pbc-bumps-normal-test-v0 --algo rsac --config configs/test/template_recurrent_500k.gin --run_id 4
 ```
 
+**halfcheetah-p-v0**
+
+```bash
+CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-halfcheetah python launch.py --env HalfCheetahBulletEnv-v0 --algo sac --config configs/test/template_1m_pybullet.gin --run_id 1
+CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-halfcheetah python launch.py --env halfcheetah-p-v0 --algo sac --config configs/test/template_1m_pybullet.gin --run_id 1
+```
+
+```bash
+CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-halfcheetah python launch.py --env halfcheetah-p-v0 --algo rsac --config configs/test/template_recurrent_1m_pybullet.gin --run_id 1
+```
 
 
 
