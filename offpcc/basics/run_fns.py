@@ -50,6 +50,8 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
     @return:
     """
 
+    env.render()
+
     state, done, episode_return, episode_len, episode_success = env.reset(), False, 0, 0, None
 
     if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
@@ -92,7 +94,8 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
 
             else:
 
-                env.render()
+                # env.render()
+                pass
 
         episode_return += reward
         episode_len += 1

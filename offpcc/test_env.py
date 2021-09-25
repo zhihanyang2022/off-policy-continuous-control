@@ -3,6 +3,7 @@ import gym
 from domains import *
 import pybullet_envs
 import time
+import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--env', required=True, type=str)
@@ -28,9 +29,12 @@ while True:
     state, reward, done, info = env.step(env.action_space.sample())
 
     # state, reward, done, info = env.step([0])
-    env.render()
-    if cnt > 30:
-        time.sleep(10)
+    # env.render(mode='rgb_array')
+    img = plt.imshow(env.render(mode='rgb_array'))
+    plt.pause(0.01)  # Need min display time > 0.0.
+    plt.draw()
+    # if cnt > 30:
+    #     time.sleep(10)
     ret += reward
     cnt += 1
     if not (cnt == env.spec.max_episode_steps):
