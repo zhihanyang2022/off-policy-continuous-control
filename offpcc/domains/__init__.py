@@ -475,6 +475,12 @@ register(
 )
 
 register(
+    id='ant-p-v0',
+    entry_point='domains.pybullet_ant:p',
+    max_episode_steps=1000
+)
+
+register(
     id='dmc-pendulum-swingup-v0',
     entry_point='domains.dmc_pendulum_su:mdp',
     max_episode_steps=200
