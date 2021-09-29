@@ -4,8 +4,8 @@ from gym import spaces
 from gym.utils import seeding
 import copy
 import socket
-if socket.gethostname() not in ['theseus', 'SXC-Wichita']:
-    from gym.envs.classic_control import rendering as visualize
+# if socket.gethostname() not in ['theseus', 'SXC-Wichita']:
+#     from gym.envs.classic_control import rendering as visualize
 
 from domains.wrappers import FilterObsByIndex, ConcatObs
 
