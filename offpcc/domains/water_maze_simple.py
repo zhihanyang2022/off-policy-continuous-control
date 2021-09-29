@@ -7,7 +7,7 @@ import socket
 if socket.gethostname() not in ['theseus', 'SXC-Wichita']:
     from gym.envs.classic_control import rendering as visualize
 
-from domains.wrappers import FilterObsByIndex
+from domains.wrappers import FilterObsByIndex, ConcatObs
 
 
 def get_new_zeros():
@@ -180,3 +180,6 @@ def mdp():
 def pomdp():
     return FilterObsByIndex(mdp(), indices_to_keep=[0, 1, 2])
 
+
+def mdp_concat10():
+    return ConcatObs(pomdp(), window_size=10)
