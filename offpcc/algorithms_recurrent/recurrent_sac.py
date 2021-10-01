@@ -249,6 +249,8 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
             # for learning the q functions
             '(qfunc) Q1 pred': float(mean_of_unmasked_elements(Q1_predictions, b.m)),
             '(qfunc) Q2 pred': float(mean_of_unmasked_elements(Q2_predictions, b.m)),
+            '(qfunc) Q1 Q2 pairwise abs diff': float(
+                mean_of_unmasked_elements(torch.abs(Q1_predictions - Q2_predictions), b.m)),
             '(qfunc) Q1 loss': float(Q1_loss),
             '(qfunc) Q2 loss': float(Q2_loss),
             # for learning the actor
