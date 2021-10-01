@@ -372,6 +372,9 @@ CUDA_VISIBLE_DEVICES=0 OFFPCC_WANDB_PROJECT=report-halfcheetah python launch.py 
 CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=report-halfcheetah python launch.py --env halfcheetah-p-v0 --algo rsac --config configs/test/template_recurrent_1m_pybullet.gin --run_id 1
 ```
 
+```bash
+CUDA_VISIBLE_DEVICES=1 OFFPCC_WANDB_PROJECT=report-halfcheetah python launch.py --env halfcheetah-p-v0 --algo rsac --config configs/test/template_recurrent_1m_sl100_pybullet.gin --run_id 1
+```
 
 
 
