@@ -245,12 +245,21 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
         polyak_update(targ_net=self.Q1_targ, pred_net=self.Q1, polyak=self.polyak)
         polyak_update(targ_net=self.Q2_targ, pred_net=self.Q2, polyak=self.polyak)
 
+        m_numpy = b.m.pu().numpy().astype(bool)
+        Q1_predictions_numpy = Q1_predictions.detach().cpu().numpy()
+        Q2_predictions_numpy = Q2_predictions.detach().cpu().numpy()
+
+        Q1_predictions_filtered = Q1_predictions_numpy[m_numpy]
+        Q2_predictions_filtered = Q2_predictions_numpy[m_numpy]
+
+        corr_matrix = np.corrcoef(Q1_predictions_filtered, Q2_predictions_filtered)
+        corr = corr_matrix[0, 1]
+
         return {
             # for learning the q functions
             '(qfunc) Q1 pred': float(mean_of_unmasked_elements(Q1_predictions, b.m)),
             '(qfunc) Q2 pred': float(mean_of_unmasked_elements(Q2_predictions, b.m)),
-            '(qfunc) Q1 Q2 pairwise abs diff': float(
-                mean_of_unmasked_elements(torch.abs(Q1_predictions - Q2_predictions), b.m)),
+            '(qfunc) Q1 Q2 corr': corr,
             '(qfunc) Q1 loss': float(Q1_loss),
             '(qfunc) Q2 loss': float(Q2_loss),
             # for learning the actor
