@@ -245,7 +245,7 @@ class RecurrentSAC(RecurrentOffPolicyRLAlgorithm):
         polyak_update(targ_net=self.Q1_targ, pred_net=self.Q1, polyak=self.polyak)
         polyak_update(targ_net=self.Q2_targ, pred_net=self.Q2, polyak=self.polyak)
 
-        m_numpy = b.m.pu().numpy().astype(bool)
+        m_numpy = b.m.cpu().numpy().astype(bool)
         Q1_predictions_numpy = Q1_predictions.detach().cpu().numpy()
         Q2_predictions_numpy = Q2_predictions.detach().cpu().numpy()
 
