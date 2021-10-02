@@ -137,7 +137,7 @@ To reproduce paper results, simply run the commands in the previous section with
 
 ## Render learned policy
 
-Create a folder in the same directory as `offpcc`, called results. In there, create a folder with the name of the environment, e.g., `pendulum-p-v0`. Within that env folder, create a folder with the name of the algorithm, e.g., `rsac`. You can get an idea of the algorithms available from the `algo_name2class` diectionary defined in `offpcc/launch.py`. Within that algorithm folder, create a folder with the run_id, e.g., `1`. Simply put the saved actor (also actor summarizer for recurrent algorithms) into that inner most foler - they can be downloaded from the wandb website after your run finishes. Finally, go back into `offpcc`, and call
+Create a folder in the same directory as `offpcc`, called `results`. In there, create a folder with the name of the environment, e.g., `pendulum-p-v0`. Within that env folder, create a folder with the name of the algorithm, e.g., `rsac`. You can get an idea of the algorithms available from the `algo_name2class` diectionary defined in `offpcc/launch.py`. Within that algorithm folder, create a folder with the run_id, e.g., `1`. Simply put the saved actor (also actor summarizer for recurrent algorithms) into that inner most foler - they can be downloaded from the wandb website after your run finishes. Finally, go back into `offpcc`, and call
 
 ```pytho
 python launch.py --env pendulum-v0 --algo sac --config configs/test/template_short.gin --run_id 1 --render
