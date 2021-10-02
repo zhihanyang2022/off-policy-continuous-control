@@ -102,7 +102,7 @@ CUDA_VISIBLE_DEVICES=3 OFFPCC_WANDB_PROJECT=project123 python launch.py --env <e
 
 ### For DDPG, TD3, SAC
 
-On `Pendulum-v0` (from gym):
+On `pendulum-v0`:
 
 ```bash
 python launch.py --env pendulum-v0 --algo sac --config configs/test/template_short.gin --run_id 1
@@ -112,7 +112,7 @@ Commands and plots for benchmarking on Pybullet domains are in a Issue called â€
 
 ### For RecurrentDDPG, RecurrentTD3, RecurrentSAC
 
-On `Pendulum-p-v0` (custom env; position only)
+On `pendulum-p-v0`:
 
 ```bash
 python launch.py --env pendulum-p-v0 --algo rsac --config configs/test/template_recurrent_100k.gin --run_id 1
@@ -134,4 +134,14 @@ To reproduce paper results, simply run the commands in the previous section with
 -   `reacher-pomdp-v0`: `reacher-pomdp`
 -   `water-maze-simple-pomdp-v0`: `watermaze`
 -   `bumps-normal-test-v0`: `push-r-bump`
+
+## Render learned policy
+
+Create a folder in the same directory as `offpcc`, called results. In there, create a folder with the name of the environment, e.g., `pendulum-p-v0`. Within that env folder, create a folder with the name of the algorithm, e.g., `rsac`. You can get an idea of the algorithms available from the `algo_name2class` diectionary defined in `offpcc/launch.py`. Within that algorithm folder, create a folder with the run_id, e.g., `1`. Simply put the saved actor (also actor summarizer for recurrent algorithms) into that inner most foler - they can be downloaded from the wandb website after your run finishes. Finally, go back into `offpcc`, and call
+
+```pytho
+python launch.py --env pendulum-v0 --algo sac --config configs/test/template_short.gin --run_id 1 --render
+```
+
+For `bumps-normal-test-v0`, you need to modify the `test_for_one_episode` function within `offpcc/basics/run_fns.py` because, for Pybullet environments, the `env.step` must only appear once before the `env.reset()` call.
 
