@@ -2,6 +2,8 @@
 
 TODO: arXiv technical report soon available.
 
+Please ask any questions in Issues, thanks.
+
 ## Introduction
 
 This PyTorch repo implements off-policy RL algorithms for continuous control, including:
