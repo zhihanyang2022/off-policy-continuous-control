@@ -1,12 +1,18 @@
 ![offpcc_logo](https://user-images.githubusercontent.com/43589364/132990408-91d68fa7-5bed-4298-b554-da6da4c80fd2.png)
 
+arXiv technical report soon available.
+
+we are updating the readme to be as comprehensive as possible
+
+Please ask any questions in Issues, thanks.
+
 ## Introduction
 
 This PyTorch repo implements off-policy RL algorithms for continuous control, including:
 
 -   Standard algorithms: DDPG, TD3, SAC
 -   Image-based algorithm: ConvolutionalSAC
--   Recurrent algorithms: RecurrentDPG, RecurrentTD3, RecurrentSAC, RecurrentSACNoSharing (see report)
+-   Recurrent algorithms: RecurrentDPG, RecurrentTD3, RecurrentSAC, RecurrentSACSharing (see report)
 
 where recurrent algorithms are generally not available in other repos.
 
