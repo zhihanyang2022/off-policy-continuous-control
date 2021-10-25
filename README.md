@@ -1,6 +1,8 @@
 ![offpcc_logo](https://user-images.githubusercontent.com/43589364/132990408-91d68fa7-5bed-4298-b554-da6da4c80fd2.png)
 
-TODO: arXiv technical report soon available.
+arXiv technical report soon available.
+
+we are updating the readme to be as comprehensive as possible
 
 Please ask any questions in Issues, thanks.
 
