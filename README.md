@@ -1,4 +1,4 @@
-![offpcc_logo](https://user-images.githubusercontent.com/43589364/132990408-91d68fa7-5bed-4298-b554-da6da4c80fd2.png)
+# Recurrent Off-policy Baselines for Memory-based Continuous Control
 
 This repo offers:
 
