@@ -16,6 +16,7 @@ Paper summary: We implement and benchmark recurrent versions of DDPG, TD3 and SA
 This repo offers:
 
 - DDPG, TD3 and SAC (clean PyTorch implementation and benchmarked against stable-baselines3)
+  - The results of benchmarking can be found in issue "Performance check against SB3" in closed Issues.
 - Recurrent versions of DDPG, TD3 and SAC that use full history: RDPG, RTD3 and RSAC
 - Very easy to understand and use; see our exhaustive documentation: [link](https://drive.google.com/drive/folders/1iUy5BslSN4zia7VqxqyRnSda4lJO0thV?usp=sharing)
 
