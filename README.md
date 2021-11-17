@@ -1,9 +1,5 @@
 ### Recurrent Off-policy Baselines for Memory-based Continuous Control
 
-TL;DR: We implement and benchmark recurrent versions of DDPG, TD3 and SAC that uses full history.
-
-This is the codebase for the following paper:
-
 ```
 @article{yang2021recurrent,
   title={Recurrent Off-policy Baselines for Memory-based Continuous Control},
@@ -12,6 +8,10 @@ This is the codebase for the following paper:
   year={2021}
 }
 ```
+
+Summary of our paper: We implement and benchmark recurrent versions of DDPG, TD3 and SAC that uses full history.
+
+This repo is the official codebase of our paper. 
 
 This repo offers:
 
