@@ -1,4 +1,6 @@
-### Recurrent Off-policy Baselines for Memory-based Continuous Control
+### off-policy-continuous-control
+
+This repo is the official codebase of our following paper:
 
 ```
 @article{yang2021recurrent,
@@ -11,11 +13,9 @@
 
 Paper summary: We implement and benchmark recurrent versions of DDPG, TD3 and SAC that uses full history.
 
-This repo is the official codebase of our paper. 
-
 This repo offers:
 
-- DDPG, TD3 and SAC (clean implementation and benchmarked against stable-baselines3)
+- DDPG, TD3 and SAC (clean PyTorch implementation and benchmarked against stable-baselines3)
 - Recurrent versions of DDPG, TD3 and SAC that use full history: RDPG, RTD3 and RSAC
 - Very easy to understand and use; see our exhaustive documentation: [link](https://drive.google.com/drive/folders/1iUy5BslSN4zia7VqxqyRnSda4lJO0thV?usp=sharing)
 
