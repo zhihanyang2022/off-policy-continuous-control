@@ -1,5 +1,7 @@
 ### Recurrent Off-policy Baselines for Memory-based Continuous Control
 
+TL;DR: We implement and benchmark recurrent versions of DDPG, TD3 and SAC that uses full history.
+
 This is the codebase for the following paper:
 
 ```
