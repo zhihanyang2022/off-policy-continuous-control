@@ -20,3 +20,5 @@ This repo offers:
 - Very easy to understand and use; see our exhaustive documentation: [link](https://drive.google.com/drive/folders/1iUy5BslSN4zia7VqxqyRnSda4lJO0thV?usp=sharing)
 
 When cloning this repo, please consider using shallow clone as it is large due to a large number of commits.
+
+Please feel free to ask a code question through Issues.
