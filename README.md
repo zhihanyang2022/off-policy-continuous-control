@@ -1,6 +1,6 @@
 # Recurrent Off-policy Baselines for Memory-based Continuous Control
 
-This is the codebase for the following papers:
+This is the codebase for the following paper:
 
 ```
 @article{yang2021recurrent,
