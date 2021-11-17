@@ -9,7 +9,7 @@
 }
 ```
 
-Summary of our paper: We implement and benchmark recurrent versions of DDPG, TD3 and SAC that uses full history.
+Paper summary: We implement and benchmark recurrent versions of DDPG, TD3 and SAC that uses full history.
 
 This repo is the official codebase of our paper. 
 
