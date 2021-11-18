@@ -1,26 +1,13 @@
-# please use python 3.6 (otherwise can't install tensorflow < 2.0.0)
-torch==1.8.0
-numpy==1.19.5
-gym==0.15.7
-mujoco-py==2.0.2.13
-matplotlib
-gin-config
-pandas
-wandb
-cloudpickle==1.2.1
-gym[atari,box2d,classic_control]~=0.15.3
-numpy
-pandas
-psutil
-scipy
-seaborn
-tqdm
-joblib
-pybullet
-# stable-baselines3 (plz install this on your own, i.e., via pip install)
-# mjlib
-# dm_control
-# our own dmc2gym wrapper
-# pybullet
-# kornia
-# pomdp-robot-domains
+dmc2gym==1.0.0
+gin_config==0.4.0
+gym==0.21.0
+kornia==0.5.11
+matplotlib==3.4.3
+meshcat==0.3.2
+mujoco_py==2.0.2.13
+numpy==1.21.4
+opencv_python==4.5.3.56
+pybullet==3.1.9
+stable_baselines3==1.2.0
+torch==1.9.1
+transforms3d==0.3.1
