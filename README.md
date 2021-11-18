@@ -21,10 +21,9 @@ This repo offers:
 
 \*The results of benchmarking can be found in issue "Performance check against SB3" in closed Issues.
 
-When cloning this repo, please consider using shallow clone as it is large due to a large number of commits.
-
-Please feel free to ask a code question through Issues.
+For users:
+- Please feel free to ask a code question through Issues.
+- When cloning this repo, please consider using shallow clone as it is large due to a large number of commits.
 
 News:
-- [2021/11/18] Used `pipreqs` to generate `requirements.txt` based on imports.
 - [2021/11/18] Noticed that I forgot to document dependencies in documentation. Added.
