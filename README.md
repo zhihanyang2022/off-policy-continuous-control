@@ -24,3 +24,7 @@ This repo offers:
 When cloning this repo, please consider using shallow clone as it is large due to a large number of commits.
 
 Please feel free to ask a code question through Issues.
+
+News:
+- [2021/11/18] Used `pipreqs` to generate `requirements.txt` based on imports.
+- [2021/11/18] Noticed that I forgot to document dependencies in documentation. Added.
