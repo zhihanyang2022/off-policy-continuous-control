@@ -53,7 +53,10 @@ class PositionalEncoding(nn.Module):
     def forward(self, observations):
         # return self.dropout(token_embedding + self.pos_embedding[:token_embedding.size(0), :])
         # observations has shape (bs, seq_len, obs_size)
-        return observations + self.pos_embedding[:, :observations.size(1), :]
+        try:
+            return observations + self.pos_embedding[:, :observations.size(1), :]
+        except:
+            print(observations.shape)
 
 
 def generate_square_subsequent_mask(sz):
