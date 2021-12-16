@@ -10,9 +10,10 @@ from gym.wrappers import RescaleAction
 
 from basics.replay_buffer import ReplayBuffer
 from basics.replay_buffer_recurrent import RecurrentReplayBuffer
-from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
+from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm, TransformerOffPolicyRLAlgorithm
 from algorithms import *
 from algorithms_recurrent import *
+from algorithms_transformer import *
 
 from basics.run_fns import train, make_log_dir, load_and_visualize_policy
 
@@ -24,7 +25,8 @@ algo_name2class = {
     'rdpg': RecurrentDDPG,
     'rtd3': RecurrentTD3,
     'rsac': RecurrentSAC,
-    'rsac_s': RecurrentSACSharing
+    'rsac_s': RecurrentSACSharing,
+    'tdpg': TransformerDDPG
 }
 
 parser = argparse.ArgumentParser()
@@ -60,10 +62,17 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
             action_dim=example_env.action_space.shape[0],
         )
     else:
-        algorithm = algo_name2class[args.algo](
-            input_dim=example_env.observation_space.shape[0],
-            action_dim=example_env.action_space.shape[0],
-        )
+        if not args.algo.startswith('t'):  # t for transformers
+            algorithm = algo_name2class[args.algo](
+                input_dim=example_env.observation_space.shape[0],
+                action_dim=example_env.action_space.shape[0],
+            )
+        else:
+            algorithm = algo_name2class[args.algo](
+                input_dim=example_env.observation_space.shape[0],
+                action_dim=example_env.action_space.shape[0],
+                max_len=example_env.spec.max_episode_steps
+            )
 
     if args.render:
 
@@ -97,7 +106,8 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
         )
 
         # creating buffer based on the need of the algorithm
-        if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+        if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm) \
+                or isinstance(algorithm, TransformerOffPolicyRLAlgorithm):
             buffer = RecurrentReplayBuffer(
                 o_dim=example_env.observation_space.shape[0],
                 a_dim=example_env.action_space.shape[0],

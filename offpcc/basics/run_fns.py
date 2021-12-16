@@ -12,7 +12,7 @@ import numpy as np
 from gym.wrappers import Monitor
 import cv2
 
-from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
+from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm, TransformerOffPolicyRLAlgorithm
 from basics.replay_buffer import ReplayBuffer
 from basics.replay_buffer_recurrent import RecurrentReplayBuffer
 
@@ -56,6 +56,8 @@ def test_for_one_episode(env, algorithm, render=False, env_from_dmc=False, rende
 
     if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
         algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
+    if isinstance(algorithm, TransformerOffPolicyRLAlgorithm):
+        algorithm.reinitialize_prev_observations()
 
     if render and env_from_dmc:
         cv2.namedWindow('img', cv2.WINDOW_NORMAL)
@@ -150,7 +152,7 @@ def load_and_visualize_policy(
 @gin.configurable(module=__name__)
 def train(
         env_fn,
-        algorithm: Union[OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm],
+        algorithm: Union[OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm, TransformerOffPolicyRLAlgorithm],
         buffer: Union[ReplayBuffer, RecurrentReplayBuffer],
         num_epochs=gin.REQUIRED,
         num_steps_per_epoch=gin.REQUIRED,
@@ -202,7 +204,7 @@ def train(
 
     state = env.reset()
 
-    if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+    if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm) or isinstance(algorithm, TransformerOffPolicyRLAlgorithm):
 
         # Since algorithm is a recurrent policy, it (ideally) shouldn't be updated during an episode since this would
         # affect its ability to interpret past hidden states. Therefore, during an episode, algorithm_clone is updated
@@ -252,7 +254,7 @@ def train(
             cutoff = False
 
         # store the transition
-        if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+        if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm) or isinstance(algorithm, TransformerOffPolicyRLAlgorithm):
             buffer.push(state, action, reward, next_state, done, cutoff)
         elif isinstance(algorithm, OffPolicyRLAlgorithm):
             buffer.push(state, action, reward, next_state, done)
@@ -273,6 +275,11 @@ def train(
                 algorithm.copy_networks_from(algorithm_clone)
                 algorithm.reinitialize_hidden()  # crucial, crucial step for recurrent agents
 
+            elif isinstance(algorithm, TransformerOffPolicyRLAlgorithm):
+
+                algorithm.copy_networks_from(algorithm_clone)
+                algorithm.reinitialize_prev_observations()  # crucial, crucial step for transformer agents
+
         # @@@@@@@@@@ update handling @@@@@@@@@@
 
         if t >= update_after and (t + 1) % update_every == 0:
@@ -280,7 +287,8 @@ def train(
 
                 batch = buffer.sample()
 
-                if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+                if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm) \
+                        or isinstance(algorithm, TransformerOffPolicyRLAlgorithm):
                     algo_specific_stats = algorithm_clone.update_networks(batch)
                 elif isinstance(algorithm, OffPolicyRLAlgorithm):
                     algo_specific_stats = algorithm.update_networks(batch)
@@ -321,7 +329,8 @@ def train(
 
                 test_episode_lens, test_episode_rets = [], []
 
-                if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm):
+                if isinstance(algorithm, RecurrentOffPolicyRLAlgorithm) \
+                        or isinstance(algorithm, TransformerOffPolicyRLAlgorithm):
                     # testing may happen during the middle of an episode, and hence "algorithm" may not contain the
                     # latest parameters
                     test_algorithm = deepcopy(algorithm_clone)
