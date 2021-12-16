@@ -87,6 +87,8 @@ class TransformerSummarizer(nn.Module):
         # 1. (bs, max_len, obs_size) - in update_networks
         # 2. (1, 1, obs_size) - in this case, we need prev_observations (1, seq_len, obs_size), if it is not None
 
+        observations_len = observations.size()[1]
+
         if prev_observations is not None:
             observations = torch.cat([prev_observations, observations], dim=1)
 
@@ -100,4 +102,4 @@ class TransformerSummarizer(nn.Module):
         # Case 1: squeeze does nothing
         # Case 2: (1, hidden_size), which is perfect for inputting into the MLP actors and critics
 
-        return summary[:, -observations.size()[1]:, ].squeeze()
+        return summary[:, -observations_len:, ].squeeze()
