@@ -78,6 +78,7 @@ class TransformerDDPG(TransformerOffPolicyRLAlgorithm):
             else:
                 self.prev_observations = torch.cat([self.prev_observations, observation], dim=1)  # along seq_len dim
             greedy_action = self.actor(summary).view(-1).cpu().numpy()  # view as 1d -> to cpu -> to numpy
+            print(greedy_action)
             if deterministic:
                 return greedy_action
             else:
