@@ -71,7 +71,7 @@ class TransformerSummarizer(nn.Module):
 
     def __init__(self, obs_size, hidden_dim, max_len):
         super(TransformerSummarizer, self).__init__()
-        self.positional_encoding = PositionalEncoding(obs_size, max_len)
+        self.positional_encoding = PositionalEncoding(hidden_dim, max_len)
         self.pre_mlp = nn.Linear(obs_size, hidden_dim)
         encoder_layer = nn.TransformerEncoderLayer(
             d_model=hidden_dim,
@@ -92,9 +92,10 @@ class TransformerSummarizer(nn.Module):
         if prev_observations is not None:
             observations = torch.cat([prev_observations, observations], dim=1)
 
-        observations = self.positional_encoding(observations)
+        embedded = self.pre_mlp(observations)
+        embedded = self.positional_encoding(embedded)
         mask = generate_square_subsequent_mask(observations.size()[1])
-        summary = self.transformer_encoder(src=self.pre_mlp(observations), mask=mask)  # (bs, maxlen or seq_len, hidden_dim)
+        summary = self.transformer_encoder(src=embedded, mask=mask)  # (bs, maxlen or seq_len, hidden_dim)
 
         # we can safely squeeze here because only in the second case would the squeeze be in effect
         # i.e., maxlen > 1
