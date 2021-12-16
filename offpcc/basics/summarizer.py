@@ -75,11 +75,11 @@ class TransformerSummarizer(nn.Module):
         self.pre_mlp = nn.Linear(obs_size, hidden_dim)
         encoder_layer = nn.TransformerEncoderLayer(
             d_model=hidden_dim,
-            nhead=4,
-            dropout=0,
+            nhead=8,
+            dropout=0.1,
             batch_first=True
         )
-        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, 2)
+        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, 4)
 
     def forward(self, observations, prev_observations=None):
 
