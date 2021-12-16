@@ -40,6 +40,8 @@ class PositionalEncoding(nn.Module):
                  maxlen: int):
         super(PositionalEncoding, self).__init__()
 
+        maxlen = maxlen + 1
+
         den = torch.exp(- torch.arange(0, obs_size, 2) * math.log(10000) / obs_size)
         pos = torch.arange(0, maxlen).reshape(maxlen, 1)
         pos_embedding = torch.zeros((maxlen, obs_size))
