@@ -113,6 +113,18 @@ class TransformerEncoderLayer(nn.Module):
 
         return x
 
+        # self-attention block
+    def _sa_block(self, x, attn_mask, key_padding_mask):
+        x = self.self_attn(x, x, x,
+                           attn_mask=attn_mask,
+                           key_padding_mask=key_padding_mask,
+                           need_weights=False)[0]
+        return self.dropout1(x)
+
+    # feed forward block
+    def _ff_block(self, x):
+        x = self.linear2(self.dropout(self.activation(self.linear1(x))))
+        return self.dropout2(x)
 
 
 class PositionalEncoding(nn.Module):
