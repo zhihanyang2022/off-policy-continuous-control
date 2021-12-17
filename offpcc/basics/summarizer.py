@@ -75,7 +75,7 @@ class TransformerSummarizer(nn.Module):
             dropout=0,
             batch_first=True
         )
-        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, 4)
+        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, 6)
 
     def forward(self, observations, prev_observations=None):
 
