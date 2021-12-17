@@ -34,31 +34,26 @@ class Summarizer(nn.Module):
 
 
 class PositionalEncoding(nn.Module):
+
     def __init__(self,
-                 obs_size: int,
+                 hidden_dim: int,
                  # dropout: float,
                  maxlen: int):
         super(PositionalEncoding, self).__init__()
 
-        maxlen = maxlen + 1
+        maxlen = maxlen + 1  # if maxlen is episode length, then the number of observations we store is maxlen + 1
 
-        den = torch.exp(- torch.arange(0, obs_size, 2) * math.log(10000) / obs_size)
+        den = torch.exp(- torch.arange(0, hidden_dim, 2) * math.log(10000) / hidden_dim)
         pos = torch.arange(0, maxlen).reshape(maxlen, 1)
-        pos_embedding = torch.zeros((maxlen, obs_size))
+        pos_embedding = torch.zeros((maxlen, hidden_dim))
         pos_embedding[:, 0::2] = torch.sin(pos * den)
         pos_embedding[:, 1::2] = torch.cos(pos * den)
         pos_embedding = pos_embedding.unsqueeze(0)  # (1, maxlen, obs_size)
 
-        # self.dropout = nn.Dropout(dropout)
-        self.register_buffer('pos_embedding', pos_embedding)  # so that it will be saved
+        self.register_buffer('pos_embedding', pos_embedding)  # it will be saved as model parameters, but not updated
 
-    def forward(self, observations):
-        # return self.dropout(token_embedding + self.pos_embedding[:token_embedding.size(0), :])
-        # observations has shape (bs, seq_len, obs_size)
-        try:
-            return observations + self.pos_embedding[:, :observations.size(1), :]
-        except:
-            print(observations.shape)
+    def forward(self, embedded):
+        return embedded + self.pos_embedding[:, :embedded.size(1), :]
 
 
 def generate_square_subsequent_mask(sz):
@@ -71,12 +66,13 @@ class TransformerSummarizer(nn.Module):
 
     def __init__(self, obs_size, hidden_dim, max_len):
         super(TransformerSummarizer, self).__init__()
+
+        self.input_projector = nn.Linear(obs_size, hidden_dim)
         self.positional_encoding = PositionalEncoding(hidden_dim, max_len)
-        self.pre_mlp = nn.Linear(obs_size, hidden_dim)
         encoder_layer = nn.TransformerEncoderLayer(
             d_model=hidden_dim,
             nhead=8,
-            dropout=0.1,
+            dropout=0,
             batch_first=True
         )
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, 4)
@@ -87,15 +83,15 @@ class TransformerSummarizer(nn.Module):
         # 1. (bs, max_len, obs_size) - in update_networks
         # 2. (1, 1, obs_size) - in this case, we need prev_observations (1, seq_len, obs_size), if it is not None
 
-        observations_len = observations.size()[1]
-
         if prev_observations is not None:
-            observations = torch.cat([prev_observations, observations], dim=1)
+            x = torch.cat([prev_observations, observations], dim=1)
+        else:
+            x = observations
 
-        embedded = self.pre_mlp(observations)
-        embedded = self.positional_encoding(embedded)
-        mask = generate_square_subsequent_mask(observations.size()[1])
-        summary = self.transformer_encoder(src=embedded, mask=mask)  # (bs, maxlen or seq_len, hidden_dim)
+        x = self.input_projector(x)
+        x = self.positional_encoding(x)
+        mask = generate_square_subsequent_mask(x.size()[1])
+        summary = self.transformer_encoder(src=x, mask=mask)  # (bs, maxlen or seq_len, hidden_dim)
 
         # we can safely squeeze here because only in the second case would the squeeze be in effect
         # i.e., maxlen > 1
@@ -103,4 +99,4 @@ class TransformerSummarizer(nn.Module):
         # Case 1: squeeze does nothing
         # Case 2: (1, hidden_size), which is perfect for inputting into the MLP actors and critics
 
-        return summary[:, -observations_len:, ].squeeze()
+        return summary[:, -observations.size()[1]:, ].squeeze()
