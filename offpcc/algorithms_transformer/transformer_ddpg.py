@@ -72,7 +72,7 @@ class TransformerDDPG(TransformerOffPolicyRLAlgorithm):
 
         with torch.no_grad():
             observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
-            summary = self.actor_summarizer(observation, self.prev_observations)  # (1, 1, hidden_size)
+            summary = self.actor_summarizer(observation, self.prev_observations)  # (1, hidden_size)
             # print('Summary:', summary.shape)
             if self.prev_observations is None:
                 self.prev_observations = observation
