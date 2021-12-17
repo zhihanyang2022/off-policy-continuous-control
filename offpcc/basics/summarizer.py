@@ -98,4 +98,4 @@ class TransformerSummarizer(nn.Module):
         # Case 1: squeeze does nothing
         # Case 2: (1, hidden_size), which is perfect for inputting into the MLP actors and critics
 
-        return summary[:, -observations.size()[1]:, ].squeeze()
+        return summary[:, -observations.size()[1]:, ]
