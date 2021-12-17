@@ -72,14 +72,17 @@ class TransformerDDPG(TransformerOffPolicyRLAlgorithm):
 
         with torch.no_grad():
 
+            # compute input to actor
             observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
-            summary = self.actor_summarizer(observation, self.prev_observations)
+            summary = self.actor_summarizer(observation, self.prev_observations)  # (1, 1, hidden_dim)
 
+            # update prev observations
             if self.prev_observations is None:
                 self.prev_observations = observation
             else:
                 self.prev_observations = torch.cat([self.prev_observations, observation], dim=1)  # along seq_len dim
 
+            # compute action
             greedy_action = self.actor(summary).view(-1).cpu().numpy()  # view as 1d -> to cpu -> to numpy
 
             if deterministic:
