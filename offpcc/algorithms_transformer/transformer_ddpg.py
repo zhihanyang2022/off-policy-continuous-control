@@ -74,7 +74,6 @@ class TransformerDDPG(TransformerOffPolicyRLAlgorithm):
 
             observation = torch.tensor(observation).unsqueeze(0).unsqueeze(0).float().to(get_device())
             summary = self.actor_summarizer(observation, self.prev_observations)
-            print(summary.shape)
 
             if self.prev_observations is None:
                 self.prev_observations = observation
