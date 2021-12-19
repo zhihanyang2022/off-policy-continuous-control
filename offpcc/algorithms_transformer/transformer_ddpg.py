@@ -4,6 +4,8 @@ import numpy as np
 import torch
 import torch.optim as optim
 
+import wandb
+
 from basics.abstract_algorithms import TransformerOffPolicyRLAlgorithm
 from basics.summarizer import TransformerSummarizer
 from basics.actors_and_critics import MLPTanhActor, MLPCritic
@@ -64,6 +66,14 @@ class TransformerDDPG(TransformerOffPolicyRLAlgorithm):
 
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
         self.Q_optimizer = optim.Adam(self.Q.parameters(), lr=lr)
+
+        # tracking gradients in wandb
+
+        wandb.watch(self.actor_summarizer, log='all')
+        wandb.watch(self.critic_summarizer, log='all')
+
+        wandb.watch(self.actor, log='all')
+        wandb.watch(self.Q, log='all')
 
     def reinitialize_prev_observations(self) -> None:
         self.prev_observations = None
