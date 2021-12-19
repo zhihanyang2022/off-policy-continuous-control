@@ -164,7 +164,7 @@ class TransformerSummarizer(nn.Module):
         self.input_projector = nn.Linear(obs_size, hidden_dim)
         self.positional_encoding = PositionalEncoding(hidden_dim, max_len)
         encoder_layer = nn.TransformerEncoderLayer(
-            d_model=512, nhead=8,
+            d_model=256, nhead=8,
             dim_feedforward=1024, dropout=0,
             batch_first=True
         )
