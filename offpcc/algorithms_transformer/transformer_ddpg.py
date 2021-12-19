@@ -23,7 +23,7 @@ class TransformerDDPG(TransformerOffPolicyRLAlgorithm):
         input_dim,
         action_dim,
         max_len,
-        hidden_dim=256,
+        hidden_dim=128,
         gamma=0.99,
         lr=3e-4,
         polyak=0.995,
@@ -61,19 +61,11 @@ class TransformerDDPG(TransformerOffPolicyRLAlgorithm):
 
         # optimizers
 
-        self.actor_summarizer_optimizer = optim.Adam(self.actor_summarizer.parameters(), lr=lr / 10)
-        self.critic_summarizer_optimizer = optim.Adam(self.critic_summarizer.parameters(), lr=lr / 10)
+        self.actor_summarizer_optimizer = optim.Adam(self.actor_summarizer.parameters(), lr=lr)
+        self.critic_summarizer_optimizer = optim.Adam(self.critic_summarizer.parameters(), lr=lr)
 
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
         self.Q_optimizer = optim.Adam(self.Q.parameters(), lr=lr)
-
-        # tracking gradients in wandb
-
-        wandb.watch(self.actor_summarizer, log='all')
-        wandb.watch(self.critic_summarizer, log='all')
-
-        wandb.watch(self.actor, log='all')
-        wandb.watch(self.Q, log='all')
 
     def reinitialize_prev_observations(self) -> None:
         self.prev_observations = None
@@ -168,7 +160,7 @@ class TransformerDDPG(TransformerOffPolicyRLAlgorithm):
 
         policy_loss.backward()
 
-        torch.nn.utils.clip_grad_norm_(self.actor_summarizer.parameters(), 1.0)
+        # torch.nn.utils.clip_grad_norm_(self.actor_summarizer.parameters(), 1.0)
 
         self.actor_summarizer_optimizer.step()
         self.actor_optimizer.step()
