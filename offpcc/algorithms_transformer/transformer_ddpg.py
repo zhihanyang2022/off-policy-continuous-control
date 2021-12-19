@@ -59,8 +59,8 @@ class TransformerDDPG(TransformerOffPolicyRLAlgorithm):
 
         # optimizers
 
-        self.actor_summarizer_optimizer = optim.Adam(self.actor_summarizer.parameters(), lr=lr)
-        self.critic_summarizer_optimizer = optim.Adam(self.critic_summarizer.parameters(), lr=lr)
+        self.actor_summarizer_optimizer = optim.Adam(self.actor_summarizer.parameters(), lr=lr / 10)
+        self.critic_summarizer_optimizer = optim.Adam(self.critic_summarizer.parameters(), lr=lr / 10)
 
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr)
         self.Q_optimizer = optim.Adam(self.Q.parameters(), lr=lr)
@@ -157,6 +157,8 @@ class TransformerDDPG(TransformerOffPolicyRLAlgorithm):
         self.actor_optimizer.zero_grad()
 
         policy_loss.backward()
+
+        nn.utils.clip_grad_norm_(self.actor_summarizer.parameters(), 0.5)
 
         self.actor_summarizer_optimizer.step()
         self.actor_optimizer.step()
