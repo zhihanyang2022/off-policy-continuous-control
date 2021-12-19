@@ -158,7 +158,7 @@ class TransformerDDPG(TransformerOffPolicyRLAlgorithm):
 
         policy_loss.backward()
 
-        nn.utils.clip_grad_norm_(self.actor_summarizer.parameters(), 0.5)
+        nn.utils.clip_grad_norm_(self.actor_summarizer.parameters(), 1.0)
 
         self.actor_summarizer_optimizer.step()
         self.actor_optimizer.step()
