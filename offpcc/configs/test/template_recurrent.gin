@@ -5,7 +5,7 @@
 capacity = 5000  # 1M / 200 = 5000
 batch_size = 10
 
-num_epochs = 6000
+num_epochs = 300
 num_steps_per_epoch = 1000
 update_after = 10000
 num_test_episodes_per_epoch = 100

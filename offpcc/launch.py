@@ -10,6 +10,7 @@ from gym.wrappers import RescaleAction
 from basics.replay_buffer import ReplayBuffer
 from basics.replay_buffer_recurrent import RecurrentReplayBufferGlobal
 from basics.abstract_algorithms import OffPolicyRLAlgorithm, RecurrentOffPolicyRLAlgorithm
+from basics.utils import NoisyObsWrapper, RandomActWrapper
 from algorithms import *
 from algorithms_recurrent import *
 
@@ -32,6 +33,18 @@ parser.add_argument('--run_id', nargs='+', type=int, required=True)
 parser.add_argument('--config', type=str, required=True, help='Task-specific hyperparameters')
 parser.add_argument('--render', action='store_true', help='Visualize a trained policy (no training happens)')
 parser.add_argument('--record', action='store_true', help='Record a trained policy (no training happens)')
+parser.add_argument(
+        '--noisy-obs',
+        action='store_true',
+        help='Noisy observation'
+    )
+
+parser.add_argument(
+        '--random-act',
+        action='store_true',
+        help='Random action with some probability'
+    ) 
+
 
 args = parser.parse_args()
 assert not (args.render and args.record), "You should only set one of these two flags."
@@ -41,10 +54,19 @@ gin.parse_config_file(args.config)
 
 def env_fn():
     """Any wrapper by default copies the observation and action space of its wrappee."""
-    if args.env.startswith("bumps"):  # some of our custom envs require special treatment
-        return RescaleAction(gym.make(args.env, rendering=args.render), -1, 1)
-    else:
-        return RescaleAction(gym.make(args.env, rendering=args.render), -1, 1)
+    # if args.env.startswith("bumps"):  # some of our custom envs require special treatment
+    #     return RescaleAction(gym.make(args.env, rendering=args.render), -1, 1)
+    # else:
+    #     return RescaleAction(gym.make(args.env, rendering=args.render), -1, 1)
+
+    if args.noisy_obs:
+        print("Noisy obs")
+        return NoisyObsWrapper(gym.make(args.env, rendering=args.render))
+
+    if args.random_act:
+        print("Random act")
+        return RandomActWrapper(gym.make(args.env, rendering=args.render))
+
 
 
 example_env = env_fn()
@@ -92,7 +114,7 @@ for run_id in args.run_id:  # args.run_id is a list of ints; could contain more 
         run = wandb.init(
             project=env_name + 'baselines',
             # entity='hainh22',
-            group=f"state-visit-{args.algo} {args.env}",
+            group=f"{args.noisy_obs}{args.random_act}state-visit-{args.algo} {args.env}",
             settings=wandb.Settings(_disable_stats=True),
             name=f's{run_id}',
         )

@@ -5,6 +5,7 @@ from copy import deepcopy
 import numpy as np
 import torch
 import torch.nn as nn
+import gym
 
 
 def get_device():
@@ -62,3 +63,39 @@ def create_target(net: nn.Module) -> nn.Module:
     target = deepcopy(net)
     set_requires_grad_flag(target, False)
     return target
+
+
+class NoisyObsWrapper(gym.ObservationWrapper):
+    def __init__(self, env, noise_p=0.9, noise_delta=0.1, untouched_lst=[]):
+        """
+        Replace o_t with a uniform sample in [o_t*(1-self.delta), o_t*(1+self.delta)] with a probability self.p
+        """
+        super(NoisyObsWrapper, self).__init__(env)
+        self.p = noise_p
+        self.delta = noise_delta
+        self.untouched_lst = untouched_lst
+
+    def observation(self, observation):
+        if np.random.binomial(1, self.p, 1).item():
+            observation_perturbed = np.random.uniform(low=observation*(1-self.delta), high=observation*(1+self.delta), size=observation.shape)
+
+            for i in self.untouched_lst:
+                observation_perturbed[i] = observation[i]
+
+            return observation_perturbed
+
+        return observation
+
+
+class RandomActWrapper(gym.ActionWrapper):
+    def __init__(self, env, noise_p=0.1):
+        """
+        Replace a_t with a uniform sample in [-1.0, 1.0] with a probability p
+        """
+        super(RandomActWrapper, self).__init__(env)
+        self.p = noise_p
+
+    def action(self, action):
+        if random.random() < self.p:
+            return self.env.action_space.sample()
+        return action
