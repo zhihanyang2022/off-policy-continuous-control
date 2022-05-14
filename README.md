@@ -1,4 +1,4 @@
-Poster (open in new tab for better resolution):
+Poster (click to open in new tab for better resolution):
 
 ![poster](https://user-images.githubusercontent.com/43589364/147326061-576303a8-694e-4503-b0c4-1812d4191488.jpeg)
 
