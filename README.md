@@ -1,11 +1,3 @@
-Poster (click to open in new tab for better resolution):
-
-![poster](https://user-images.githubusercontent.com/43589364/147326061-576303a8-694e-4503-b0c4-1812d4191488.jpeg)
-
-Paper link:
-
-https://arxiv.org/pdf/2110.12628.pdf
-
 ### off-policy-continuous-control
 
 This repo is the official codebase of our following paper:
@@ -35,3 +27,11 @@ For users:
 
 News:
 - [2021/11/18] Noticed that I forgot to document dependencies in documentation. Added.
+
+Paper link:
+
+https://arxiv.org/pdf/2110.12628.pdf
+
+Poster (click to open in new tab for better resolution):
+
+![poster](https://user-images.githubusercontent.com/43589364/147326061-576303a8-694e-4503-b0c4-1812d4191488.jpeg)
