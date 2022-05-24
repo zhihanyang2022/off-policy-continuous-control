@@ -1,4 +1,4 @@
-### off-policy-continuous-control
+### Recurrent Off-policy Baselines for Memory-based Continuous Control
 
 This repo is the official codebase of our following paper:
 
