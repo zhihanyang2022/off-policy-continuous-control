@@ -2,7 +2,7 @@
 
 This repo is the official codebase of our following paper:
 
-```
+```bibtex
 @article{yang2021recurrent,
   title={Recurrent Off-policy Baselines for Memory-based Continuous Control},
   author={Yang, Zhihan and Nguyen, Hai},
