@@ -35,3 +35,7 @@ https://arxiv.org/pdf/2110.12628.pdf
 Poster (click to open in new tab for better resolution):
 
 ![poster](https://user-images.githubusercontent.com/43589364/147326061-576303a8-694e-4503-b0c4-1812d4191488.jpeg)
+
+Star history:
+
+[![Star History Chart](https://api.star-history.com/svg?repos=zhihanyang2022/off-policy-continuous-control&type=Date)](https://star-history.com/#zhihanyang2022/off-policy-continuous-control&Date)
